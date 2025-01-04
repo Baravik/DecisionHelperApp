@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decision Helper"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:paddingBottom="24dp"
+        android:textColor="@color/black" />
+
+    <!-- Start Quiz Button -->
+    <Button
+        android:id="@+id/btnStartQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Quiz"
+        android:backgroundTint="@color/primary"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Rate Questions Button -->
+    <Button
+        android:id="@+id/btnRateQuestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rate Questions"
+        android:backgroundTint="@color/secondary"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Add Questions/Quiz Button -->
+    <Button
+        android:id="@+id/btnAddQuestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Questions/Quiz"
+        android:backgroundTint="@color/gray"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
+
+    <!-- Admin Panel Button -->
+    <Button
+        android:id="@+id/btnAdminPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Admin Panel"
+        android:backgroundTint="@color/error"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+</LinearLayout>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Decision Helper</string>
+
+    <!-- Main Activity -->
+    <string name="main_title">Decision Helper</string>
+    <string name="start_quiz">Start Quiz</string>
+    <string name="rate_questions">Rate Questions</string>
+    <string name="add_questions">Add Questions/Quiz</string>
+    <string name="admin_panel">Admin Panel</string>
+
+    <!-- Quiz Activity -->
+    <string name="quiz_title">Quiz</string>
+    <string name="question_progress">Question %1$d of %2$d</string>
+    <string name="submit_quiz">Submit Quiz</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+
+    <!-- Rating Activity -->
+    <string name="rating_title">Rate Importance</string>
+    <string name="submit_rating">Submit Rating</string>
+    <string name="rate_prompt">Rate the importance of the question:</string>
+
+    <!-- Admin Activity -->
+    <string name="admin_title">Admin Panel</string>
+    <string name="pending_requests">Pending Requests:</string>
+    <string name="approve">Approve</string>
+    <string name="reject">Reject</string>
+
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error">Something went wrong. Please try again.</string>
+    <string name="success">Operation successful!</string>
+
+    <!-- Confirmation -->
+    <string name="confirm_submit">Are you sure you want to submit?</string>
+    <string name="confirm_approve">Are you sure you want to approve this?</string>
+    <string name="confirm_reject">Are you sure you want to reject this?</string>
+
+</resources>

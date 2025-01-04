@@ -1,0 +1,30 @@
+<resources>
+    <!-- Primary Colors -->
+    <color name="primary">#6200EE</color> <!-- Indigo -->
+    <color name="primary_dark">#3700B3</color> <!-- Dark Indigo -->
+    <color name="on_primary">#FFFFFF</color> <!-- White -->
+
+    <!-- Secondary Colors -->
+    <color name="secondary">#03DAC6</color> <!-- Teal -->
+    <color name="secondary_dark">#018786</color> <!-- Dark Teal -->
+    <color name="on_secondary">#FFFFFF</color> <!-- White -->
+
+    <!-- Background and Surface -->
+    <color name="background">#FFFFFF</color> <!-- White -->
+    <color name="on_background">#000000</color> <!-- Black -->
+    <color name="surface">#FFFFFF</color> <!-- White -->
+    <color name="on_surface">#000000</color> <!-- Black -->
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color> <!-- Black -->
+    <color name="text_secondary">#808080</color> <!-- Gray -->
+
+    <!-- Status and Error Colors -->
+    <color name="error">#B00020</color> <!-- Red -->
+    <color name="on_error">#FFFFFF</color> <!-- White -->
+
+    <!-- Neutral Colors -->
+    <color name="gray">#808080</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
