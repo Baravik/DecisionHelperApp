@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
-    <string name="app_name">Decision Helper</string>
+    <string name="app_name">DecisionHelperApp</string>
 
     <!-- Main Activity -->
     <string name="main_title">Decision Helper</string>
@@ -11,8 +11,9 @@
     <string name="admin_panel">Admin Panel</string>
 
     <!-- Quiz Activity -->
-    <string name="quiz_title">Quiz</string>
+    <string name="quiz_title">Quiz: Should I Buy This?</string>
     <string name="question_progress">Question %1$d of %2$d</string>
+    <string name="question_text">Do I have enough space for this product?</string>
     <string name="submit_quiz">Submit Quiz</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -20,9 +21,9 @@
     <string name="next">Next</string>
 
     <!-- Rating Activity -->
-    <string name="rating_title">Rate Importance</string>
+    <string name="rating_title">Rate the Importance of the Question</string>
+    <string name="rating_question">How important is this question to you?</string>
     <string name="submit_rating">Submit Rating</string>
-    <string name="rate_prompt">Rate the importance of the question:</string>
 
     <!-- Admin Activity -->
     <string name="admin_title">Admin Panel</string>
@@ -39,5 +40,11 @@
     <string name="confirm_submit">Are you sure you want to submit?</string>
     <string name="confirm_approve">Are you sure you want to approve this?</string>
     <string name="confirm_reject">Are you sure you want to reject this?</string>
+
+    <!-- New Strings -->
+    <string name="score">Score: %1$d</string>
+    <string name="recommendation_not_recommended">Not recommended</string>
+    <string name="recommendation_consider_it">Consider it</string>
+    <string name="recommendation_good_idea">Seems like a good idea</string>
 
 </resources>
