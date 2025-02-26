@@ -1,3 +1,5 @@
+package com.decisionhelperapp.database;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -5,9 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
-
-package com.decisionhelperapp.database;
-
 
 public class RatingDAO {
 
@@ -17,10 +16,14 @@ public class RatingDAO {
     private static final String COLUMN_COMMENT = "comment";
 
     private SQLiteDatabase db;
-    private DBHelper dbHelper;
+    private SQLiteOpenHelper dbHelper;
 
     public RatingDAO(Context context) {
-        dbHelper = new DBHelper(context);
+        this.dbHelper = new DBHelper(context);
+    }
+
+    public RatingDAO(SQLiteOpenHelper dbHelper) {
+        this.dbHelper = dbHelper;
     }
 
     public void open() {

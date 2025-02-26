@@ -4,6 +4,7 @@ public class Quiz {
     private int quizId;
     private String title;
     private String description;
+    private boolean Synced;
 
     public Quiz(int quizId, String title, String description) {
         this.quizId = quizId;
@@ -34,4 +35,8 @@ public class Quiz {
     public void setDescription(String description) {
         this.description = description;
     }
+    public void setSynced(boolean Synced) {
+        this.Synced = Synced;
+    }
+
 }

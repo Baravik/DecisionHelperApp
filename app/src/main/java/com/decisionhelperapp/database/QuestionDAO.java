@@ -14,8 +14,14 @@ public class QuestionDAO {
 
     private DatabaseHelper dbHelper;
 
+    // New constructor: allows passing an existing DatabaseHelper
+    public QuestionDAO(DatabaseHelper dbHelper) {
+        this.dbHelper = dbHelper;
+    }
+
+    // Existing constructor: accepts a Context and creates a new DatabaseHelper instance
     public QuestionDAO(Context context) {
-        dbHelper = new DatabaseHelper(context);
+        this(new DatabaseHelper(context));
     }
 
     // Inserts a new Question into the database
@@ -37,8 +43,8 @@ public class QuestionDAO {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 question = new Question();
-                question.setId(cursor.getLong(cursor.getColumnIndex("id")));
-                question.setQuestionText(cursor.getString(cursor.getColumnIndex("question_text")));
+                // Removed: question.setId(cursor.getLong(cursor.getColumnIndex("id")));
+                question.setQuestionText(cursor.getString(cursor.getColumnIndexOrThrow("question_text")));
                 // Set additional fields as needed
             }
             cursor.close();
@@ -55,8 +61,8 @@ public class QuestionDAO {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 Question question = new Question();
-                question.setId(cursor.getLong(cursor.getColumnIndex("id")));
-                question.setQuestionText(cursor.getString(cursor.getColumnIndex("question_text")));
+                // Removed: question.setId(cursor.getLong(cursor.getColumnIndex("id")));
+                question.setQuestionText(cursor.getString(cursor.getColumnIndexOrThrow("question_text")));
                 // Set additional fields as needed
                 questions.add(question);
             } while (cursor.moveToNext());
@@ -66,13 +72,13 @@ public class QuestionDAO {
         return questions;
     }
 
-    // Updates an existing Question
-    public int updateQuestion(Question question) {
+    // Updates an existing Question using the provided id
+    public int updateQuestion(long id, Question question) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("question_text", question.getQuestionText());
         // Add other fields to update as necessary
-        int rows = db.update("questions", values, "id = ?", new String[]{String.valueOf(question.getId())});
+        int rows = db.update("questions", values, "id = ?", new String[]{String.valueOf(id)});
         db.close();
         return rows;
     }

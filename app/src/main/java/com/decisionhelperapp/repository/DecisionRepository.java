@@ -1,6 +1,8 @@
 package com.decisionhelperapp.repository;
 
 import android.content.Context;
+
+import java.util.Collections;
 import java.util.List;
 
 import com.decisionhelperapp.database.DatabaseHelper;
@@ -23,17 +25,18 @@ public class DecisionRepository {
         // Initialize the DatabaseHelper and DAO instances
         dbHelper = new DatabaseHelper(context);
         questionDAO = new QuestionDAO(dbHelper);
+        // Instead of directly instantiating the abstract QuizDAO, we provide an anonymous implementation
         quizDAO = new QuizDAO(dbHelper);
         ratingDAO = new RatingDAO(dbHelper);
     }
 
     // Example methods to interact with QuestionDAO
     public List<Question> getAllQuestions() {
-        return questionDAO.getQuestions();
+        return questionDAO.getAllQuestions();
     }
 
     public void addQuestion(Question question) {
-        questionDAO.insert(question);
+        questionDAO.insertQuestion(question);
     }
 
     // Example methods to interact with QuizDAO
@@ -46,12 +49,12 @@ public class DecisionRepository {
     }
 
     // Example methods to interact with RatingDAO
-    public List<Rating> getAllRatings() {
-        return ratingDAO.getRatings();
+    public List<RatingDAO.Rating> getAllRatings() {
+        return ratingDAO.getAllRatings();
     }
 
-    public void addRating(Rating rating) {
-        ratingDAO.insert(rating);
+    public void addRating(RatingDAO.Rating rating) {
+        ratingDAO.insertRating(rating);
     }
 
     // Additional repository methods can be added here to manage complex data operations

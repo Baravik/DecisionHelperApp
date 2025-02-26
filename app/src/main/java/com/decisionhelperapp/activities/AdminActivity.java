@@ -1,12 +1,11 @@
 package com.decisionhelperapp.activities;
 
 import android.os.Bundle;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.decisionhelperapp.R;
+import com.example.decisionhelperapp.R;
 import com.decisionhelperapp.viewmodel.AdminViewModel;
 
 public class AdminActivity extends AppCompatActivity {
@@ -20,11 +19,9 @@ public class AdminActivity extends AppCompatActivity {
         // Initialize AdminViewModel
         AdminViewModel adminViewModel = new ViewModelProvider(this).get(AdminViewModel.class);
 
-        // Example: Update a TextView with the admin status
-        TextView statusTextView = findViewById(R.id.adminStatusTextView);
-        adminViewModel.getStatus().observe(this, status -> {
-            statusTextView.setText(status);
-        });
+        // Removed the reference to adminStatusTextView since it does not exist in layout
+        // Removed: TextView statusTextView = findViewById(R.id.adminStatusTextView);
+        // Removed: adminViewModel.getStatus().observe(this, status -> { statusTextView.setText(status); });
 
         // TODO: Add functionality for managing questions/quizzes
     }

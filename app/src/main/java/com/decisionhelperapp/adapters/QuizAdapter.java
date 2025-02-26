@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.decisionhelperapp.R;
+import com.example.decisionhelperapp.R;
 import com.decisionhelperapp.models.Question;
 import java.util.List;
 
@@ -22,26 +22,17 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false);
         return new QuizViewHolder(view);
-        }
+    }
 
-        @Override
-        public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
+    @Override
+    public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
         Question question = questionList.get(position);
         holder.questionTextView.setText(question.getQuestionText());
-        // Bind additional question details if available
-        TextView detailsTextView = holder.itemView.findViewById(R.id.questionDetailsTextView);
-        if (question.getDetails() != null && !question.getDetails().isEmpty()) {
-            detailsTextView.setVisibility(View.VISIBLE);
-            detailsTextView.setText(question.getDetails());
-        } else {
-            detailsTextView.setVisibility(View.GONE);
-        }
-        }
+        // Removed binding for question details as 'Question' does not have getDetails method
+    }
 
-        @Override
-        public int getItemCount() {
-        return questionList.size();
-        }
+    @Override
+    public int getItemCount() {
         return questionList.size();
     }
 

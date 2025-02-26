@@ -2,6 +2,7 @@ package com.decisionhelperapp.utils;
 
 import android.content.Context;
 
+import com.decisionhelperapp.database.DatabaseHelper;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.models.Quiz;
 
@@ -10,9 +11,12 @@ import java.util.List;
 // This class handles offline storage of quizzes and syncs them once internet is available
 public class OfflineSyncManager {
 
+    private static DatabaseHelper dbHelper;
+
     // Save quiz data locally when offline
     public static void saveQuizOffline(Context context, Quiz quiz) {
-        QuizDAO quizDAO = new QuizDAO(context);
+        dbHelper = new DatabaseHelper(context);
+        QuizDAO quizDAO = new QuizDAO(dbHelper);
         // Assume the Quiz model has a 'synced' boolean field
         quiz.setSynced(false);
         quizDAO.insertQuiz(quiz);
@@ -24,7 +28,7 @@ public class OfflineSyncManager {
         if (!ApiService.isInternetAvailable(context)) {
             return;
         }
-        QuizDAO quizDAO = new QuizDAO(context);
+        QuizDAO quizDAO = new QuizDAO(dbHelper);
         List<Quiz> unsyncedQuizzes = quizDAO.getUnsyncedQuizzes();
         if (unsyncedQuizzes == null || unsyncedQuizzes.isEmpty()) {
             return;
@@ -35,7 +39,7 @@ public class OfflineSyncManager {
             if (!response.startsWith("Error") && !response.equals("Connection timed out")) {
                 // Mark quiz as synced upon successful upload
                 quiz.setSynced(true);
-                quizDAO.updateQuiz(quiz);
+                quizDAO.update(quiz);
             }
         }
     }

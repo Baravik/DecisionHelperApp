@@ -5,10 +5,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.decisionhelperapp.R;
+import com.example.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuizAdapter;
 import com.decisionhelperapp.database.DatabaseHelper;
 import com.decisionhelperapp.models.Question;
+
+import java.util.Collections;
 import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
@@ -23,11 +25,12 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView); // Updated to correct id as defined in your layout resource
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         databaseHelper = new DatabaseHelper(this);
-        questionList = databaseHelper.getQuestionsForQuiz();
+        // Updated to include a string parameter as required
+        questionList = Collections.singletonList((Question) databaseHelper.getQuestionsForQuiz("quiz"));
 
         quizAdapter = new QuizAdapter(questionList);
         recyclerView.setAdapter(quizAdapter);

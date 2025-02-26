@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import com.decisionhelperapp.R;
+import com.example.decisionhelperapp.R;
 import com.decisionhelperapp.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().hide();
 
         // Initialize MainViewModel
         MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
             userTextView.setText(user);
         });
 
-        Button startQuizButton = findViewById(R.id.startQuizButton);
+        Button startQuizButton = findViewById(R.id.btnStartQuiz);
         startQuizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

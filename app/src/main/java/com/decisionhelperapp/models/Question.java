@@ -17,6 +17,10 @@ public class Question {
         this.scoreIfYes = scoreIfYes;
     }
 
+    public Question() {
+        // Empty constructor added
+    }
+
     public int getQuestionId() {
         return questionId;
     }
@@ -63,5 +67,11 @@ public class Question {
 
     public void setScoreIfYes(int scoreIfYes) {
         this.scoreIfYes = scoreIfYes;
+    }
+
+    public int getSelectedOptionScore() {
+        // TODO: implement score calculation logic for the selected answer
+        // For now, we return 0 as a placeholder
+        return 0;
     }
 }

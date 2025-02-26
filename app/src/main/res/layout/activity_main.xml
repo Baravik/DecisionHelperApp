@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:padding="24dp">
 
     <!-- Title -->
     <TextView
         android:id="@+id/tvAppTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Decision Helper"
-        android:textSize="24sp"
-        android:textStyle="bold"
         android:layout_gravity="center"
         android:paddingBottom="24dp"
-        android:textColor="@color/black" />
+        android:text="@string/main_title"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <!-- Start Quiz Button -->
     <Button
         android:id="@+id/btnStartQuiz"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Quiz"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/primary"
-        android:textColor="@color/white"
-        android:layout_marginBottom="16dp" />
+        android:text="@string/start_quiz"
+        android:textColor="@color/white" />
 
-    <!-- Rate Questions Button -->
+    <TextView
+        android:id="@+id/userStatusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Status" />
+
     <Button
         android:id="@+id/btnRateQuestions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Rate Questions"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/secondary"
-        android:textColor="@color/white"
-        android:layout_marginBottom="16dp" />
+        android:text="Rate Questions"
+        android:textColor="@color/white" />
 
     <!-- Add Questions/Quiz Button -->
     <Button
         android:id="@+id/btnAddQuestions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Questions/Quiz"
-        android:backgroundTint="@color/gray"
-        android:textColor="@color/white"
         android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/gray"
+        android:text="Add Questions/Quiz"
+        android:textColor="@color/white"
         android:visibility="gone" />
 
     <!-- Admin Panel Button -->
@@ -55,8 +60,8 @@
         android:id="@+id/btnAdminPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Admin Panel"
         android:backgroundTint="@color/error"
+        android:text="Admin Panel"
         android:textColor="@color/white"
         android:visibility="gone" />
 </LinearLayout>

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 // ViewModel for Admin activity
 public class AdminViewModel extends ViewModel {
 
-    private MutableLiveData<String> status = new MutableLiveData<>("Ready");
+    private final MutableLiveData<String> status = new MutableLiveData<>("Ready");
 
     public LiveData<String> getStatus() {
         return status;
