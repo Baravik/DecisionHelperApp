@@ -32,7 +32,16 @@ public class QuizActivity extends AppCompatActivity {
         quizAdapter = new QuizAdapter(questionList);
         recyclerView.setAdapter(quizAdapter);
 
-        // TODO: Calculate total score based on user's answers
-        // TODO: Navigate to RatingActivity after completion
+        // Calculate total score based on the selected answers
+        totalScore = 0;
+        for (Question question : questionList) {
+            // Assuming a method getSelectedOptionScore() exists that returns the score for the chosen answer.
+            totalScore += question.getSelectedOptionScore();
+        }
+
+        // Navigate to RatingActivity with the calculated score
+        Intent intent = new Intent(QuizActivity.this, RatingActivity.class);
+        intent.putExtra("EXTRA_SCORE", totalScore);
+        startActivity(intent);
     }
 }

@@ -22,17 +22,26 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false);
         return new QuizViewHolder(view);
-    }
+        }
 
-    @Override
-    public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
+        @Override
+        public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
         Question question = questionList.get(position);
         holder.questionTextView.setText(question.getQuestionText());
-        // TODO: Bind other question details
-    }
+        // Bind additional question details if available
+        TextView detailsTextView = holder.itemView.findViewById(R.id.questionDetailsTextView);
+        if (question.getDetails() != null && !question.getDetails().isEmpty()) {
+            detailsTextView.setVisibility(View.VISIBLE);
+            detailsTextView.setText(question.getDetails());
+        } else {
+            detailsTextView.setVisibility(View.GONE);
+        }
+        }
 
-    @Override
-    public int getItemCount() {
+        @Override
+        public int getItemCount() {
+        return questionList.size();
+        }
         return questionList.size();
     }
 
