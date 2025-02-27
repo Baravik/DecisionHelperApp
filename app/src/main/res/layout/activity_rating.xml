@@ -39,7 +39,27 @@
         android:rating="0"
         android:layout_gravity="center"
         android:paddingBottom="24dp" />
+    
+    <!-- Score TextView -->
+    <TextView
+        android:id="@+id/scoreTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Score: "
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:paddingTop="16dp" />
 
+    <!-- Recommendation TextView -->
+    <TextView
+        android:id="@+id/recommendationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recommendation: "
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:paddingTop="8dp" />
+    
     <!-- Submit Button -->
     <Button
         android:id="@+id/btnSubmitRating"
