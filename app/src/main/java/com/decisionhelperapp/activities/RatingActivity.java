@@ -2,14 +2,13 @@ package com.decisionhelperapp.activities;
 
 import android.os.Bundle;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.models.Scores;
 import java.util.List;
 import java.util.Objects;
 
-public class RatingActivity extends AppCompatActivity {
+public class RatingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -16,6 +16,8 @@ import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.UsersViewModel;
 import com.OpenU.decisionhelperapp.R;
 
+import java.util.Objects;
+
 public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUserClickListener {
     
     private UsersViewModel usersViewModel;
@@ -28,7 +30,7 @@ public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUs
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
 
         // Initialize views

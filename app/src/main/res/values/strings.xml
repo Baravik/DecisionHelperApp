@@ -46,5 +46,8 @@
     <string name="recommendation_not_recommended">Not recommended</string>
     <string name="recommendation_consider_it">Consider it</string>
     <string name="recommendation_good_idea">Seems like a good idea</string>
+    <string name="login_with_google">Login with Google</string>
+    <string name="user">User</string>
+    <string name="default_web_client_id">0</string>
 
 </resources>

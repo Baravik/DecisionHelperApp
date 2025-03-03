@@ -1,7 +1,15 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_user"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="User"
-        android:showAsAction="always" />
+        android:title="@string/user"
+        app:showAsAction="ifRoom" />
+    
+    <!-- Added Google Login menu option -->
+    <item
+        android:id="@+id/action_google_login"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="@string/login_with_google"
+        app:showAsAction="always" />
 </menu>
