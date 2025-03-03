@@ -4,12 +4,18 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.decisionhelperapp.R;
+import com.decisionhelperapp.database.ScoresDAO;
+import com.decisionhelperapp.models.Scores;
+import java.util.List;
+import java.util.Objects;
 
 public class RatingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rating);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+
 
         TextView scoreTextView = findViewById(R.id.scoreTextView);
         TextView recommendationTextView = findViewById(R.id.recommendationTextView);
@@ -26,5 +32,20 @@ public class RatingActivity extends AppCompatActivity {
             recommendation = "Seems like a good idea";
         }
         recommendationTextView.setText(recommendation);
+
+        // Fetch scores from Firebase
+        ScoresDAO scoresDAO = new ScoresDAO();
+        scoresDAO.getAllScores(new ScoresDAO.ScoresCallback() {
+            @Override
+            public void onCallback(List<Scores> scoresList) {
+                // Update UI with scores
+                // ...
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Handle error
+            }
+        });
     }
 }

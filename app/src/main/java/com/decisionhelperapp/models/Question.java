@@ -1,77 +1,61 @@
 package com.decisionhelperapp.models;
 
 public class Question {
-    private int questionId;
-    private int quizId;
-    private String questionText;
-    private String questionType;
-    private String possibleAnswers;
-    private int scoreIfYes;
+    private String description;
+    private String id;
+    private int score;
+    private String type;
+    private String title;
 
-    public Question(int questionId, int quizId, String questionText, String questionType, String possibleAnswers, int scoreIfYes) {
-        this.questionId = questionId;
-        this.quizId = quizId;
-        this.questionText = questionText;
-        this.questionType = questionType;
-        this.possibleAnswers = possibleAnswers;
-        this.scoreIfYes = scoreIfYes;
+    public Question(String description, String id, int score, String type, String title) {
+        this.description = description;
+        this.id = id;
+        this.score = score;
+        this.type = type;
+        this.title = title;
     }
 
     public Question() {
         // Empty constructor added
     }
 
-    public int getQuestionId() {
-        return questionId;
+    public String getDescription() {
+        return description;
     }
 
-    public void setQuestionId(int questionId) {
-        this.questionId = questionId;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public int getQuizId() {
-        return quizId;
+    public String getId() {
+        return id;
     }
 
-    public void setQuizId(int quizId) {
-        this.quizId = quizId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getQuestionText() {
-        return questionText;
+    public int getScore() {
+        return score;
     }
 
-    public void setQuestionText(String questionText) {
-        this.questionText = questionText;
+    public void setScore(int score) {
+        this.score = score;
     }
 
-    public String getQuestionType() {
-        return questionType;
+    public String getType() {
+        return type;
     }
 
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getPossibleAnswers() {
-        return possibleAnswers;
+    public String getTitle() {
+        return title;
     }
 
-    public void setPossibleAnswers(String possibleAnswers) {
-        this.possibleAnswers = possibleAnswers;
-    }
-
-    public int getScoreIfYes() {
-        return scoreIfYes;
-    }
-
-    public void setScoreIfYes(int scoreIfYes) {
-        this.scoreIfYes = scoreIfYes;
-    }
-
-    public int getSelectedOptionScore() {
-        // TODO: implement score calculation logic for the selected answer
-        // For now, we return 0 as a placeholder
-        return 0;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

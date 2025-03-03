@@ -39,6 +39,16 @@
         <activity
             android:name="com.decisionhelperapp.activities.AdminActivity"
             android:label="@string/admin_title" />
+            
+        <!-- Scores Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.ScoresActivity"
+            android:label="Scores" />
+
+        <!-- Users Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.UsersActivity"
+            android:label="Users" />
 
         <!-- File Provider (optional, add if you share files) -->
         <provider

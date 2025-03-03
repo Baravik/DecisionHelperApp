@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.decisionhelperapp.models.Quiz; // added import
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "decision_helper.db";
@@ -29,12 +30,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "score INTEGER" +
                 ");";
         db.execSQL(createResultsTable);
+
+        // Added quiz table creation
+        String createQuizTable = "CREATE TABLE quiz (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "quiz_name TEXT" +
+                ");";
+        db.execSQL(createQuizTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS questions");
         db.execSQL("DROP TABLE IF EXISTS results");
+        // Drop quiz table as well
+        db.execSQL("DROP TABLE IF EXISTS quiz");
         onCreate(db);
     }
 
@@ -72,5 +82,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert("results", null, values);
         db.close();
         return id;
+    }
+
+    // Added getQuiz method to retrieve a Quiz by id
+    public Quiz getQuiz(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                "quiz",
+                null,
+                "id = ?",
+                new String[]{String.valueOf(id)},
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    Quiz quiz = new Quiz();
+                    quiz.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("id"))));
+                    quiz.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("quiz_name")));
+                    return quiz;
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    // Added updateQuiz method to update a Quiz
+    public void updateQuiz(Quiz quiz) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        // Changed quiz.getName() to quiz.getQuizName() because there is no setName/getName
+        values.put("quiz_name", quiz.getDescription());
+        db.update("quiz", values, "id = ?", new String[]{String.valueOf(quiz.getId())});
+        db.close();
     }
 }

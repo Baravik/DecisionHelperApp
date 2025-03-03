@@ -26,11 +26,32 @@ public class MainActivity extends AppCompatActivity {
             userTextView.setText(user);
         });
 
+        // Button to start a quiz
         Button startQuizButton = findViewById(R.id.btnStartQuiz);
         startQuizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+                startActivity(intent);
+            }
+        });
+        
+        // Button to view scores
+        Button viewScoresButton = findViewById(R.id.btnViewScores);
+        viewScoresButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
+                startActivity(intent);
+            }
+        });
+        
+        // Button to view users
+        Button viewUsersButton = findViewById(R.id.btnViewUsers);
+        viewUsersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, UsersActivity.class);
                 startActivity(intent);
             }
         });

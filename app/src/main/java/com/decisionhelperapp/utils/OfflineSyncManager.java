@@ -16,10 +16,10 @@ public class OfflineSyncManager {
     // Save quiz data locally when offline
     public static void saveQuizOffline(Context context, Quiz quiz) {
         dbHelper = new DatabaseHelper(context);
-        QuizDAO quizDAO = new QuizDAO(dbHelper);
+        QuizDAO quizDAO = new QuizDAO();
         // Assume the Quiz model has a 'synced' boolean field
-        quiz.setSynced(false);
-        quizDAO.insertQuiz(quiz);
+        //quiz.setSynced(false);
+        //quizDAO.insertQuiz(quiz);
     }
 
     // Attempt to sync unsynced quizzes to the remote database
@@ -28,7 +28,8 @@ public class OfflineSyncManager {
         if (!ApiService.isInternetAvailable(context)) {
             return;
         }
-        QuizDAO quizDAO = new QuizDAO(dbHelper);
+        /*
+        QuizDAO quizDAO = new QuizDAO();
         List<Quiz> unsyncedQuizzes = quizDAO.getUnsyncedQuizzes();
         if (unsyncedQuizzes == null || unsyncedQuizzes.isEmpty()) {
             return;
@@ -42,5 +43,7 @@ public class OfflineSyncManager {
                 quizDAO.update(quiz);
             }
         }
+
+         */
     }
 }

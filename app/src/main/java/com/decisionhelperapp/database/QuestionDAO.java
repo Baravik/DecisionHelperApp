@@ -1,93 +1,61 @@
 package com.decisionhelperapp.database;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.decisionhelperapp.models.Question;
-
 import java.util.ArrayList;
 import java.util.List;
+import androidx.annotation.NonNull;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.DocumentReference;
 
 public class QuestionDAO {
+    private FirebaseFirestore db;
 
-    private DatabaseHelper dbHelper;
-
-    // New constructor: allows passing an existing DatabaseHelper
-    public QuestionDAO(DatabaseHelper dbHelper) {
-        this.dbHelper = dbHelper;
+    public QuestionDAO() {
+        db = FirebaseFirestore.getInstance();
     }
 
-    // Existing constructor: accepts a Context and creates a new DatabaseHelper instance
-    public QuestionDAO(Context context) {
-        this(new DatabaseHelper(context));
-    }
-
-    // Inserts a new Question into the database
-    public long insertQuestion(Question question) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("question_text", question.getQuestionText());
-        // Add other fields as necessary
-        long id = db.insert("questions", null, values);
-        db.close();
-        return id;
-    }
-
-    // Retrieves a Question by its ID
-    public Question getQuestionById(long id) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("questions", null, "id = ?", new String[]{String.valueOf(id)}, null, null, null);
-        Question question = null;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                question = new Question();
-                // Removed: question.setId(cursor.getLong(cursor.getColumnIndex("id")));
-                question.setQuestionText(cursor.getString(cursor.getColumnIndexOrThrow("question_text")));
-                // Set additional fields as needed
+    public void getAllQuestions(final QuestionCallback callback) {
+        db.collection("Question").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<Question> questionList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Question question = document.toObject(Question.class);
+                        questionList.add(question);
+                    }
+                    callback.onCallback(questionList);
+                } else {
+                    callback.onFailure(task.getException());
+                }
             }
-            cursor.close();
-        }
-        db.close();
-        return question;
+        });
     }
 
-    // Retrieves all Questions from the database
-    public List<Question> getAllQuestions() {
-        List<Question> questions = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM questions", null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                Question question = new Question();
-                // Removed: question.setId(cursor.getLong(cursor.getColumnIndex("id")));
-                question.setQuestionText(cursor.getString(cursor.getColumnIndexOrThrow("question_text")));
-                // Set additional fields as needed
-                questions.add(question);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        db.close();
-        return questions;
+    public void insertQuestion(Question question) {
+        db.collection("Question").add(question)
+            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    // Document added successfully. Optionally handle the documentReference.
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // Handle the error case
+                }
+            });
     }
 
-    // Updates an existing Question using the provided id
-    public int updateQuestion(long id, Question question) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("question_text", question.getQuestionText());
-        // Add other fields to update as necessary
-        int rows = db.update("questions", values, "id = ?", new String[]{String.valueOf(id)});
-        db.close();
-        return rows;
-    }
-
-    // Deletes a Question by its ID
-    public int deleteQuestion(long id) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int rows = db.delete("questions", "id = ?", new String[]{String.valueOf(id)});
-        db.close();
-        return rows;
+    public interface QuestionCallback {
+        void onCallback(List<Question> questionList);
+        void onFailure(Exception e);
     }
 }
