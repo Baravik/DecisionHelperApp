@@ -9,6 +9,7 @@
          android:id="@+id/editTextEmail"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
+        android:autofillHints="emailAddress"
          android:hint="@string/email" />
 
     <EditText
@@ -36,9 +37,10 @@
     <!-- Updated googleSignInButton width from wrap_content to match_parent for consistency -->
     <ImageButton
         android:id="@+id/googleSignInButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_google_icon"
-        android:contentDescription="@string/sign_in_with_google" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/sign_in_with_google"
+        android:src="@mipmap/ic_google_icon"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

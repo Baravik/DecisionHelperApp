@@ -55,6 +55,10 @@
             android:name="com.decisionhelperapp.activities.UsersActivity"
             android:label="Users" />
 
+        <!-- Login Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.LoginActivity"
+            android:label="Login" />
         <!-- File Provider (optional, add if you share files) -->
         <provider
             android:name="androidx.core.content.FileProvider"
