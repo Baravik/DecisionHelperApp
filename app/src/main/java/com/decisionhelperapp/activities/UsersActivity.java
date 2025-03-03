@@ -30,8 +30,6 @@ public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUs
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
 
         // Initialize views
         recyclerView = findViewById(R.id.usersRecyclerView);

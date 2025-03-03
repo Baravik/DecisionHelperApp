@@ -9,35 +9,36 @@
          android:id="@+id/editTextEmail"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:hint="Email" />
+         android:hint="@string/email" />
 
     <EditText
          android:id="@+id/editTextPassword"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:hint="Password"
+        android:autofillHints=""
+        android:hint="@string/password"
          android:inputType="textPassword" />
 
     <Button
          android:id="@+id/buttonLogin"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:text="Login"
+         android:text="@string/login"
          android:layout_marginTop="16dp" />
 
     <Button
          android:id="@+id/buttonRegister"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:text="Register"
+         android:text="@string/register"
          android:layout_marginTop="8dp" />
 
     <!-- Updated googleSignInButton width from wrap_content to match_parent for consistency -->
     <ImageButton
         android:id="@+id/googleSignInButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@drawable/ic_google_icon"
-        android:contentDescription="Sign in with Google" />
+        android:contentDescription="@string/sign_in_with_google" />
 
 </LinearLayout>

@@ -16,8 +16,6 @@ import com.decisionhelperapp.models.Scores;
 import com.decisionhelperapp.viewmodel.ScoresViewModel;
 import com.OpenU.decisionhelperapp.R;
 
-import java.util.Objects;
-
 public class ScoresActivity extends AppCompatActivity implements ScoresAdapter.OnScoreClickListener {
     
     private ScoresViewModel scoresViewModel;
@@ -30,8 +28,6 @@ public class ScoresActivity extends AppCompatActivity implements ScoresAdapter.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scores);
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
 
         // Initialize views
         recyclerView = findViewById(R.id.scoresRecyclerView);

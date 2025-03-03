@@ -10,7 +10,6 @@ import com.decisionhelperapp.adapters.QuizAdapter;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.models.Quiz;
 import java.util.List;
-import java.util.Objects;
 
 public class QuizActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -20,7 +19,6 @@ public class QuizActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        Objects.requireNonNull(getSupportActionBar()).hide();
 
 
         recyclerView = findViewById(R.id.recyclerView);

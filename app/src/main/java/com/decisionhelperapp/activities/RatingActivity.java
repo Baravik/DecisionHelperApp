@@ -6,15 +6,12 @@ import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.models.Scores;
 import java.util.List;
-import java.util.Objects;
 
 public class RatingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rating);
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
 
         TextView scoreTextView = findViewById(R.id.scoreTextView);
         TextView recommendationTextView = findViewById(R.id.recommendationTextView);

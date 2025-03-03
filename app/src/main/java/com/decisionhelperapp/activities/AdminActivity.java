@@ -15,8 +15,6 @@ public class AdminActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-        getSupportActionBar().hide();
-
 
         // Removed direct DB/business logic calls
         // Initialize AdminViewModel
