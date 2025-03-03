@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.models.Quiz;
 import java.util.List;
 

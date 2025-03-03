@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.viewmodel.AdminViewModel;
 
 public class AdminActivity extends AppCompatActivity {

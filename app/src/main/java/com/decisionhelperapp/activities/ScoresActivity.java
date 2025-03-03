@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.decisionhelperapp.adapters.ScoresAdapter;
 import com.decisionhelperapp.models.Scores;
 import com.decisionhelperapp.viewmodel.ScoresViewModel;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 
 public class ScoresActivity extends AppCompatActivity implements ScoresAdapter.OnScoreClickListener {
     

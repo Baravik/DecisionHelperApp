@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.decisionhelperapp.models.Scores;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 
 import java.util.List;
 

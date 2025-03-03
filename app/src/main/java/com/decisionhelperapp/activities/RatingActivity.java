@@ -3,7 +3,7 @@ package com.decisionhelperapp.activities;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.models.Scores;
 import java.util.List;

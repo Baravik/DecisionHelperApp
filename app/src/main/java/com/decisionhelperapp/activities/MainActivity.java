@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {

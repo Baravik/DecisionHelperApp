@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.decisionhelperapp.adapters.UserAdapter;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.UsersViewModel;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 
 public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUserClickListener {
     

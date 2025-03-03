@@ -5,7 +5,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuizAdapter;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.models.Quiz;
