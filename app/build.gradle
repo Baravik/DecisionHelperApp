@@ -6,11 +6,14 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.8.2'
         classpath 'com.google.gms:google-services:4.4.2'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'
+
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     google()
@@ -58,7 +61,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    implementation "androidx.lifecycle:lifecycle-viewmodel:2.8.7"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
     implementation 'com.google.android.gms:play-services-auth:21.3.0'
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "androidx.credentials:credentials:<latest version>"
+    implementation "androidx.credentials:credentials-play-services-auth:<latest version>"
+    implementation "com.google.android.libraries.identity.googleid:googleid:<latest version>"
 }

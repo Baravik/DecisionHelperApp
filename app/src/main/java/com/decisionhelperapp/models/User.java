@@ -42,16 +42,6 @@ public class User {
         this.lastUpdated = new Date();
     }
 
-    // Constructor for guest user
-    public User(String id) {
-        this.name = "Guest";
-        this.id = id;
-        this.viaGmail = false;
-        this.creationDate = new Date();
-        this.lastLoginDate = new Date();
-        this.lastUpdated = new Date();
-    }
-
     public String getEmail() {
         return email;
     }

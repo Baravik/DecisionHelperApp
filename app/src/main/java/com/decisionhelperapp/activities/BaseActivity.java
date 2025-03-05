@@ -7,8 +7,6 @@ import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.OpenU.decisionhelperapp.R;
-import com.decisionhelperapp.activities.LoginActivity;
-import com.decisionhelperapp.activities.MainActivity;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -34,11 +32,7 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-        /*if (id == R.id.action_google_login) { // Navigate to LoginActivity for Google login
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            return true;
-        } else*/ if (id == R.id.action_user) { // Also open LoginActivity when action_user is selected
+        if (id == R.id.action_user) { // Also open LoginActivity when action_user is selected
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             return true;

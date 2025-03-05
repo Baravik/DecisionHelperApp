@@ -61,19 +61,6 @@ public class LoginActivity extends AppCompatActivity {
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
-        // Check if it's the first time opening the app
-        if (isFirstTime()) {
-            createGuestUser();
-        } else {
-            // Check if we have a stored user
-            String userId = sharedPreferences.getString(KEY_USER_ID, null);
-            if (userId != null) {
-                // User has logged in before, proceed to MainActivity
-                goToMainActivity(userId);
-                return;
-            }
-        }
-
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,30 +99,6 @@ public class LoginActivity extends AppCompatActivity {
             editor.apply();
         }
         return firstTime;
-    }
-
-    private void createGuestUser() {
-        // Create a guest user with a generated ID
-        String guestId = "guest_" + System.currentTimeMillis();
-        User guestUser = new User(guestId);
-        userDAO.addUser(guestUser, new UserDAO.ActionCallback() {
-            @Override
-            public void onSuccess() {
-                // Save the guest user ID
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(KEY_USER_ID, guestId);
-                editor.apply();
-                
-                Toast.makeText(LoginActivity.this, "Welcome Guest User!", Toast.LENGTH_SHORT).show();
-                goToMainActivity(guestId);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG, "Failed to create guest user", e);
-                Toast.makeText(LoginActivity.this, "Failed to create guest account", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void loginWithEmailPassword() {
