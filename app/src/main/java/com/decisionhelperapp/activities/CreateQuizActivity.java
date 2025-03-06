@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class CreateQuizActivity extends BaseActivity {
@@ -51,12 +52,11 @@ public class CreateQuizActivity extends BaseActivity {
     private CircularProgressIndicator progressIndicator;
     private SwitchMaterial switchPublic;
 
-    private List<Question> questionsList = new ArrayList<>();
-    private List<String> categories = Arrays.asList("General", "Business", "Education", "Health", "Technology", "Lifestyle");
+    private final List<Question> questionsList = new ArrayList<>();
+    private final List<String> categories = Arrays.asList("General", "Business", "Education", "Health", "Technology", "Lifestyle");
     
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
-    private FirebaseStorage storage;
     private StorageReference storageRef;
 
     private int currentEditingQuestionPosition = -1;
@@ -69,7 +69,7 @@ public class CreateQuizActivity extends BaseActivity {
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         
         // Set up toolbar
@@ -151,8 +151,8 @@ public class CreateQuizActivity extends BaseActivity {
         Quiz quiz = new Quiz(
                 quizId,
                 (String) ((Spinner) findViewById(R.id.spinner_category)).getSelectedItem(),
-                editQuizDescription.getText().toString().trim(),
-                editQuizName.getText().toString().trim(),
+                Objects.requireNonNull(editQuizDescription.getText()).toString().trim(),
+                Objects.requireNonNull(editQuizName.getText()).toString().trim(),
                 currentUser.getUid(),
                 0,  // Default score
                 ""  // Completed at will be empty for new quiz
@@ -184,11 +184,11 @@ public class CreateQuizActivity extends BaseActivity {
                                                     R.string.quiz_saved, Toast.LENGTH_SHORT).show();
                                             finish();
                                         })
-                                        .addOnFailureListener(e -> handleError(e));
+                                        .addOnFailureListener(this::handleError);
                             })
-                            .addOnFailureListener(e -> handleError(e));
+                            .addOnFailureListener(this::handleError);
                 })
-                .addOnFailureListener(e -> handleError(e));
+                .addOnFailureListener(this::handleError);
     }
 
     private void previewQuiz() {
@@ -201,8 +201,8 @@ public class CreateQuizActivity extends BaseActivity {
         Quiz previewQuiz = new Quiz(
                 previewQuizId,
                 (String) ((Spinner)findViewById(R.id.spinner_category)).getSelectedItem(),
-                editQuizDescription.getText().toString().trim(),
-                editQuizName.getText().toString().trim(),
+                Objects.requireNonNull(editQuizDescription.getText()).toString().trim(),
+                Objects.requireNonNull(editQuizName.getText()).toString().trim(),
                 currentUser.getUid(),
                 0,
                 ""
@@ -218,8 +218,8 @@ public class CreateQuizActivity extends BaseActivity {
     }
     
     private boolean validateQuiz() {
-        String quizName = editQuizName.getText().toString().trim();
-        String quizDescription = editQuizDescription.getText().toString().trim();
+        String quizName = Objects.requireNonNull(editQuizName.getText()).toString().trim();
+        String quizDescription = Objects.requireNonNull(editQuizDescription.getText()).toString().trim();
         
         if (quizName.isEmpty()) {
             editQuizName.setError("Quiz name is required");
@@ -336,8 +336,8 @@ public class CreateQuizActivity extends BaseActivity {
     
     @Override
     public void onBackPressed() {
-        if (!editQuizName.getText().toString().isEmpty() || 
-                !editQuizDescription.getText().toString().isEmpty() ||
+        if (!Objects.requireNonNull(editQuizName.getText()).toString().isEmpty() ||
+                !Objects.requireNonNull(editQuizDescription.getText()).toString().isEmpty() ||
                 !questionsList.isEmpty()) {
             // Show confirmation dialog
             new AlertDialog.Builder(this)

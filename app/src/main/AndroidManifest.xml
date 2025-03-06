@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.OpenU.decisionhelperapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.OpenU.decisionhelperapp">
 
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -14,8 +14,8 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="false">
 
-        <!-- Splash Activity -->
-        <activity android:name="com.decisionhelperapp.activities.SplashActivity"
+        <activity
+            android:name="com.decisionhelperapp.activities.SplashActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
@@ -24,53 +24,50 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity -->
         <activity
             android:name="com.decisionhelperapp.activities.MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
 
-        <!-- Quiz Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.QuizActivity"
-            android:label="@string/quiz_title" />
-
-        <!-- Rating Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.RatingActivity"
-            android:label="@string/rating_title" />
-
-        <!-- Admin Panel Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.AdminActivity"
-            android:label="@string/admin_title" />
-            
-        <!-- Scores Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.ScoresActivity"
-            android:label="Scores" />
-
-        <!-- Users Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.UsersActivity"
-            android:label="Users" />
-
-        <!-- Login Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.LoginActivity"
-            android:label="Login" />
-
-        <!-- Create Quiz Activity -->
         <activity
             android:name="com.decisionhelperapp.activities.CreateQuizActivity"
-            android:label="@string/create_quiz_title" />
+            android:theme="@style/Theme.CreateQuizActivity"
+            android:label="@string/create_quiz_title"
+            android:exported="false" />
 
-        <!-- Base Activity (if needed as a registered activity) -->
+        <activity
+            android:name="com.decisionhelperapp.activities.QuizActivity"
+            android:label="@string/quiz_title"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.RatingActivity"
+            android:label="@string/rating_title"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.AdminActivity"
+            android:label="@string/admin_title"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.ScoresActivity"
+            android:label="Scores"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.UsersActivity"
+            android:label="Users"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.LoginActivity"
+            android:label="Login"
+            android:exported="true" />
+
         <activity
             android:name="com.decisionhelperapp.activities.BaseActivity"
             android:exported="false" />
 
-        <!-- File Provider (optional, add if you share files) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -81,5 +78,19 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <!-- Firebase Auth & Services Metadata -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="default_channel" />
+
+        <service
+            android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:exported="false">
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
+
     </application>
+
 </manifest>
