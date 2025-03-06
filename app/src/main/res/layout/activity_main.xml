@@ -18,7 +18,32 @@
         android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold" />
-
+        
+    <!-- User Status with Profile Picture -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        
+        <ImageView
+            android:id="@+id/userProfileImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/profile_picture"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_profile"/>
+            
+        <TextView
+            android:id="@+id/userStatusTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/user_status" />
+    </LinearLayout>
+    
     <!-- Start Quiz Button -->
     <Button
         android:id="@+id/btnStartQuiz"
@@ -29,14 +54,6 @@
         android:text="@string/start_quiz"
         android:textColor="@color/white" />
 
-    <TextView
-        android:id="@+id/userStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
-        android:text="User Status" />
-
     <!-- View Scores Button -->
     <Button
         android:id="@+id/btnViewScores"
@@ -44,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/secondary"
-        android:text="View Scores"
+        android:text="@string/view_scores"
         android:textColor="@color/white" />
 
     <!-- View Users Button -->
@@ -54,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/secondary"
-        android:text="View Users"
+        android:text="@string/view_users"
         android:textColor="@color/white" />
 
     <Button
@@ -63,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/secondary"
-        android:text="Rate Questions"
+        android:text="@string/rate_questions"
         android:textColor="@color/white" />
 
     <!-- Add Questions/Quiz Button -->
@@ -75,7 +92,7 @@
         android:backgroundTint="@color/gray"
         android:text="Add Questions/Quiz"
         android:textColor="@color/white"
-        android:visibility="gone" />
+        />
 
     <!-- Admin Panel Button -->
     <Button
@@ -85,5 +102,5 @@
         android:backgroundTint="@color/error"
         android:text="Admin Panel"
         android:textColor="@color/white"
-        android:visibility="gone" />
+        />
 </LinearLayout>
