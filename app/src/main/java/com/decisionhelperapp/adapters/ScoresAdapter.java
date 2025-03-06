@@ -28,7 +28,7 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
     @NonNull
     @Override
     public ScoresViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_score, parent, false);
         return new ScoresViewHolder(view);
     }
 
@@ -61,9 +61,8 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
 
         public ScoresViewHolder(@NonNull View itemView) {
             super(itemView);
-            scoreDescriptionTextView = itemView.findViewById(R.id.questionTextView);
-            scoreRangeTextView = itemView.findViewById(R.id.questionDetailsTextView);
-            scoreRangeTextView.setVisibility(View.VISIBLE);
+            scoreDescriptionTextView = itemView.findViewById(R.id.scoreDescriptionTextView);
+            scoreRangeTextView = itemView.findViewById(R.id.scoreRangeTextView);
         }
 
         public void bindScore(Scores score) {
