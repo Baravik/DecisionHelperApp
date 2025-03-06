@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity (launcher intent removed) -->
+        <!-- Main Activity -->
         <activity
             android:name="com.decisionhelperapp.activities.MainActivity"
             android:exported="true">
@@ -64,6 +64,11 @@
         <activity
             android:name="com.decisionhelperapp.activities.CreateQuizActivity"
             android:label="@string/create_quiz_title" />
+
+        <!-- Base Activity (if needed as a registered activity) -->
+        <activity
+            android:name="com.decisionhelperapp.activities.BaseActivity"
+            android:exported="false" />
 
         <!-- File Provider (optional, add if you share files) -->
         <provider
