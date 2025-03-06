@@ -93,6 +93,19 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+        
+        // Button to add/create questions and quizzes
+        Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
+        addQuestionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreateQuizActivity.class);
+                if (currentUser != null) {
+                    intent.putExtra("USER_ID", currentUser.getId());
+                }
+                startActivity(intent);
+            }
+        });
     }
     
     private void loadUserData(String userId) {

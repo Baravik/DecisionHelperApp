@@ -59,6 +59,12 @@
         <activity
             android:name="com.decisionhelperapp.activities.LoginActivity"
             android:label="Login" />
+
+        <!-- Create Quiz Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.CreateQuizActivity"
+            android:label="@string/create_quiz_title" />
+
         <!-- File Provider (optional, add if you share files) -->
         <provider
             android:name="androidx.core.content.FileProvider"

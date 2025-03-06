@@ -59,4 +59,24 @@
     <string name="user_status">User Status</string>
     <string name="profile_picture">Profile Picture</string>
 
+    <!-- Create Quiz Activity -->
+    <string name="create_quiz_title">Create Questionnaire</string>
+    <string name="quiz_name_hint">Quiz Name</string>
+    <string name="quiz_description_hint">Description</string>
+    <string name="quiz_category_hint">Category</string>
+    <string name="add_question">Add Question</string>
+    <string name="save_quiz">Save Quiz</string>
+    <string name="preview_quiz">Preview Quiz</string>
+    <string name="public_private_quiz">Public Quiz</string>
+    <string name="question_text_hint">Question Text</string>
+    <string name="question_type_hint">Question Type</string>
+    <string name="add_image">Add Image</string>
+    <string name="delete_question">Delete Question</string>
+    <string name="add_answer_option">Add Answer Option</string>
+    <string name="answer_option_hint">Answer Option</string>
+    <string name="multiple_choice">Multiple Choice</string>
+    <string name="open_question">Open Question</string>
+    <string name="question_added">Question added successfully</string>
+    <string name="quiz_saved">Questionnaire saved successfully</string>
+
 </resources>
