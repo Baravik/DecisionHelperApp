@@ -124,7 +124,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
             @Override
             public void afterTextChanged(Editable editable) {
-                int adapterPosition = holder.getAbsoluteAdapterPosition();
+                int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     questions.get(adapterPosition).setTitle(editable.toString());
                 }
@@ -133,7 +133,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         
         // Set up radio group change listener
         holder.radioGroupType.setOnCheckedChangeListener((group, checkedId) -> {
-            int adapterPosition = holder.getAbsoluteAdapterPosition();
+            int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 if (checkedId == R.id.radio_multiple_choice) {
                     questions.get(adapterPosition).setType("multiple_choice");
@@ -152,7 +152,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         
         // Set up Delete Question button
         holder.btnDeleteQuestion.setOnClickListener(v -> {
-            int adapterPosition = holder.getAbsoluteAdapterPosition();
+            int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
                 listener.onQuestionDeleted(adapterPosition);
             }
@@ -160,7 +160,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         
         // Set up Add Image button
         holder.btnAddImage.setOnClickListener(v -> {
-            int adapterPosition = holder.getAbsoluteAdapterPosition();
+            int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
                 listener.onImageRequested(adapterPosition);
             }
@@ -183,13 +183,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 Glide.with(context)
                         .load(Uri.parse(imageUrl))
                         .centerCrop()
-                        .placeholder(R.drawable.ic_launcher_background) // Use a proper placeholder
+                        .placeholder(R.drawable.default_profile)
                         .into(holder.questionImage);
             }
             
             // Set up remove image button
             holder.btnRemoveImage.setOnClickListener(v -> {
-                int adapterPosition = holder.getAbsoluteAdapterPosition();
+                int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
                     holder.imageContainer.setVisibility(View.GONE);
                     listener.onImageRemoved(adapterPosition);
@@ -327,7 +327,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    int adapterPosition = holder.getAbsoluteAdapterPosition();
+                    int adapterPosition = holder.getAdapterPosition();
                     if (adapterPosition != RecyclerView.NO_POSITION) {
                         options.set(adapterPosition, s.toString());
                         notifyOptionsChanged();
@@ -336,7 +336,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             });
             
             holder.btnDeleteOption.setOnClickListener(v -> {
-                int adapterPosition = holder.getAbsoluteAdapterPosition();
+                int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     if (options.size() > 2) { // Keep at least 2 options
                         options.remove(adapterPosition);

@@ -20,15 +20,15 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     @NonNull
     @Override
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_quiz, parent, false);
         return new QuizViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
         Quiz quiz = quizList.get(position);
-        holder.questionTextView.setText(quiz.getCustomTitle()); // changed getTitle() to getCustomTitle()
-        // Binding logic based on Quiz fields
+        holder.tvTitle.setText(quiz.getCustomTitle());
+        holder.tvQuestion.setText(quiz.getDescription());
     }
 
     @Override
@@ -37,11 +37,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     }
 
     public static class QuizViewHolder extends RecyclerView.ViewHolder {
-        TextView questionTextView;
+        TextView tvTitle;
+        TextView tvQuestion;
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
-            questionTextView = itemView.findViewById(R.id.questionTextView);
+            tvTitle = itemView.findViewById(R.id.tvQuizTitle);
+            tvQuestion = itemView.findViewById(R.id.tvQuestion);
         }
     }
 }
