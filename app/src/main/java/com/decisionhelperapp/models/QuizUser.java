@@ -1,49 +1,25 @@
 package com.decisionhelperapp.models;
 
-public class Quiz {
-    // Added no-argument constructor
-    public Quiz() {}
+import java.util.Date;
 
-    private String description;
-    private String id;
-    private String topic;
+public class QuizUser {
     private String customTitle;
     private String userId;
+    private String quizId;
     private int score;
     private String completedAt;
+    private String id; // Document ID for Firebase
 
-    public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt) {
-        this.id = id;
-        this.topic = topic;
-        this.description = description;
+    // Empty constructor for Firestore
+    public QuizUser() {
+    }
+
+    public QuizUser(String customTitle, String userId, String quizId, int score, String completedAt) {
         this.customTitle = customTitle;
         this.userId = userId;
+        this.quizId = quizId;
         this.score = score;
         this.completedAt = completedAt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getCustomTitle() {
@@ -62,6 +38,14 @@ public class Quiz {
         this.userId = userId;
     }
 
+    public String getQuizId() {
+        return quizId;
+    }
+
+    public void setQuizId(String quizId) {
+        this.quizId = quizId;
+    }
+
     public int getScore() {
         return score;
     }
@@ -76,5 +60,13 @@ public class Quiz {
 
     public void setCompletedAt(String completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

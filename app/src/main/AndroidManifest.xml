@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"> <!--package="com.decisionhelperapp"-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.OpenU.decisionhelperapp">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,15 +14,20 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="false">
 
-        <!-- Main Activity -->
-        <activity
-            android:name="com.decisionhelperapp.activities.MainActivity"
+        <!-- Splash Activity -->
+        <activity android:name="com.decisionhelperapp.activities.SplashActivity"
+            android:theme="@style/SplashTheme"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <!-- Main Activity (launcher intent removed) -->
+        <activity
+            android:name="com.decisionhelperapp.activities.MainActivity"
+            android:exported="true">
         </activity>
 
         <!-- Quiz Activity -->
@@ -39,7 +44,21 @@
         <activity
             android:name="com.decisionhelperapp.activities.AdminActivity"
             android:label="@string/admin_title" />
+            
+        <!-- Scores Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.ScoresActivity"
+            android:label="Scores" />
 
+        <!-- Users Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.UsersActivity"
+            android:label="Users" />
+
+        <!-- Login Activity -->
+        <activity
+            android:name="com.decisionhelperapp.activities.LoginActivity"
+            android:label="Login" />
         <!-- File Provider (optional, add if you share files) -->
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -33,7 +33,29 @@
         android:id="@+id/userStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
         android:text="User Status" />
+
+    <!-- View Scores Button -->
+    <Button
+        android:id="@+id/btnViewScores"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/secondary"
+        android:text="View Scores"
+        android:textColor="@color/white" />
+
+    <!-- View Users Button -->
+    <Button
+        android:id="@+id/btnViewUsers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/secondary"
+        android:text="View Users"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btnRateQuestions"

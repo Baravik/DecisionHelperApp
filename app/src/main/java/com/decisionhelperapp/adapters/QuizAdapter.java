@@ -6,15 +6,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.decisionhelperapp.R;
-import com.decisionhelperapp.models.Question;
+import com.OpenU.decisionhelperapp.R;
+import com.decisionhelperapp.models.Quiz;
 import java.util.List;
 
 public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder> {
-    private List<Question> questionList;
+    private final List<Quiz> quizList;
 
-    public QuizAdapter(List<Question> questionList) {
-        this.questionList = questionList;
+    public QuizAdapter(List<Quiz> quizList) {
+        this.quizList = quizList;
     }
 
     @NonNull
@@ -26,14 +26,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
-        Question question = questionList.get(position);
-        holder.questionTextView.setText(question.getQuestionText());
-        // Removed binding for question details as 'Question' does not have getDetails method
+        Quiz quiz = quizList.get(position);
+        holder.questionTextView.setText(quiz.getCustomTitle()); // changed getTitle() to getCustomTitle()
+        // Binding logic based on Quiz fields
     }
 
     @Override
     public int getItemCount() {
-        return questionList.size();
+        return quizList.size();
     }
 
     public static class QuizViewHolder extends RecyclerView.ViewHolder {

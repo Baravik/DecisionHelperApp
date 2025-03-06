@@ -5,14 +5,51 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.8.2'
+        classpath 'com.google.gms:google-services:4.4.2'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'
+
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     google()
     mavenCentral()
+}
+
+android {
+    namespace 'com.OpenU.decisionhelperapp'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.OpenU.decisionhelperapp"
+        minSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    dependenciesInfo {
+        includeInApk true
+        includeInBundle true
+    }
 }
 
 dependencies {
@@ -20,35 +57,15 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.room:room-common:2.6.1'
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
+    implementation 'com.google.firebase:firebase-firestore'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    implementation "androidx.lifecycle:lifecycle-viewmodel:2.8.7"
-}
-
-android {
-    namespace 'com.example.decisionhelperapp'
-    defaultConfig {
-        applicationId "com.example.decisionhelperapp"
-        minSdk 34
-        targetSdkVersion 35
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        viewBinding true
-    }
-    dependenciesInfo {
-        includeInApk true
-        includeInBundle true
-    }
-    compileSdk 35
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
+    implementation 'com.google.android.gms:play-services-auth:21.3.0'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "androidx.credentials:credentials:<latest version>"
+    implementation "androidx.credentials:credentials-play-services-auth:<latest version>"
+    implementation "com.google.android.libraries.identity.googleid:googleid:<latest version>"
 }

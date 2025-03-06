@@ -2,10 +2,12 @@ package com.decisionhelperapp.activities;
 
 import android.os.Bundle;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.decisionhelperapp.R;
+import com.OpenU.decisionhelperapp.R;
+import com.decisionhelperapp.database.ScoresDAO;
+import com.decisionhelperapp.models.Scores;
+import java.util.List;
 
-public class RatingActivity extends AppCompatActivity {
+public class RatingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,5 +28,20 @@ public class RatingActivity extends AppCompatActivity {
             recommendation = "Seems like a good idea";
         }
         recommendationTextView.setText(recommendation);
+
+        // Fetch scores from Firebase
+        ScoresDAO scoresDAO = new ScoresDAO();
+        scoresDAO.getAllScores(new ScoresDAO.ScoresCallback() {
+            @Override
+            public void onCallback(List<Scores> scoresList) {
+                // Update UI with scores
+                // ...
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Handle error
+            }
+        });
     }
 }
