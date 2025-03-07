@@ -79,4 +79,13 @@
     <string name="question_added">Question added successfully</string>
     <string name="quiz_saved">Questionnaire saved successfully</string>
 
+    <!-- Take Quiz Activity -->
+    <string name="take_quiz_title">Take Quiz</string>
+    <string name="quiz_complete">Quiz Complete</string>
+    <string name="your_score">Your score: %1$d%%</string>
+    <string name="view_my_scores">View My Scores</string>
+    <string name="back_to_edit">Back to Edit</string>
+    <string name="done">Done</string>
+    <string name="finish">Finish</string>
+
 </resources>

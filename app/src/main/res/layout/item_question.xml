@@ -80,10 +80,10 @@
                 android:text="@string/multiple_choice" />
 
             <RadioButton
-                android:id="@+id/radio_open_question"
+                android:id="@+id/radio_yes_no_question"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/open_question" />
+                android:text="Yes/No" />
         </RadioGroup>
 
         <!-- Container for multiple choice answers -->
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="Answer Options"
+                android:text="Answer Options with Scores (%)"
                 android:textSize="14sp" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -116,6 +116,43 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/add_answer_option"
                 android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Container for yes/no question -->
+        <LinearLayout
+            android:id="@+id/container_yes_no_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Which answer gets 100% score?"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/radio_group_yes_no_score"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_yes_full_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Yes (100%)" />
+
+                <RadioButton
+                    android:id="@+id/radio_no_full_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No (100%)" />
+            </RadioGroup>
         </LinearLayout>
 
         <LinearLayout

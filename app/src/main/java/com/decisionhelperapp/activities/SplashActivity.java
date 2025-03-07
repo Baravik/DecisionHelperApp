@@ -17,7 +17,6 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
-        Log.d("FirebaseCheck", "FirebaseApp initialized: " + FirebaseApp.getInstance().getName());
         setContentView(R.layout.activity_splash);
 
         // Initialize the progress bar assuming there's a ProgressBar in the layout with id 'progress_bar'

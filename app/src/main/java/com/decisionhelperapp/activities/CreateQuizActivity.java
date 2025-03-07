@@ -129,7 +129,15 @@ public class CreateQuizActivity extends BaseActivity {
         newQuestion.setId(UUID.randomUUID().toString());
         newQuestion.setTitle("");  // Will be filled in by user
         newQuestion.setType("multiple_choice");  // Default type
-        newQuestion.setDescription("");  // Will be filled in by user
+        
+        // Add default options with equal percentages
+        StringBuilder defaultDesc = new StringBuilder();
+        defaultDesc.append("option:Option 1\n");
+        defaultDesc.append("percentage:50\n");
+        defaultDesc.append("option:Option 2\n");
+        defaultDesc.append("percentage:50\n");
+        newQuestion.setDescription(defaultDesc.toString());
+        
         newQuestion.setScore(0);  // Default score
         
         questionsList.add(newQuestion);
@@ -209,11 +217,11 @@ public class CreateQuizActivity extends BaseActivity {
         );
         
         // Open QuizActivity with the preview quiz
-        Intent intent = new Intent(this, QuizActivity.class);
+        Intent intent = new Intent(this, TakeQuizActivity.class);
         intent.putExtra("QUIZ_ID", previewQuizId);
         intent.putExtra("QUIZ_TITLE", previewQuiz.getCustomTitle());
         intent.putExtra("IS_PREVIEW", true);
-        intent.putExtra("QUESTIONS", new ArrayList<>(questionsList));
+        intent.putParcelableArrayListExtra("QUESTIONS", new ArrayList<>(questionsList));
         startActivity(intent);
     }
     
@@ -254,11 +262,21 @@ public class CreateQuizActivity extends BaseActivity {
                     return false;
                 }
                 
-                // Count options
+                // Count options and check percentages
                 int optionCount = 0;
+                boolean hasPercentages = false;
+                int totalPercentage = 0;
+                
                 for (String part : description.split("\n")) {
                     if (part.startsWith("option:")) {
                         optionCount++;
+                    } else if (part.startsWith("percentage:")) {
+                        hasPercentages = true;
+                        try {
+                            totalPercentage += Integer.parseInt(part.substring("percentage:".length()));
+                        } catch (NumberFormatException e) {
+                            // Ignore parsing errors
+                        }
                     }
                 }
                 
@@ -267,6 +285,36 @@ public class CreateQuizActivity extends BaseActivity {
                             " needs at least 2 options", Toast.LENGTH_SHORT).show();
                     return false;
                 }
+                
+                // Check if percentages are defined properly
+                if (!hasPercentages) {
+                    Toast.makeText(this, "Question " + (i + 1) + 
+                            " is missing percentages for options", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                
+                // You might want to warn if total percentage isn't 100%, but we'll be flexible here
+                // and just check if any percentage is defined
+                if (totalPercentage == 0) {
+                    Toast.makeText(this, "Question " + (i + 1) + 
+                            " needs at least one option with a non-zero percentage", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+            else if (question.getType().equals("yes_no_question")) {
+                // Check if the yes/no score is defined
+                String description = question.getDescription();
+                if (!description.contains("yes_full_score:")) {
+                    Toast.makeText(this, "Yes/No question " + (i + 1) + 
+                            " needs to define which answer gives 100% score", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+            else {
+                // Invalid question type
+                Toast.makeText(this, "Question " + (i + 1) + 
+                        " has an invalid type", Toast.LENGTH_SHORT).show();
+                return false;
             }
         }
         
@@ -301,11 +349,23 @@ public class CreateQuizActivity extends BaseActivity {
                         if (currentEditingQuestionPosition != -1) {
                             Question question = questionsList.get(currentEditingQuestionPosition);
                             
-                            // Add image info to question description
-                            String currentDesc = question.getDescription();
-                            String updatedDesc = currentDesc + "\nhas_image:true" + "\nimage_url:" + uri.toString();
-                            question.setDescription(updatedDesc);
+                            // Parse the current description to keep all the options/percentages information
+                            StringBuilder updatedDesc = new StringBuilder();
                             
+                            // Add image info
+                            updatedDesc.append("has_image:true\n");
+                            updatedDesc.append("image_url:").append(uri.toString()).append("\n");
+                            
+                            // Preserve existing option and percentage data
+                            String currentDesc = question.getDescription();
+                            for (String line : currentDesc.split("\n")) {
+                                if (line.startsWith("option:") || line.startsWith("percentage:") || 
+                                    line.startsWith("yes_full_score:")) {
+                                    updatedDesc.append(line).append("\n");
+                                }
+                            }
+                            
+                            question.setDescription(updatedDesc.toString().trim());
                             questionAdapter.notifyItemChanged(currentEditingQuestionPosition);
                             showLoading(false);
                         }

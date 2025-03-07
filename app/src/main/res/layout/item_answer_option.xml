@@ -3,13 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
+
+    <!-- Drag handle to reorder options -->
+    <ImageButton
+        android:id="@+id/btn_drag_handle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Drag to reorder"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_sort_by_size" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="3"
+        android:layout_marginStart="4dp"
         android:hint="@string/answer_option_hint">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -17,6 +29,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Score percentage field -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:hint="%">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_answer_percent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="3" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

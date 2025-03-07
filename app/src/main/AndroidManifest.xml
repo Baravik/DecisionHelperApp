@@ -35,6 +35,11 @@
             android:exported="false" />
 
         <activity
+            android:name="com.decisionhelperapp.activities.TakeQuizActivity"
+            android:label="Take Quiz"
+            android:exported="false" />
+
+        <activity
             android:name="com.decisionhelperapp.activities.QuizActivity"
             android:label="@string/quiz_title"
             android:exported="false" />
