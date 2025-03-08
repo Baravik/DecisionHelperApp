@@ -27,7 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import android.widget.ImageButton;
-import android.content.Intent;
 
 public class LoginActivity extends AppCompatActivity {
 

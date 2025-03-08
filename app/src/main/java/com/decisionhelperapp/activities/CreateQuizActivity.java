@@ -12,7 +12,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -41,10 +40,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.OnBackPressedCallback;
+
 public class CreateQuizActivity extends BaseActivity {
 
-    private static final int REQUEST_IMAGE_PICK = 1001;
-    
     private TextInputEditText editQuizName;
     private TextInputEditText editQuizDescription;
     private RecyclerView recyclerQuestions;
@@ -60,6 +61,7 @@ public class CreateQuizActivity extends BaseActivity {
     private StorageReference storageRef;
 
     private int currentEditingQuestionPosition = -1;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +124,40 @@ public class CreateQuizActivity extends BaseActivity {
         findViewById(R.id.btn_add_question).setOnClickListener(v -> addNewQuestion());
         findViewById(R.id.btn_save).setOnClickListener(v -> saveQuiz());
         findViewById(R.id.btn_preview).setOnClickListener(v -> previewQuiz());
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        if (currentEditingQuestionPosition != -1) {
+                            Uri selectedImageUri = result.getData().getData();
+                            uploadImage(selectedImageUri);
+                        }
+                    }
+                });
+
+        // Replace deprecated onBackPressed() by using onBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!Objects.requireNonNull(editQuizName.getText()).toString().isEmpty() ||
+                        !Objects.requireNonNull(editQuizDescription.getText()).toString().isEmpty() ||
+                        !questionsList.isEmpty()) {
+                    new AlertDialog.Builder(CreateQuizActivity.this)
+                            .setTitle("Discard Changes")
+                            .setMessage("Are you sure you want to discard your changes?")
+                            .setPositiveButton("Discard", (dialog, which) -> {
+                                setEnabled(false);
+                                CreateQuizActivity.this.getOnBackPressedDispatcher().onBackPressed();
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                } else {
+                    setEnabled(false);
+                    CreateQuizActivity.this.getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     private void addNewQuestion() {
@@ -131,12 +167,11 @@ public class CreateQuizActivity extends BaseActivity {
         newQuestion.setType("multiple_choice");  // Default type
         
         // Add default options with equal percentages
-        StringBuilder defaultDesc = new StringBuilder();
-        defaultDesc.append("option:Option 1\n");
-        defaultDesc.append("percentage:50\n");
-        defaultDesc.append("option:Option 2\n");
-        defaultDesc.append("percentage:50\n");
-        newQuestion.setDescription(defaultDesc.toString());
+        String defaultDesc = "option:\n" +
+                "percentage:50\n" +
+                "option:\n" +
+                "percentage:50\n";
+        newQuestion.setDescription(defaultDesc);
         
         newQuestion.setScore(0);  // Default score
         
@@ -148,7 +183,7 @@ public class CreateQuizActivity extends BaseActivity {
     }
 
     private void saveQuiz() {
-        if (!validateQuiz()) {
+        if (validateQuiz()) {
             return;
         }
 
@@ -182,25 +217,21 @@ public class CreateQuizActivity extends BaseActivity {
 
         // Save to Firestore
         db.collection("quizzes").document(quizId).set(quiz)
-                .addOnSuccessListener(aVoid -> {
-                    db.collection("quizQuestions").document(quizId).set(quizQuestions)
-                            .addOnSuccessListener(aVoid1 -> {
-                                db.collection("quizMetadata").document(quizId).set(quizData)
-                                        .addOnSuccessListener(aVoid2 -> {
-                                            showLoading(false);
-                                            Toast.makeText(CreateQuizActivity.this, 
-                                                    R.string.quiz_saved, Toast.LENGTH_SHORT).show();
-                                            finish();
-                                        })
-                                        .addOnFailureListener(this::handleError);
-                            })
-                            .addOnFailureListener(this::handleError);
-                })
+                .addOnSuccessListener(aVoid -> db.collection("quizQuestions").document(quizId).set(quizQuestions)
+                        .addOnSuccessListener(aVoid1 -> db.collection("quizMetadata").document(quizId).set(quizData)
+                                .addOnSuccessListener(aVoid2 -> {
+                                    showLoading(false);
+                                    Toast.makeText(CreateQuizActivity.this,
+                                            R.string.quiz_saved, Toast.LENGTH_SHORT).show();
+                                    finish();
+                                })
+                                .addOnFailureListener(this::handleError))
+                        .addOnFailureListener(this::handleError))
                 .addOnFailureListener(this::handleError);
     }
 
     private void previewQuiz() {
-        if (!validateQuiz()) {
+        if (validateQuiz()) {
             return;
         }
         
@@ -231,17 +262,17 @@ public class CreateQuizActivity extends BaseActivity {
         
         if (quizName.isEmpty()) {
             editQuizName.setError("Quiz name is required");
-            return false;
+            return true;
         }
         
         if (quizDescription.isEmpty()) {
             editQuizDescription.setError("Description is required");
-            return false;
+            return true;
         }
         
         if (questionsList.isEmpty()) {
             Toast.makeText(this, "Add at least one question", Toast.LENGTH_SHORT).show();
-            return false;
+            return true;
         }
         
         // Validate each question
@@ -250,7 +281,7 @@ public class CreateQuizActivity extends BaseActivity {
             if (question.getTitle().trim().isEmpty()) {
                 Toast.makeText(this, "Question " + (i + 1) + " text is empty", 
                         Toast.LENGTH_SHORT).show();
-                return false;
+                return true;
             }
             
             if (question.getType().equals("multiple_choice")) {
@@ -259,7 +290,7 @@ public class CreateQuizActivity extends BaseActivity {
                 if (!description.contains("option:")) {
                     Toast.makeText(this, "Multiple choice question " + (i + 1) + 
                             " needs at least 2 options", Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
                 }
                 
                 // Count options and check percentages
@@ -283,14 +314,14 @@ public class CreateQuizActivity extends BaseActivity {
                 if (optionCount < 2) {
                     Toast.makeText(this, "Multiple choice question " + (i + 1) + 
                             " needs at least 2 options", Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
                 }
                 
                 // Check if percentages are defined properly
                 if (!hasPercentages) {
                     Toast.makeText(this, "Question " + (i + 1) + 
                             " is missing percentages for options", Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
                 }
                 
                 // You might want to warn if total percentage isn't 100%, but we'll be flexible here
@@ -298,7 +329,7 @@ public class CreateQuizActivity extends BaseActivity {
                 if (totalPercentage == 0) {
                     Toast.makeText(this, "Question " + (i + 1) + 
                             " needs at least one option with a non-zero percentage", Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
                 }
             }
             else if (question.getType().equals("yes_no_question")) {
@@ -307,34 +338,23 @@ public class CreateQuizActivity extends BaseActivity {
                 if (!description.contains("yes_full_score:")) {
                     Toast.makeText(this, "Yes/No question " + (i + 1) + 
                             " needs to define which answer gives 100% score", Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
                 }
             }
             else {
                 // Invalid question type
                 Toast.makeText(this, "Question " + (i + 1) + 
                         " has an invalid type", Toast.LENGTH_SHORT).show();
-                return false;
+                return true;
             }
         }
         
-        return true;
+        return false;
     }
     
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, REQUEST_IMAGE_PICK);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
-            if (currentEditingQuestionPosition != -1) {
-                Uri selectedImageUri = data.getData();
-                uploadImage(selectedImageUri);
-            }
-        }
+        imagePickerLauncher.launch(intent);
     }
 
     private void uploadImage(Uri imageUri) {
@@ -344,36 +364,32 @@ public class CreateQuizActivity extends BaseActivity {
         StorageReference imageRef = storageRef.child(imageName);
         
         imageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        if (currentEditingQuestionPosition != -1) {
-                            Question question = questionsList.get(currentEditingQuestionPosition);
-                            
-                            // Parse the current description to keep all the options/percentages information
-                            StringBuilder updatedDesc = new StringBuilder();
-                            
-                            // Add image info
-                            updatedDesc.append("has_image:true\n");
-                            updatedDesc.append("image_url:").append(uri.toString()).append("\n");
-                            
-                            // Preserve existing option and percentage data
-                            String currentDesc = question.getDescription();
-                            for (String line : currentDesc.split("\n")) {
-                                if (line.startsWith("option:") || line.startsWith("percentage:") || 
-                                    line.startsWith("yes_full_score:")) {
-                                    updatedDesc.append(line).append("\n");
-                                }
+                .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    if (currentEditingQuestionPosition != -1) {
+                        Question question = questionsList.get(currentEditingQuestionPosition);
+
+                        // Parse the current description to keep all the options/percentages information
+                        StringBuilder updatedDesc = new StringBuilder();
+
+                        // Add image info
+                        updatedDesc.append("has_image:true\n");
+                        updatedDesc.append("image_url:").append(uri.toString()).append("\n");
+
+                        // Preserve existing option and percentage data
+                        String currentDesc = question.getDescription();
+                        for (String line : currentDesc.split("\n")) {
+                            if (line.startsWith("option:") || line.startsWith("percentage:") ||
+                                line.startsWith("yes_full_score:")) {
+                                updatedDesc.append(line).append("\n");
                             }
-                            
-                            question.setDescription(updatedDesc.toString().trim());
-                            questionAdapter.notifyItemChanged(currentEditingQuestionPosition);
-                            showLoading(false);
                         }
-                    });
-                })
-                .addOnFailureListener(e -> {
-                    handleError(e);
-                });
+
+                        question.setDescription(updatedDesc.toString().trim());
+                        questionAdapter.notifyItemChanged(currentEditingQuestionPosition);
+                        showLoading(false);
+                    }
+                }))
+                .addOnFailureListener(this::handleError);
     }
     
     private void showLoading(boolean show) {
@@ -388,26 +404,9 @@ public class CreateQuizActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-    
-    @Override
-    public void onBackPressed() {
-        if (!Objects.requireNonNull(editQuizName.getText()).toString().isEmpty() ||
-                !Objects.requireNonNull(editQuizDescription.getText()).toString().isEmpty() ||
-                !questionsList.isEmpty()) {
-            // Show confirmation dialog
-            new AlertDialog.Builder(this)
-                    .setTitle("Discard Changes")
-                    .setMessage("Are you sure you want to discard your changes?")
-                    .setPositiveButton("Discard", (dialog, which) -> super.onBackPressed())
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        } else {
-            super.onBackPressed();
-        }
     }
 }

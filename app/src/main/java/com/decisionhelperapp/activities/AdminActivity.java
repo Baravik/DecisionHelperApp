@@ -20,10 +20,6 @@ public class AdminActivity extends BaseActivity {
         // Initialize AdminViewModel
         AdminViewModel adminViewModel = new ViewModelProvider(this).get(AdminViewModel.class);
 
-        // Removed the reference to adminStatusTextView since it does not exist in layout
-        // Removed: TextView statusTextView = findViewById(R.id.adminStatusTextView);
-        // Removed: adminViewModel.getStatus().observe(this, status -> { statusTextView.setText(status); });
-
         // TODO: Add functionality for managing questions/quizzes
     }
 }
