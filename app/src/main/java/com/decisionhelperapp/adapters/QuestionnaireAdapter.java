@@ -14,9 +14,8 @@ import com.decisionhelperapp.models.Quiz;
 import java.util.List;
 
 public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdapter.QuestionnaireViewHolder> {
-
     private List<Quiz> questionnaires;
-    private OnQuestionnaireClickListener listener;
+    private final OnQuestionnaireClickListener listener;
 
     public interface OnQuestionnaireClickListener {
         void onQuestionnaireClick(Quiz quiz);
@@ -25,6 +24,13 @@ public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdap
     public QuestionnaireAdapter(List<Quiz> questionnaires, OnQuestionnaireClickListener listener) {
         this.questionnaires = questionnaires;
         this.listener = listener;
+    }
+
+    public void updateQuestionnaires(List<Quiz> newQuestionnaires) {
+        if (newQuestionnaires != null) {
+            this.questionnaires = newQuestionnaires;
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -37,8 +43,10 @@ public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdap
 
     @Override
     public void onBindViewHolder(@NonNull QuestionnaireViewHolder holder, int position) {
-        Quiz quiz = questionnaires.get(position);
-        holder.bind(quiz, listener);
+        if (questionnaires != null && position >= 0 && position < questionnaires.size()) {
+            Quiz quiz = questionnaires.get(position);
+            holder.bind(quiz, listener);
+        }
     }
 
     @Override
@@ -47,8 +55,8 @@ public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdap
     }
 
     static class QuestionnaireViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView;
-        TextView descriptionTextView;
+        private final TextView titleTextView;
+        private final TextView descriptionTextView;
 
         public QuestionnaireViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,15 +65,24 @@ public class QuestionnaireAdapter extends RecyclerView.Adapter<QuestionnaireAdap
         }
 
         public void bind(final Quiz quiz, final OnQuestionnaireClickListener listener) {
-            titleTextView.setText(quiz.getCustomTitle());
-            descriptionTextView.setText(quiz.getDescription());
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onQuestionnaireClick(quiz);
+            if (quiz != null) {
+                String title = quiz.getCustomTitle();
+                String description = quiz.getDescription();
+                
+                if (titleTextView != null) {
+                    titleTextView.setText(title != null ? title : "Untitled Questionnaire");
                 }
-            });
+                
+                if (descriptionTextView != null) {
+                    descriptionTextView.setText(description != null ? description : "No description available");
+                }
+
+                itemView.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onQuestionnaireClick(quiz);
+                    }
+                });
+            }
         }
     }
 }
