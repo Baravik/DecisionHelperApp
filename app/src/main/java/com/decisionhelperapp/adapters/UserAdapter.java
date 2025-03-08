@@ -4,10 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.decisionhelperapp.models.User;
+
 import com.OpenU.decisionhelperapp.R;
+import com.decisionhelperapp.models.User;
 
 import java.util.List;
 
@@ -28,8 +30,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Using the same item layout as questions for now - will need a custom layout later
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question, parent, false);
+        // Using the custom user layout
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
         return new UserViewHolder(view);
     }
 
@@ -62,9 +64,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
-            userNameTextView = itemView.findViewById(R.id.questionTextView);
-            userEmailTextView = itemView.findViewById(R.id.questionDetailsTextView);
-            userEmailTextView.setVisibility(View.VISIBLE); // Make sure it's visible
+            userNameTextView = itemView.findViewById(R.id.userNameTextView);
+            userEmailTextView = itemView.findViewById(R.id.userEmailTextView);
         }
 
         public void bindUser(User user) {

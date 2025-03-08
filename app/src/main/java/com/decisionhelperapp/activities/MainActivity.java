@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.SharedPreferences;
+
 import androidx.lifecycle.ViewModelProvider;
 
 import com.OpenU.decisionhelperapp.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.MainViewModel;
@@ -18,23 +22,26 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private static final String PREF_NAME = "DecisionHelperPrefs";
     private static final String KEY_USER_ID = "userId";
+    
     private User currentUser;
     private UserDAO userDAO;
     private TextView userTextView;
+    private ImageView userProfileImageView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         // Initialize UserDAO
         userDAO = new UserDAO();
         
         // Initialize MainViewModel
         MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-
+        
         // Setup UI components
         userTextView = findViewById(R.id.userStatusTextView);
+        userProfileImageView = findViewById(R.id.userProfileImageView);
         
         // Get the user ID from the intent or shared preferences
         String userId = getIntent().getStringExtra("USER_ID");
@@ -53,7 +60,7 @@ public class MainActivity extends BaseActivity {
             finish();
             return;
         }
-
+        
         // Button to start a quiz
         Button startQuizButton = findViewById(R.id.btnStartQuiz);
         startQuizButton.setOnClickListener(new View.OnClickListener() {
@@ -77,12 +84,15 @@ public class MainActivity extends BaseActivity {
             }
         });
         
-        // Button to view users
-        Button viewUsersButton = findViewById(R.id.btnViewUsers);
-        viewUsersButton.setOnClickListener(new View.OnClickListener() {
+        // Button to add/create questions and quizzes
+        Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
+        addQuestionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, UsersActivity.class);
+                Intent intent = new Intent(MainActivity.this, CreateQuizActivity.class);
+                if (currentUser != null) {
+                    intent.putExtra("USER_ID", currentUser.getId());
+                }
                 startActivity(intent);
             }
         });
@@ -126,6 +136,19 @@ public class MainActivity extends BaseActivity {
         }
         
         userTextView.setText(welcomeText);
+        
+        // Load profile picture if available
+        if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            Glide.with(this)
+                .load(user.getProfilePictureUrl())
+                .apply(RequestOptions.circleCropTransform())
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .into(userProfileImageView);
+        } else {
+            // Set default profile picture
+            userProfileImageView.setImageResource(R.drawable.default_profile);
+        }
     }
     
     @Override

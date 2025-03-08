@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Splash screen theme (without ActionBar) -->
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
     </style>
+
+    <!-- Overlay style for AppBars (Toolbar) if needed in specific cases -->
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- Overlay style for Popups (Dialog, Menus, etc.) -->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Example of button styling (optional) -->
+    <style name="AppTheme.Widget.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Example of EditText/TextInputLayout styling (optional) -->
+    <style name="AppTheme.Widget.EditText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/white</item>
+    </style>
+
 </resources>
