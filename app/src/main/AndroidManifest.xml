@@ -60,17 +60,31 @@
             android:exported="false" />
 
         <activity
-            android:name="com.decisionhelperapp.activities.UsersActivity"
-            android:label="Users"
-            android:exported="false" />
-
-        <activity
             android:name="com.decisionhelperapp.activities.LoginActivity"
             android:label="Login"
             android:exported="true" />
 
         <activity
             android:name="com.decisionhelperapp.activities.BaseActivity"
+            android:exported="false" />
+
+        <!-- New activities for the questionnaire feature -->
+        <activity
+            android:name="com.decisionhelperapp.activities.QuestionnaireListActivity"
+            android:label="Available Questionnaires"
+            android:exported="false" />
+        <activity
+            android:name="com.decisionhelperapp.activities.QuestionActivity"
+            android:label="Answer Questions"
+            android:exported="false" />
+        <activity
+            android:name="com.decisionhelperapp.activities.ResultActivity"
+            android:label="Questionnaire Result"
+            android:exported="false" />
+
+        <activity
+            android:name="com.decisionhelperapp.activities.UsersActivity"
+            android:label="User Management"
             android:exported="false" />
 
         <provider

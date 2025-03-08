@@ -37,6 +37,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "quiz_name TEXT" +
                 ");";
         db.execSQL(createQuizTable);
+
+        // Add ratings table creation
+        String createRatingsTable = "CREATE TABLE ratings (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "user_id TEXT, " +
+                "quiz_id TEXT, " +
+                "score INTEGER, " +
+                "timestamp INTEGER" +
+                ");";
+        db.execSQL(createRatingsTable);
     }
 
     @Override
@@ -45,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS results");
         // Drop quiz table as well
         db.execSQL("DROP TABLE IF EXISTS quiz");
+        db.execSQL("DROP TABLE IF EXISTS ratings");
         onCreate(db);
     }
 

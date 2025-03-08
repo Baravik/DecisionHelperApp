@@ -1,128 +1,220 @@
 package com.decisionhelperapp.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import com.decisionhelperapp.models.Rating;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 public class RatingDAO {
 
-    private static final String TABLE_RATING = "rating";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_VALUE = "value";
-    private static final String COLUMN_COMMENT = "comment";
+    private FirebaseFirestore db;
+    private DatabaseHelper dbHelper;
+    private static final String COLLECTION_NAME = "Ratings";
+    private boolean useLocalStorage;
 
-    private SQLiteDatabase db;
-    private SQLiteOpenHelper dbHelper;
-
-    public RatingDAO(Context context) {
-        this.dbHelper = new DBHelper(context);
+    // Constructor for Firebase usage
+    public RatingDAO() {
+        db = FirebaseFirestore.getInstance();
+        useLocalStorage = false;
     }
 
-    public RatingDAO(SQLiteOpenHelper dbHelper) {
+    // Constructor for local SQLite usage
+    public RatingDAO(DatabaseHelper dbHelper) {
         this.dbHelper = dbHelper;
+        useLocalStorage = true;
     }
 
-    public void open() {
-        db = dbHelper.getWritableDatabase();
+    /**
+     * Save a rating to storage (either Firestore or SQLite)
+     */
+    public void saveRating(Rating rating, final RatingCallback callback) {
+        if (useLocalStorage) {
+            saveRatingLocally(rating, callback);
+        } else {
+            saveRatingToFirestore(rating, callback);
+        }
     }
 
-    public void close() {
-        dbHelper.close();
-    }
-
-    // Insert a new rating into the database.
-    public long insertRating(Rating rating) {
+    private void saveRatingLocally(Rating rating, final RatingCallback callback) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_VALUE, rating.getValue());
-        values.put(COLUMN_COMMENT, rating.getComment());
-        return db.insert(TABLE_RATING, null, values);
-    }
+        values.put("user_id", rating.getUserId());
+        values.put("quiz_id", rating.getQuizId());
+        values.put("score", rating.getScore());
+        values.put("timestamp", rating.getTimestamp());
 
-    // Retrieve all ratings from the database.
-    public List<Rating> getAllRatings() {
-        List<Rating> ratings = new ArrayList<>();
-        Cursor cursor = db.query(TABLE_RATING, null, null, null, null, null, null);
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Rating rating = new Rating();
-                rating.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-                rating.setValue(cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_VALUE)));
-                rating.setComment(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COMMENT)));
-                ratings.add(rating);
+        try {
+            long id = db.insert("ratings", null, values);
+            if (id != -1) {
+                if (callback != null) callback.onSuccess();
+            } else {
+                if (callback != null) callback.onFailure(new Exception("Failed to insert rating"));
             }
-            cursor.close();
-        }
-        return ratings;
-    }
-
-    // Update an existing rating.
-    public int updateRating(Rating rating) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_VALUE, rating.getValue());
-        values.put(COLUMN_COMMENT, rating.getComment());
-        return db.update(TABLE_RATING, values, COLUMN_ID + " = ?", new String[]{String.valueOf(rating.getId())});
-    }
-
-    // Delete a rating by its ID.
-    public int deleteRating(long id) {
-        return db.delete(TABLE_RATING, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
-    }
-
-    // SQLiteOpenHelper for managing the database.
-    private static class DBHelper extends SQLiteOpenHelper {
-        private static final String DATABASE_NAME = "decision_helper.db";
-        private static final int DATABASE_VERSION = 1;
-
-        private static final String CREATE_TABLE_RATING =
-                "CREATE TABLE " + TABLE_RATING + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_VALUE + " REAL, " +
-                COLUMN_COMMENT + " TEXT" +
-                ")";
-
-        public DBHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(CREATE_TABLE_RATING);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_RATING);
-            onCreate(db);
+        } catch (Exception e) {
+            if (callback != null) callback.onFailure(e);
+        } finally {
+            db.close();
         }
     }
 
-    // A simple model class to represent a Rating.
-    public static class Rating {
-        private long id;
-        private float value;
-        private String comment;
+    private void saveRatingToFirestore(Rating rating, final RatingCallback callback) {
+        Map<String, Object> ratingData = new HashMap<>();
+        ratingData.put("userId", rating.getUserId());
+        ratingData.put("quizId", rating.getQuizId());
+        ratingData.put("score", rating.getScore());
+        ratingData.put("timestamp", rating.getTimestamp());
 
-        public long getId() {
-            return id;
-        }
-        public void setId(long id) {
-            this.id = id;
-        }
-        public float getValue() {
-            return value;
-        }
-        public void setValue(float value) {
-            this.value = value;
-        }
-        public String getComment() {
-            return comment;
-        }
-        public void setComment(String comment) {
-            this.comment = comment;
-        }
+        db.collection(COLLECTION_NAME)
+                .add(ratingData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        if (callback != null) {
+                            callback.onSuccess();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (callback != null) {
+                            callback.onFailure(e);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Get all ratings for a specific user
+     */
+    public void getRatingsByUserId(String userId, final RatingListCallback callback) {
+        db.collection(COLLECTION_NAME)
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<Rating> ratings = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Rating rating = document.toObject(Rating.class);
+                                rating.setId(document.getId());
+                                ratings.add(rating);
+                            }
+                            callback.onCallback(ratings);
+                        } else {
+                            callback.onFailure(task.getException());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Get all ratings for a specific quiz
+     */
+    public void getRatingsByQuizId(String quizId, final RatingListCallback callback) {
+        db.collection(COLLECTION_NAME)
+                .whereEqualTo("quizId", quizId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<Rating> ratings = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Rating rating = document.toObject(Rating.class);
+                                rating.setId(document.getId());
+                                ratings.add(rating);
+                            }
+                            callback.onCallback(ratings);
+                        } else {
+                            callback.onFailure(task.getException());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Get average rating score for a specific quiz
+     */
+    public void getAverageRatingForQuiz(String quizId, final AverageRatingCallback callback) {
+        getRatingsByQuizId(quizId, new RatingListCallback() {
+            @Override
+            public void onCallback(List<Rating> ratings) {
+                if (ratings.isEmpty()) {
+                    callback.onCallback(0);
+                    return;
+                }
+
+                int totalScore = 0;
+                for (Rating rating : ratings) {
+                    totalScore += rating.getScore();
+                }
+                double average = totalScore / (double) ratings.size();
+                callback.onCallback(average);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    /**
+     * Delete a rating by ID
+     */
+    public void deleteRating(String ratingId, final RatingCallback callback) {
+        db.collection(COLLECTION_NAME)
+                .document(ratingId)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        if (callback != null) {
+                            callback.onSuccess();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (callback != null) {
+                            callback.onFailure(e);
+                        }
+                    }
+                });
+    }
+
+    public interface RatingCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public interface RatingListCallback {
+        void onCallback(List<Rating> ratings);
+        void onFailure(Exception e);
+    }
+
+    public interface AverageRatingCallback {
+        void onCallback(double averageRating);
+        void onFailure(Exception e);
     }
 }

@@ -87,5 +87,23 @@
     <string name="back_to_edit">Back to Edit</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
-
+    
+    <!-- Questionnaire Feature -->
+    <string name="questionnaire_list_title">Available Questionnaires</string>
+    <string name="no_questionnaires">No questionnaires available</string>
+    <string name="create_new_questionnaire">Create a new questionnaire in the admin section</string>
+    <string name="question_importance">How important is this question to you?</string>
+    <string name="not_important">Not Important</string>
+    <string name="very_important">Very Important</string>
+    <string name="please_select_answer">Please select an answer</string>
+    <string name="result_title">Your Result</string>
+    <string name="score_label">Score</string>
+    <string name="return_to_home">Return to Home</string>
+    <string name="view_details">View Details</string>
+    <!-- Feedback messages based on score -->
+    <string name="feedback_excellent">Excellent! This option is highly recommended based on your priorities.</string>
+    <string name="feedback_good">Good choice! This option matches your priorities well.</string>
+    <string name="feedback_average">Average match. This option meets some of your priorities.</string>
+    <string name="feedback_low">Low match. Consider other options that might better align with your priorities.</string>
+    <string name="feedback_poor">Poor match. This option doesn\'t align well with your priorities.</string>
 </resources>

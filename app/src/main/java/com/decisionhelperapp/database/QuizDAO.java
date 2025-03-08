@@ -12,13 +12,14 @@ import java.util.List;
 
 public class QuizDAO {
     private FirebaseFirestore db;
+    private static final String COLLECTION_NAME = "quizzes"; // Changed from "Quiz" to "quizzes"
 
     public QuizDAO() {
         db = FirebaseFirestore.getInstance();
     }
 
     public void getAllQuizzes(final QuizCallback callback) {
-        db.collection("Quiz").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(COLLECTION_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {

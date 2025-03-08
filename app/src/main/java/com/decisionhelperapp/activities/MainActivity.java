@@ -66,7 +66,8 @@ public class MainActivity extends BaseActivity {
         startQuizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+                // Changed to go to the questionnaire list activity instead of QuizActivity
+                Intent intent = new Intent(MainActivity.this, QuestionnaireListActivity.class);
                 if (currentUser != null) {
                     intent.putExtra("USER_ID", currentUser.getId());
                 }
