@@ -3,12 +3,13 @@ package com.decisionhelperapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.SharedPreferences;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.OpenU.decisionhelperapp.R;
@@ -35,14 +36,19 @@ public class MainActivity extends BaseActivity {
         
         // Initialize UserDAO
         userDAO = new UserDAO();
-        
-        // Initialize MainViewModel
-        MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        
+
         // Setup UI components
         userTextView = findViewById(R.id.userStatusTextView);
         userProfileImageView = findViewById(R.id.userProfileImageView);
-        
+
+        // Set up toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.create_quiz_title);
+        }
         // Get the user ID from the intent or shared preferences
         String userId = getIntent().getStringExtra("USER_ID");
         if (userId == null) {
@@ -63,39 +69,30 @@ public class MainActivity extends BaseActivity {
         
         // Button to start a quiz
         Button startQuizButton = findViewById(R.id.btnStartQuiz);
-        startQuizButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Changed to go to the questionnaire list activity instead of QuizActivity
-                Intent intent = new Intent(MainActivity.this, QuestionnaireListActivity.class);
-                if (currentUser != null) {
-                    intent.putExtra("USER_ID", currentUser.getId());
-                }
-                startActivity(intent);
+        startQuizButton.setOnClickListener(v -> {
+            // Changed to go to the questionnaire list activity instead of QuizActivity
+            Intent intent = new Intent(MainActivity.this, QuestionnaireListActivity.class);
+            if (currentUser != null) {
+                intent.putExtra("USER_ID", currentUser.getId());
             }
+            startActivity(intent);
         });
         
         // Button to view scores
         Button viewScoresButton = findViewById(R.id.btnViewScores);
-        viewScoresButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
-                startActivity(intent);
-            }
+        viewScoresButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
+            startActivity(intent);
         });
         
         // Button to add/create questions and quizzes
         Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
-        addQuestionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CreateQuizActivity.class);
-                if (currentUser != null) {
-                    intent.putExtra("USER_ID", currentUser.getId());
-                }
-                startActivity(intent);
+        addQuestionsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CreateQuizActivity.class);
+            if (currentUser != null) {
+                intent.putExtra("USER_ID", currentUser.getId());
             }
+            startActivity(intent);
         });
     }
     
@@ -122,7 +119,7 @@ public class MainActivity extends BaseActivity {
             public void onFailure(Exception e) {
                 Log.e(TAG, "Failed to retrieve user data", e);
                 // Handle the error - maybe show a retry button or redirect to login
-                userTextView.setText("Error loading user data");
+                userTextView.setText(com.OpenU.decisionhelperapp.R.string.error_loading_user_data);
             }
         });
     }

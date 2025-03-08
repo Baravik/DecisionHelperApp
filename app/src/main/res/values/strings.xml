@@ -108,4 +108,5 @@
     <string name="feedback_poor">Poor match. This option doesn\'t align well with your priorities.</string>
     <string name="no_questionnaires_available">No questionnaires available</string>
     <string name="failed_to_load_questionnaires_please_try_again">Failed to load questionnaires. Please try again.</string>
+    <string name="error_loading_user_data">Error loading user data</string>
 </resources>
