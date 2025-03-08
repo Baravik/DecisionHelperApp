@@ -16,12 +16,11 @@ import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.utils.Utils;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInCredential;
+
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,7 +31,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "LoginActivity";
-    private GoogleSignInClient mGoogleSignInClient;
+    private SignInClient mGoogleSignInClient;
+    private BeginSignInRequest signInRequest;
+
     private FirebaseAuth mAuth;
     private UserDAO userDAO;
     private EditText emailField;
@@ -63,12 +64,16 @@ public class LoginActivity extends AppCompatActivity {
 
         registerButton.setOnClickListener(v -> showRegistrationDialog());
 
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        // Initialize new Google Identity Services client and sign-in request
+        mGoogleSignInClient = Identity.getSignInClient(this);
+        signInRequest = BeginSignInRequest.builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setServerClientId(getString(R.string.default_web_client_id))
+                    .setFilterByAuthorizedAccounts(false)
+                    .build())
+            .build();
 
         ImageButton googleSignInButton = findViewById(R.id.googleSignInButton);
         googleSignInButton.setOnClickListener(v -> signIn());
@@ -130,8 +135,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mGoogleSignInClient.beginSignIn(signInRequest)
+            .addOnSuccessListener(result -> {
+                try {
+                    startIntentSenderForResult(
+                        result.getPendingIntent().getIntentSender(),
+                        RC_SIGN_IN, null, 0, 0, 0);
+                } catch (Exception e) {
+                    Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
+                }
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "One Tap SignIn failed", e);
+                Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show();
+            });
     }
 
     @Override
@@ -139,27 +156,32 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d(TAG, "Google sign in successful");
-                firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
+                SignInCredential credential = mGoogleSignInClient.getSignInCredentialFromIntent(data);
+                String idToken = credential.getGoogleIdToken();
+                if (idToken != null) {
+                    firebaseAuthWithGoogle(credential);
+                } else {
+                    Log.w(TAG, "No ID token!");
+                    Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
                 Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
+    private void firebaseAuthWithGoogle(SignInCredential credential) {
+        String idToken = credential.getGoogleIdToken();
+        AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(firebaseCredential)
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     // Sign in success
                     FirebaseUser firebaseUser = mAuth.getCurrentUser();
                     if (firebaseUser != null) {
-                        checkOrCreateGoogleUser(firebaseUser, account);
+                        checkOrCreateGoogleUser(firebaseUser, credential);
                     }
                 } else {
                     // Sign in fails
@@ -169,11 +191,11 @@ public class LoginActivity extends AppCompatActivity {
             });
     }
 
-    private void checkOrCreateGoogleUser(FirebaseUser firebaseUser, GoogleSignInAccount account) {
+    private void checkOrCreateGoogleUser(FirebaseUser firebaseUser, SignInCredential credential) {
         final String email = firebaseUser.getEmail();
-        final String name = firebaseUser.getDisplayName();
+        final String name = credential.getDisplayName();
         final String id = firebaseUser.getUid();
-        final String profilePictureUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null;
+        final String profilePictureUrl = credential.getProfilePictureUri() != null ? credential.getProfilePictureUri().toString() : null;
 
         userDAO.getUserByEmail(email, new UserDAO.SingleUserCallback() {
             @Override
