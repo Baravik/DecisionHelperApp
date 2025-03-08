@@ -167,10 +167,12 @@ public class CreateQuizActivity extends BaseActivity {
         newQuestion.setType("multiple_choice");  // Default type
         
         // Add default options with equal percentages
-        String defaultDesc = "option:\n" +
-                "percentage:50\n" +
-                "option:\n" +
-                "percentage:50\n";
+        String defaultDesc = """
+                option:
+                percentage:50
+                option:
+                percentage:50
+                """;
         newQuestion.setDescription(defaultDesc);
         
         newQuestion.setScore(0);  // Default score

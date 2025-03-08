@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.QuestionDAO;
-import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.models.Question;
 import com.decisionhelperapp.models.Question.Answer;
 import com.decisionhelperapp.models.Rating;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class QuestionActivity extends AppCompatActivity {
 
@@ -39,9 +39,9 @@ public class QuestionActivity extends AppCompatActivity {
     private String userId;
     private List<Question> questions = new ArrayList<>();
     private int currentQuestionIndex = 0;
-    private Map<String, Answer> selectedAnswers = new HashMap<>();
-    private Map<String, Integer> importanceRatings = new HashMap<>();
-    private Map<String, Integer> calculatedScores = new HashMap<>();
+    private final Map<String, Answer> selectedAnswers = new HashMap<>();
+    private final Map<String, Integer> importanceRatings = new HashMap<>();
+    private final Map<String, Integer> calculatedScores = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,24 +88,21 @@ public class QuestionActivity extends AppCompatActivity {
         });
 
         // Set up next button listener
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (answersRadioGroup.getCheckedRadioButtonId() == -1) {
-                    Toast.makeText(QuestionActivity.this, R.string.please_select_answer, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        nextButton.setOnClickListener(v -> {
+            if (answersRadioGroup.getCheckedRadioButtonId() == -1) {
+                Toast.makeText(QuestionActivity.this, R.string.please_select_answer, Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                saveCurrentQuestionResponses();
+            saveCurrentQuestionResponses();
 
-                if (currentQuestionIndex < questions.size() - 1) {
-                    // More questions to answer
-                    currentQuestionIndex++;
-                    displayQuestion();
-                } else {
-                    // End of questionnaire - calculate final score
-                    calculateFinalScore();
-                }
+            if (currentQuestionIndex < questions.size() - 1) {
+                // More questions to answer
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                // End of questionnaire - calculate final score
+                calculateFinalScore();
             }
         });
 
@@ -166,8 +163,8 @@ public class QuestionActivity extends AppCompatActivity {
             answersRadioGroup.addView(radioButton);
             
             // Check if this answer was previously selected
-            if (selectedAnswers.containsKey(currentQuestion.getId()) && 
-                selectedAnswers.get(currentQuestion.getId()).getText().equals(answer.getText())) {
+            if (selectedAnswers.containsKey(currentQuestion.getId()) &&
+                Objects.requireNonNull(selectedAnswers.get(currentQuestion.getId())).getText().equals(answer.getText())) {
                 radioButton.setChecked(true);
             }
         }

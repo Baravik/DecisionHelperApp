@@ -20,12 +20,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
 import com.decisionhelperapp.models.Question;
-import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.models.QuizQuestions;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +37,6 @@ import java.util.Map;
 public class TakeQuizActivity extends BaseActivity {
 
     private String quizId;
-    private String quizTitle;
     private boolean isPreview;
     private ArrayList<Question> previewQuestions;
 
@@ -56,8 +53,7 @@ public class TakeQuizActivity extends BaseActivity {
     
     private List<Question> questions = new ArrayList<>();
     private int currentQuestionIndex = 0;
-    private double totalScore = 0;
-    private Map<String, String> userAnswers = new HashMap<>();
+    private final Map<String, String> userAnswers = new HashMap<>();
     
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
@@ -81,11 +77,11 @@ public class TakeQuizActivity extends BaseActivity {
         
         // Get data from intent
         quizId = getIntent().getStringExtra("QUIZ_ID");
-        quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
+        String quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
         isPreview = getIntent().getBooleanExtra("IS_PREVIEW", false);
         
         if (isPreview) {
-            previewQuestions = getIntent().getParcelableArrayListExtra("QUESTIONS");
+            previewQuestions = getIntent().getParcelableArrayListExtra("QUESTIONS", Question.class);
         }
         
         // Set toolbar title
@@ -223,7 +219,7 @@ public class TakeQuizActivity extends BaseActivity {
         if ("multiple_choice".equals(question.getType())) {
             setupMultipleChoiceQuestion(question);
         } else if ("yes_no_question".equals(question.getType())) {
-            setupYesNoQuestion(question);
+            setupYesNoQuestion();
         }
         
         // Update navigation buttons
@@ -283,7 +279,7 @@ public class TakeQuizActivity extends BaseActivity {
         }
     }
     
-    private void setupYesNoQuestion(Question question) {
+    private void setupYesNoQuestion() {
         // Show yes/no buttons, hide radio buttons
         radioOptions.setVisibility(View.GONE);
         layoutYesNo.setVisibility(View.VISIBLE);
@@ -345,7 +341,7 @@ public class TakeQuizActivity extends BaseActivity {
     }
     
     private void calculateScore() {
-        totalScore = 0;
+        double totalScore = 0;
         double maxPossibleScore = 0;
         
         for (Question question : questions) {
@@ -454,7 +450,8 @@ public class TakeQuizActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            // Use getOnBackPressedDispatcher() to handle back press
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

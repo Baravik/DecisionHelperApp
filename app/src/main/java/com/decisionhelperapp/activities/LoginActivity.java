@@ -39,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordField;
     private SharedPreferences sharedPreferences;
     private static final String PREF_NAME = "DecisionHelperPrefs";
-    private static final String KEY_FIRST_TIME = "firstTime";
     private static final String KEY_USER_ID = "userId";
 
     @Override
@@ -60,19 +59,9 @@ public class LoginActivity extends AppCompatActivity {
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginWithEmailPassword();
-            }
-        });
+        loginButton.setOnClickListener(v -> loginWithEmailPassword());
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRegistrationDialog();
-            }
-        });
+        registerButton.setOnClickListener(v -> showRegistrationDialog());
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -82,22 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         ImageButton googleSignInButton = findViewById(R.id.googleSignInButton);
-        googleSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        });
-    }
-
-    private boolean isFirstTime() {
-        boolean firstTime = sharedPreferences.getBoolean(KEY_FIRST_TIME, true);
-        if (firstTime) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(KEY_FIRST_TIME, false);
-            editor.apply();
-        }
-        return firstTime;
+        googleSignInButton.setOnClickListener(v -> signIn());
     }
 
     private void loginWithEmailPassword() {

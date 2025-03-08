@@ -16,8 +16,6 @@ import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.UsersViewModel;
 import com.OpenU.decisionhelperapp.R;
 
-import java.util.Objects;
-
 public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUserClickListener {
     
     private UsersViewModel usersViewModel;

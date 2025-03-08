@@ -74,7 +74,7 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
                 if (quizzes != null && !quizzes.isEmpty()) {
                     showContent(quizzes);
                 } else {
-                    showEmptyState("No questionnaires available");
+                    showEmptyState();
                 }
             }
 
@@ -84,7 +84,7 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
-                showError("Failed to load questionnaires. Please try again.");
+                showError();
             }
         });
     }
@@ -98,25 +98,25 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
         }
     }
 
-    private void showEmptyState(String message) {
+    private void showEmptyState() {
         if (recyclerView != null && emptyStateView != null && errorMessageView != null) {
             recyclerView.setVisibility(View.GONE);
             emptyStateView.setVisibility(View.VISIBLE);
             errorMessageView.setVisibility(View.GONE);
             TextView emptyStateText = emptyStateView.findViewById(R.id.empty_state_text);
             if (emptyStateText != null) {
-                emptyStateText.setText(message);
+                emptyStateText.setText(com.OpenU.decisionhelperapp.R.string.no_questionnaires_available);
             }
         }
     }
 
-    private void showError(String error) {
+    private void showError() {
         if (recyclerView != null && emptyStateView != null && errorMessageView != null) {
             recyclerView.setVisibility(View.GONE);
             emptyStateView.setVisibility(View.GONE);
             errorMessageView.setVisibility(View.VISIBLE);
-            errorMessageView.setText(error);
-            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            errorMessageView.setText(com.OpenU.decisionhelperapp.R.string.failed_to_load_questionnaires_please_try_again);
+            Toast.makeText(this, "Failed to load questionnaires. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
