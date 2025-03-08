@@ -84,16 +84,6 @@ public class MainActivity extends BaseActivity {
             }
         });
         
-        // Button to view users
-        Button viewUsersButton = findViewById(R.id.btnViewUsers);
-        viewUsersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, UsersActivity.class);
-                startActivity(intent);
-            }
-        });
-        
         // Button to add/create questions and quizzes
         Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
         addQuestionsButton.setOnClickListener(new View.OnClickListener() {

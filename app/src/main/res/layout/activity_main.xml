@@ -65,14 +65,6 @@
         android:textColor="@color/white" />
 
     <!-- View Users Button -->
-    <Button
-        android:id="@+id/btnViewUsers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/secondary"
-        android:text="@string/view_users"
-        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btnRateQuestions"
@@ -95,12 +87,4 @@
         />
 
     <!-- Admin Panel Button -->
-    <Button
-        android:id="@+id/btnAdminPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/error"
-        android:text="Admin Panel"
-        android:textColor="@color/white"
-        />
 </LinearLayout>
