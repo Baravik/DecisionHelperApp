@@ -1,12 +1,10 @@
 package com.decisionhelperapp.database;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.google.firebase.firestore.DocumentReference;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import com.decisionhelperapp.models.Rating;
 
@@ -15,19 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-
 public class RatingDAO {
 
     private FirebaseFirestore db;
     private DatabaseHelper dbHelper;
     private static final String COLLECTION_NAME = "Ratings";
-    private boolean useLocalStorage;
+    private final boolean useLocalStorage;
 
     // Constructor for Firebase usage
     public RatingDAO() {
@@ -41,9 +32,6 @@ public class RatingDAO {
         useLocalStorage = true;
     }
 
-    /**
-     * Save a rating to storage (either Firestore or SQLite)
-     */
     public void saveRating(Rating rating, final RatingCallback callback) {
         if (useLocalStorage) {
             saveRatingLocally(rating, callback);
@@ -83,20 +71,14 @@ public class RatingDAO {
 
         db.collection(COLLECTION_NAME)
                 .add(ratingData)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        if (callback != null) {
-                            callback.onSuccess();
-                        }
+                .addOnSuccessListener(documentReference -> {
+                    if (callback != null) {
+                        callback.onSuccess();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        if (callback != null) {
-                            callback.onFailure(e);
-                        }
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.onFailure(e);
                     }
                 });
     }
@@ -108,20 +90,17 @@ public class RatingDAO {
         db.collection(COLLECTION_NAME)
                 .whereEqualTo("userId", userId)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<Rating> ratings = new ArrayList<>();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Rating rating = document.toObject(Rating.class);
-                                rating.setId(document.getId());
-                                ratings.add(rating);
-                            }
-                            callback.onCallback(ratings);
-                        } else {
-                            callback.onFailure(task.getException());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Rating> ratings = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Rating rating = document.toObject(Rating.class);
+                            rating.setId(document.getId());
+                            ratings.add(rating);
                         }
+                        callback.onCallback(ratings);
+                    } else {
+                        callback.onFailure(task.getException());
                     }
                 });
     }
@@ -133,20 +112,17 @@ public class RatingDAO {
         db.collection(COLLECTION_NAME)
                 .whereEqualTo("quizId", quizId)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<Rating> ratings = new ArrayList<>();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Rating rating = document.toObject(Rating.class);
-                                rating.setId(document.getId());
-                                ratings.add(rating);
-                            }
-                            callback.onCallback(ratings);
-                        } else {
-                            callback.onFailure(task.getException());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Rating> ratings = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Rating rating = document.toObject(Rating.class);
+                            rating.setId(document.getId());
+                            ratings.add(rating);
                         }
+                        callback.onCallback(ratings);
+                    } else {
+                        callback.onFailure(task.getException());
                     }
                 });
     }
@@ -185,20 +161,14 @@ public class RatingDAO {
         db.collection(COLLECTION_NAME)
                 .document(ratingId)
                 .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        if (callback != null) {
-                            callback.onSuccess();
-                        }
+                .addOnSuccessListener(aVoid -> {
+                    if (callback != null) {
+                        callback.onSuccess();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        if (callback != null) {
-                            callback.onFailure(e);
-                        }
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.onFailure(e);
                     }
                 });
     }

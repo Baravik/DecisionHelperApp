@@ -1,6 +1,13 @@
 package com.decisionhelperapp.models;
 
-public class Quiz {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Quiz implements Serializable {
+    // Serial version UID for serialization
+    private static final long serialVersionUID = 1L;
+    
     // Added no-argument constructor
     public Quiz() {}
 
@@ -11,6 +18,7 @@ public class Quiz {
     private String userId;
     private int score;
     private String completedAt;
+    private List<Question> questions = new ArrayList<>();
 
     public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt) {
         this.id = id;
@@ -20,6 +28,18 @@ public class Quiz {
         this.userId = userId;
         this.score = score;
         this.completedAt = completedAt;
+    }
+
+    // Overloaded constructor with questions parameter
+    public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt, List<Question> questions) {
+        this.id = id;
+        this.topic = topic;
+        this.description = description;
+        this.customTitle = customTitle;
+        this.userId = userId;
+        this.score = score;
+        this.completedAt = completedAt;
+        this.questions = questions;
     }
 
     public String getId() {
@@ -76,5 +96,13 @@ public class Quiz {
 
     public void setCompletedAt(String completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 }

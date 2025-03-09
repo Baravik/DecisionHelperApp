@@ -1,37 +1,32 @@
 package com.decisionhelperapp.database;
 
+import static com.decisionhelperapp.database.DatabaseHelper.COLLECTION_QUIZZES;
+
 import com.decisionhelperapp.models.Quiz;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuizDAO {
-    private FirebaseFirestore db;
-    private static final String COLLECTION_NAME = "quizzes"; // Changed from "Quiz" to "quizzes"
+    private final FirebaseFirestore db;
 
     public QuizDAO() {
         db = FirebaseFirestore.getInstance();
     }
 
     public void getAllQuizzes(final QuizCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<Quiz> quizList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Quiz quiz = document.toObject(Quiz.class);
-                        quizList.add(quiz);
-                    }
-                    callback.onCallback(quizList);
-                } else {
-                    callback.onFailure(task.getException());
+        db.collection(COLLECTION_QUIZZES).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Quiz> quizList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Quiz quiz = document.toObject(Quiz.class);
+                    quizList.add(quiz);
                 }
+                callback.onCallback(quizList);
+            } else {
+                callback.onFailure(task.getException());
             }
         });
     }

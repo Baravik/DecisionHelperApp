@@ -1,23 +1,14 @@
 package com.decisionhelperapp.database;
 
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.decisionhelperapp.models.Scores;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 public class ScoresDAO {
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
     private static final String COLLECTION_NAME = "Scores";
 
     public ScoresDAO() {
@@ -25,19 +16,16 @@ public class ScoresDAO {
     }
 
     public void getAllScores(final ScoresCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<Scores> scoresList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Scores scores = document.toObject(Scores.class);
-                        scoresList.add(scores);
-                    }
-                    callback.onCallback(scoresList);
-                } else {
-                    callback.onFailure(task.getException());
+        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Scores> scoresList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Scores scores = document.toObject(Scores.class);
+                    scoresList.add(scores);
                 }
+                callback.onCallback(scoresList);
+            } else {
+                callback.onFailure(task.getException());
             }
         });
     }
@@ -52,7 +40,7 @@ public class ScoresDAO {
                     callback.onCallback(null);
                 }
             })
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public void addScore(Scores score, final ActionCallback callback) {
@@ -65,14 +53,14 @@ public class ScoresDAO {
                     score.setId(documentReference.getId());
                     callback.onSuccess();
                 })
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         } else {
             // If ID is provided, use it as the document ID
             db.collection(COLLECTION_NAME)
                 .document(score.getId())
                 .set(score)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         }
     }
 
@@ -86,7 +74,7 @@ public class ScoresDAO {
             .document(score.getId())
             .set(score)  // Using set instead of update to completely replace the document
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public void deleteScore(String id, final ActionCallback callback) {
@@ -94,7 +82,7 @@ public class ScoresDAO {
             .document(id)
             .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public interface ScoresCallback {

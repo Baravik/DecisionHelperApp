@@ -125,39 +125,42 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
 
     @Override
     public void onQuestionnaireClick(Quiz quiz) {
-        if (quiz != null && quiz.getId() != null) {
-            Log.d(TAG, "Starting TakeQuizActivity with quiz: " + quiz.getId());
-            try {
-                // Verify TakeQuizActivity class is available
-                Class<?> takeQuizActivityClass = TakeQuizActivity.class;
-                
-                // Create intent with verified class
-                Intent intent = new Intent(QuestionnaireListActivity.this, takeQuizActivityClass);
-                
-                // Add required extras
-                intent.putExtra("QUIZ_ID", quiz.getId());
-                
-                // Add optional extras with null checks
-                if (quiz.getCustomTitle() != null) {
-                    intent.putExtra("QUIZ_TITLE", quiz.getCustomTitle());
-                } else {
-                    intent.putExtra("QUIZ_TITLE", "Untitled Quiz");
-                }
-                
-                intent.putExtra("USER_ID", userId);
-                
-                // Log before starting the activity
-                Log.d(TAG, "Launching TakeQuizActivity with intent extras: " + 
-                      "QUIZ_ID=" + quiz.getId() + ", USER_ID=" + userId);
-                      
-                startActivity(intent);
-            } catch (Exception e) {
-                Log.e(TAG, "Error starting TakeQuizActivity", e);
-                Toast.makeText(this, "Error opening questionnaire: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Log.e(TAG, "Invalid quiz selected: " + (quiz == null ? "null" : "no ID"));
-            Toast.makeText(this, "Invalid questionnaire selected", Toast.LENGTH_SHORT).show();
+        if (quiz == null) {
+            Log.e(TAG, "Null quiz selected");
+            Toast.makeText(this, "Error: Invalid questionnaire", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        String quizId = quiz.getId();
+        if (quizId == null || quizId.isEmpty()) {
+            Log.e(TAG, "Quiz with null or empty ID selected");
+            Toast.makeText(this, "Error: Invalid questionnaire ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Log.d(TAG, "Starting TakeQuizActivity with quiz: " + quizId);
+        
+        try {
+            Intent intent = new Intent(this, TakeQuizActivity.class);
+            
+            // Add required extras
+            intent.putExtra("QUIZ_ID", quizId);
+            intent.putExtra("USER_ID", userId);
+            
+            // Add quiz title with fallback for null
+            String quizTitle = quiz.getCustomTitle();
+            intent.putExtra("QUIZ_TITLE", (quizTitle != null && !quizTitle.isEmpty()) ? 
+                    quizTitle : "Untitled Quiz");
+            
+            // Don't rely on quiz.getQuestions() as it might be null or not loaded yet
+            // Instead, we'll load questions in TakeQuizActivity
+            
+            // Start the activity
+            startActivity(intent);
+            Log.d(TAG, "TakeQuizActivity started");
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting TakeQuizActivity", e);
+            Toast.makeText(this, "Error loading quiz: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }
