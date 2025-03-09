@@ -25,7 +25,6 @@
 
         <activity
             android:name="com.decisionhelperapp.activities.CreateQuizActivity"
-            android:theme="@style/Theme.CreateQuizActivity"
             android:label="@string/create_quiz_title"
             android:exported="false" />
 

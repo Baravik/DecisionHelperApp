@@ -16,6 +16,7 @@ import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuestionnaireAdapter;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.models.Quiz;
+import com.decisionhelperapp.activities.TakeQuizActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +106,8 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
             errorMessageView.setVisibility(View.GONE);
             TextView emptyStateText = emptyStateView.findViewById(R.id.empty_state_text);
             if (emptyStateText != null) {
-                emptyStateText.setText(com.OpenU.decisionhelperapp.R.string.no_questionnaires_available);
+                // Changed resource reference to local package R
+                emptyStateText.setText(R.string.no_questionnaires_available);
             }
         }
     }
@@ -115,7 +117,8 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
             recyclerView.setVisibility(View.GONE);
             emptyStateView.setVisibility(View.GONE);
             errorMessageView.setVisibility(View.VISIBLE);
-            errorMessageView.setText(com.OpenU.decisionhelperapp.R.string.failed_to_load_questionnaires_please_try_again);
+            // Changed resource reference to local package R
+            errorMessageView.setText(R.string.failed_to_load_questionnaires_please_try_again);
             Toast.makeText(this, "Failed to load questionnaires. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -123,17 +126,37 @@ public class QuestionnaireListActivity extends AppCompatActivity implements Ques
     @Override
     public void onQuestionnaireClick(Quiz quiz) {
         if (quiz != null && quiz.getId() != null) {
+            Log.d(TAG, "Starting TakeQuizActivity with quiz: " + quiz.getId());
             try {
-                Intent intent = new Intent(this, TakeQuizActivity.class);
+                // Verify TakeQuizActivity class is available
+                Class<?> takeQuizActivityClass = TakeQuizActivity.class;
+                
+                // Create intent with verified class
+                Intent intent = new Intent(QuestionnaireListActivity.this, takeQuizActivityClass);
+                
+                // Add required extras
                 intent.putExtra("QUIZ_ID", quiz.getId());
-                intent.putExtra("QUIZ_TITLE", quiz.getCustomTitle());
+                
+                // Add optional extras with null checks
+                if (quiz.getCustomTitle() != null) {
+                    intent.putExtra("QUIZ_TITLE", quiz.getCustomTitle());
+                } else {
+                    intent.putExtra("QUIZ_TITLE", "Untitled Quiz");
+                }
+                
                 intent.putExtra("USER_ID", userId);
+                
+                // Log before starting the activity
+                Log.d(TAG, "Launching TakeQuizActivity with intent extras: " + 
+                      "QUIZ_ID=" + quiz.getId() + ", USER_ID=" + userId);
+                      
                 startActivity(intent);
             } catch (Exception e) {
                 Log.e(TAG, "Error starting TakeQuizActivity", e);
-                Toast.makeText(this, "Error opening questionnaire", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error opening questionnaire: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         } else {
+            Log.e(TAG, "Invalid quiz selected: " + (quiz == null ? "null" : "no ID"));
             Toast.makeText(this, "Invalid questionnaire selected", Toast.LENGTH_SHORT).show();
         }
     }

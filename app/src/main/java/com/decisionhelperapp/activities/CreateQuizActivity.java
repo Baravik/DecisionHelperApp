@@ -74,15 +74,6 @@ public class CreateQuizActivity extends BaseActivity {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         
-        // Set up toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(R.string.create_quiz_title);
-        }
-        
         // Initialize views
         editQuizName = findViewById(R.id.edit_quiz_name);
         editQuizDescription = findViewById(R.id.edit_quiz_description);
