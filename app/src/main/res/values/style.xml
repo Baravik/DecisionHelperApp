@@ -4,6 +4,8 @@
     <!-- Splash screen theme (without ActionBar) -->
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <!-- Overlay style for AppBars (Toolbar) if needed in specific cases -->
