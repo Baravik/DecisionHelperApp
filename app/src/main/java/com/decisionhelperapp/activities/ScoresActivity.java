@@ -6,7 +6,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,7 @@ import com.decisionhelperapp.models.Scores;
 import com.decisionhelperapp.viewmodel.ScoresViewModel;
 import com.OpenU.decisionhelperapp.R;
 
-public class ScoresActivity extends AppCompatActivity implements ScoresAdapter.OnScoreClickListener {
+public class ScoresActivity extends BaseActivity implements ScoresAdapter.OnScoreClickListener {
     
     private ScoresViewModel scoresViewModel;
     private RecyclerView recyclerView;

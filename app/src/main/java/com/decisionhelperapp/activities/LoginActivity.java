@@ -9,36 +9,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.OpenU.decisionhelperapp.R;
-import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.User;
-import com.decisionhelperapp.utils.Utils;
+import com.decisionhelperapp.viewmodel.LoginViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 import android.widget.ImageButton;
-import android.content.Intent;
+import android.widget.ProgressBar;
 
-public class LoginActivity extends AppCompatActivity {
+// Extending BaseActivity instead of AppCompatActivity for consistency
+public class LoginActivity extends BaseActivity {
 
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "LoginActivity";
     private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth mAuth;
-    private UserDAO userDAO;
     private EditText emailField;
     private EditText passwordField;
     private SharedPreferences sharedPreferences;
+    private ProgressBar progressBar;
+    private LoginViewModel loginViewModel;
+    
     private static final String PREF_NAME = "DecisionHelperPrefs";
     private static final String KEY_FIRST_TIME = "firstTime";
     private static final String KEY_USER_ID = "userId";
@@ -53,26 +50,25 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.editTextPassword);
         Button loginButton = findViewById(R.id.buttonLogin);
         Button registerButton = findViewById(R.id.buttonRegister);
-        
-        // Initialize Firebase Auth and UserDAO
-        mAuth = FirebaseAuth.getInstance();
-        userDAO = new UserDAO();
+        progressBar = findViewById(R.id.progressBar);
         
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginWithEmailPassword();
-            }
+        
+        // Initialize ViewModel
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        
+        // Observe ViewModel changes
+        setupObservers();
+        
+        loginButton.setOnClickListener(v -> {
+            String email = emailField.getText().toString().trim();
+            String password = passwordField.getText().toString().trim();
+            loginViewModel.loginWithEmailPassword(email, password);
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRegistrationDialog();
-            }
+        registerButton.setOnClickListener(v -> {
+            showRegistrationDialog();
         });
 
         // Configure Google Sign In
@@ -83,11 +79,29 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         ImageButton googleSignInButton = findViewById(R.id.googleSignInButton);
-        googleSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
+        googleSignInButton.setOnClickListener(v -> {
+            signIn();
+        });
+    }
+    
+    private void setupObservers() {
+        // Observe logged in user
+        loginViewModel.getLoggedInUser().observe(this, user -> {
+            if (user != null) {
+                saveUserAndGoToMain(user.getId());
             }
+        });
+        
+        // Observe error messages
+        loginViewModel.getErrorMessage().observe(this, errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        // Observe loading state
+        loginViewModel.getIsLoading().observe(this, isLoading -> {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         });
     }
 
@@ -99,61 +113,6 @@ public class LoginActivity extends AppCompatActivity {
             editor.apply();
         }
         return firstTime;
-    }
-
-    private void loginWithEmailPassword() {
-        String email = emailField.getText().toString().trim();
-        String password = passwordField.getText().toString().trim();
-
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check if user exists in database
-        userDAO.getUserByEmail(email, new UserDAO.SingleUserCallback() {
-            @Override
-            public void onCallback(User user) {
-                if (user == null) {
-                    Toast.makeText(LoginActivity.this, "Email/password doesn't exist", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Verify password (in a real app, you'd use secure hashing)
-                String hashedPassword = Utils.hashPassword(password); // You need to implement this method
-                if (user.getPasswordHash() != null && user.getPasswordHash().equals(hashedPassword)) {
-                    // Update last login date
-                    user.setLastLoginDate(new java.util.Date());
-                    userDAO.updateUser(user, new UserDAO.ActionCallback() {
-                        @Override
-                        public void onSuccess() {
-                            // Save user ID for future sessions
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(KEY_USER_ID, user.getId());
-                            editor.apply();
-
-                            Toast.makeText(LoginActivity.this, "Logged in successfully", Toast.LENGTH_SHORT).show();
-                            goToMainActivity(user.getId());
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            Log.e(TAG, "Failed to update user login date", e);
-                            // Still proceed to main activity even if update fails
-                            goToMainActivity(user.getId());
-                        }
-                    });
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid password", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG, "Error checking user by email", e);
-                Toast.makeText(LoginActivity.this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void signIn() {
@@ -170,88 +129,12 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d(TAG, "Google sign in successful");
-                firebaseAuthWithGoogle(account);
+                loginViewModel.firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    // Sign in success
-                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                    if (firebaseUser != null) {
-                        checkOrCreateGoogleUser(firebaseUser, account);
-                    }
-                } else {
-                    // Sign in fails
-                    Log.w(TAG, "Firebase auth with Google failed", task.getException());
-                    Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                }
-            });
-    }
-
-    private void checkOrCreateGoogleUser(FirebaseUser firebaseUser, GoogleSignInAccount account) {
-        final String email = firebaseUser.getEmail();
-        final String name = firebaseUser.getDisplayName();
-        final String id = firebaseUser.getUid();
-        final String profilePictureUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null;
-
-        userDAO.getUserByEmail(email, new UserDAO.SingleUserCallback() {
-            @Override
-            public void onCallback(User user) {
-                if (user != null) {
-                    // User exists, update ViaGmail flag and last login
-                    user.setViaGmail(true);
-                    user.setLastLoginDate(new java.util.Date());
-                    user.setLastUpdated(new java.util.Date());
-                    if (profilePictureUrl != null) {
-                        user.setProfilePictureUrl(profilePictureUrl);
-                    }
-
-                    userDAO.updateUser(user, new UserDAO.ActionCallback() {
-                        @Override
-                        public void onSuccess() {
-                            saveUserAndGoToMain(user.getId());
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            Log.e(TAG, "Failed to update existing user", e);
-                            saveUserAndGoToMain(user.getId());
-                        }
-                    });
-                } else {
-                    // User doesn't exist, create new user
-                    User newUser = new User(email, name, id, profilePictureUrl, true);
-
-                    userDAO.addUser(newUser, new UserDAO.ActionCallback() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(LoginActivity.this, "New user created with Google", Toast.LENGTH_SHORT).show();
-                            saveUserAndGoToMain(id);
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            Log.e(TAG, "Failed to create new user", e);
-                            Toast.makeText(LoginActivity.this, "Failed to create user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG, "Error checking for existing user", e);
-                Toast.makeText(LoginActivity.this, "Authentication error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void saveUserAndGoToMain(String userId) {
@@ -284,66 +167,18 @@ public class LoginActivity extends AppCompatActivity {
         final EditText confirmPasswordInput = view.findViewById(R.id.editTextConfirmPassword);
 
         builder.setPositiveButton("Register", (dialog, which) -> {
-            // Handle registration logic
+            // Get registration data and pass to ViewModel
             String name = nameInput.getText().toString().trim();
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
             String confirmPassword = confirmPasswordInput.getText().toString();
-
-            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(LoginActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!password.equals(confirmPassword)) {
-                Toast.makeText(LoginActivity.this, "Passwords don't match", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            registerUser(name, email, password);
+            
+            loginViewModel.registerUser(name, email, password, confirmPassword);
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    private void registerUser(String name, String email, String password) {
-        // First check if user with this email already exists
-        userDAO.getUserByEmail(email, new UserDAO.SingleUserCallback() {
-            @Override
-            public void onCallback(User existingUser) {
-                if (existingUser != null) {
-                    Toast.makeText(LoginActivity.this, "Email already in use", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Create new user
-                String userId = "user_" + System.currentTimeMillis();
-                String hashedPassword = Utils.hashPassword(password); // Implement this method
-                User newUser = new User(email, name, userId, hashedPassword);
-
-                userDAO.addUser(newUser, new UserDAO.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(LoginActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                        saveUserAndGoToMain(userId);
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e(TAG, "Failed to register user", e);
-                        Toast.makeText(LoginActivity.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e(TAG, "Error checking for existing user", e);
-                Toast.makeText(LoginActivity.this, "Registration error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }

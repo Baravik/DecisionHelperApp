@@ -1,20 +1,27 @@
 package com.decisionhelperapp.viewmodel;
 
+import android.app.Application;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.models.Scores;
+import com.decisionhelperapp.repository.DecisionRepository;
 import java.util.List;
 
-public class ScoresViewModel extends ViewModel {
+public class ScoresViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Scores>> scoresList = new MutableLiveData<>();
     private MutableLiveData<Scores> selectedScore = new MutableLiveData<>();
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private ScoresDAO scoresDAO = new ScoresDAO();
+    private DecisionRepository repository;
+
+    public ScoresViewModel(Application application) {
+        super(application);
+        repository = new DecisionRepository(application.getApplicationContext());
+    }
 
     public LiveData<List<Scores>> getScoresList() {
         return scoresList;
@@ -38,7 +45,7 @@ public class ScoresViewModel extends ViewModel {
 
     public void loadScores() {
         isLoading.setValue(true);
-        scoresDAO.getAllScores(new ScoresDAO.ScoresCallback() {
+        repository.getAllScores(new ScoresDAO.ScoresCallback() {
             @Override
             public void onCallback(List<Scores> scores) {
                 scoresList.setValue(scores);
@@ -55,7 +62,7 @@ public class ScoresViewModel extends ViewModel {
 
     public void getScoreById(String scoreId) {
         isLoading.setValue(true);
-        scoresDAO.getScoreById(scoreId, new ScoresDAO.SingleScoreCallback() {
+        repository.getScoreById(scoreId, new ScoresDAO.SingleScoreCallback() {
             @Override
             public void onCallback(Scores score) {
                 selectedScore.setValue(score);
@@ -72,7 +79,7 @@ public class ScoresViewModel extends ViewModel {
 
     public void addScore(Scores score) {
         isLoading.setValue(true);
-        scoresDAO.addScore(score, new ScoresDAO.ActionCallback() {
+        repository.addScore(score, new ScoresDAO.ActionCallback() {
             @Override
             public void onSuccess() {
                 // Reload the score list after adding
@@ -89,7 +96,7 @@ public class ScoresViewModel extends ViewModel {
 
     public void updateScore(Scores score) {
         isLoading.setValue(true);
-        scoresDAO.updateScore(score, new ScoresDAO.ActionCallback() {
+        repository.updateScore(score, new ScoresDAO.ActionCallback() {
             @Override
             public void onSuccess() {
                 // Reload the score list after updating
@@ -106,7 +113,7 @@ public class ScoresViewModel extends ViewModel {
 
     public void deleteScore(String scoreId) {
         isLoading.setValue(true);
-        scoresDAO.deleteScore(scoreId, new ScoresDAO.ActionCallback() {
+        repository.deleteScore(scoreId, new ScoresDAO.ActionCallback() {
             @Override
             public void onSuccess() {
                 // Reload the score list after deletion

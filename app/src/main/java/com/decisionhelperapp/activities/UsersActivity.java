@@ -6,7 +6,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,9 +15,7 @@ import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.UsersViewModel;
 import com.OpenU.decisionhelperapp.R;
 
-import java.util.Objects;
-
-public class UsersActivity extends AppCompatActivity implements UserAdapter.OnUserClickListener {
+public class UsersActivity extends BaseActivity implements UserAdapter.OnUserClickListener {
     
     private UsersViewModel usersViewModel;
     private RecyclerView recyclerView;
