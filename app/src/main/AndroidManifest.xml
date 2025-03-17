@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="false">
 
         <activity
-            android:name="com.decisionhelperapp.activities.SplashActivity"
+            android:name="com.decisionhelperapp.activities.MainActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
@@ -23,10 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.decisionhelperapp.activities.MainActivity"
-            android:exported="true" />
 
         <activity
             android:name="com.decisionhelperapp.activities.CreateQuizActivity"
