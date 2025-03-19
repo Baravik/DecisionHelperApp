@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.decisionhelperapp.models.QuizUser;
+import com.decisionhelperapp.models.Quiz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,6 +141,50 @@ public class QuizUserDAO {
             .addOnFailureListener(e -> callback.onFailure(e));
     }
 
+    // Get all quizzes taken by a user
+    public void getQuizzesForUser(String userId, final QuizCallback callback) {
+        getQuizUsersByUserId(userId, new QuizUserCallback() {
+            @Override
+            public void onCallback(List<QuizUser> quizUserList) {
+                // Extract quiz IDs from quizUserList
+                List<String> quizIds = new ArrayList<>();
+                for (QuizUser quizUser : quizUserList) {
+                    quizIds.add(quizUser.getQuizId());
+                }
+                
+                if (quizIds.isEmpty()) {
+                    callback.onCallback(new ArrayList<>());
+                    return;
+                }
+                
+                // Fetch quizzes by their IDs
+                db.collection("Quiz")
+                    .whereIn("id", quizIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                List<Quiz> quizList = new ArrayList<>();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Quiz quiz = document.toObject(Quiz.class);
+                                    quizList.add(quiz);
+                                }
+                                callback.onCallback(quizList);
+                            } else {
+                                callback.onFailure(task.getException());
+                            }
+                        }
+                    });
+            }
+            
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
     public interface QuizUserCallback {
         void onCallback(List<QuizUser> quizUserList);
         void onFailure(Exception e);
@@ -152,6 +197,11 @@ public class QuizUserDAO {
 
     public interface ActionCallback {
         void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public interface QuizCallback {
+        void onCallback(List<Quiz> quizList);
         void onFailure(Exception e);
     }
 }

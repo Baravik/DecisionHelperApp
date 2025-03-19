@@ -142,11 +142,35 @@ public class DecisionRepository {
     }
 
     // QuizUser related methods
+    public void getAllQuizUsers(QuizUserDAO.QuizUserCallback callback) {
+        quizUserDAO.getAllQuizUsers(callback);
+    }
+    
+    public void getQuizUsersByQuizId(String quizId, QuizUserDAO.QuizUserCallback callback) {
+        quizUserDAO.getQuizUsersByQuizId(quizId, callback);
+    }
+    
+    public void getQuizUserById(String quizUserId, QuizUserDAO.SingleQuizUserCallback callback) {
+        quizUserDAO.getQuizUserById(quizUserId, callback);
+    }
+    
+    public void getQuizUsersByUserId(String userId, QuizUserDAO.QuizUserCallback callback) {
+        quizUserDAO.getQuizUsersByUserId(userId, callback);
+    }
+
     public void getQuizzesForUser(String userId, QuizUserDAO.QuizCallback callback) {
         quizUserDAO.getQuizzesForUser(userId, callback);
     }
 
     public void addQuizUser(QuizUser quizUser, QuizUserDAO.ActionCallback callback) {
         quizUserDAO.addQuizUser(quizUser, callback);
+    }
+    
+    public void updateQuizUser(QuizUser quizUser, QuizUserDAO.ActionCallback callback) {
+        quizUserDAO.updateQuizUser(quizUser, callback);
+    }
+    
+    public void deleteQuizUser(String quizUserId, QuizUserDAO.ActionCallback callback) {
+        quizUserDAO.deleteQuizUser(quizUserId, callback);
     }
 }
