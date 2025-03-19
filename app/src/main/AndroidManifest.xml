@@ -46,18 +46,8 @@
             android:exported="false" />
 
         <activity
-            android:name="com.decisionhelperapp.activities.AdminActivity"
-            android:label="@string/admin_title"
-            android:exported="false" />
-
-        <activity
             android:name="com.decisionhelperapp.activities.ScoresActivity"
             android:label="Scores"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.UsersActivity"
-            android:label="Users"
             android:exported="false" />
 
         <activity

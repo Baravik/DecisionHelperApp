@@ -3,7 +3,6 @@ package com.decisionhelperapp.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.OpenU.decisionhelperapp.R;
-import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.LoginViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -37,7 +35,6 @@ public class LoginActivity extends BaseActivity {
     private LoginViewModel loginViewModel;
     
     private static final String PREF_NAME = "DecisionHelperPrefs";
-    private static final String KEY_FIRST_TIME = "firstTime";
     private static final String KEY_USER_ID = "userId";
 
     @Override
@@ -67,9 +64,7 @@ public class LoginActivity extends BaseActivity {
             loginViewModel.loginWithEmailPassword(email, password);
         });
 
-        registerButton.setOnClickListener(v -> {
-            showRegistrationDialog();
-        });
+        registerButton.setOnClickListener(v -> showRegistrationDialog());
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -79,9 +74,7 @@ public class LoginActivity extends BaseActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         ImageButton googleSignInButton = findViewById(R.id.googleSignInButton);
-        googleSignInButton.setOnClickListener(v -> {
-            signIn();
-        });
+        googleSignInButton.setOnClickListener(v -> signIn());
     }
     
     private void setupObservers() {
@@ -100,19 +93,7 @@ public class LoginActivity extends BaseActivity {
         });
         
         // Observe loading state
-        loginViewModel.getIsLoading().observe(this, isLoading -> {
-            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        });
-    }
-
-    private boolean isFirstTime() {
-        boolean firstTime = sharedPreferences.getBoolean(KEY_FIRST_TIME, true);
-        if (firstTime) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(KEY_FIRST_TIME, false);
-            editor.apply();
-        }
-        return firstTime;
+        loginViewModel.getIsLoading().observe(this, isLoading -> progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE));
     }
 
     private void signIn() {

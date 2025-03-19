@@ -111,6 +111,15 @@ public class DecisionRepository {
         questionDAO.deleteQuestion(questionId, callback);
     }
 
+    /**
+     * Updates multiple questions in a batch operation
+     * @param questions List of questions to update
+     * @param callback Callback to handle success or failure
+     */
+    public void updateQuestions(List<Question> questions, QuestionDAO.ActionCallback callback) {
+        questionDAO.updateQuestions(questions, callback);
+    }
+
     // Scores related methods
     public void getAllScores(ScoresDAO.ScoresCallback callback) {
         scoresDAO.getAllScores(callback);

@@ -5,6 +5,8 @@ import android.widget.TextView;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.models.Scores;
+
+import java.text.MessageFormat;
 import java.util.List;
 
 public class RatingActivity extends BaseActivity {
@@ -17,7 +19,7 @@ public class RatingActivity extends BaseActivity {
         TextView recommendationTextView = findViewById(R.id.recommendationTextView);
 
         int score = getIntent().getIntExtra("score", 0);
-        scoreTextView.setText("Score: " + score);
+        scoreTextView.setText(MessageFormat.format("Score: {0}", score));
 
         String recommendation;
         if (score <= 5) {

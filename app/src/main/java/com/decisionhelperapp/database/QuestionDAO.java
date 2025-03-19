@@ -5,6 +5,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.WriteBatch;
 import com.decisionhelperapp.models.Question;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +95,38 @@ public class QuestionDAO {
                         callback.onFailure(task.getException());
                     }
                 }
+            });
+    }
+
+    /**
+     * Updates multiple questions in a batch operation
+     * @param questions List of questions to update
+     * @param callback Callback to handle success or failure
+     */
+    public void updateQuestions(List<Question> questions, final ActionCallback callback) {
+        if (questions == null || questions.isEmpty()) {
+            callback.onSuccess(); // Nothing to update
+            return;
+        }
+
+        // Create a batch operation
+        WriteBatch batch = db.batch();
+        
+        // Add each question to the batch
+        for (Question question : questions) {
+            if (question.getId() != null && !question.getId().isEmpty()) {
+                DocumentReference docRef = db.collection(COLLECTION_NAME).document(question.getId());
+                batch.set(docRef, question);
+            }
+        }
+        
+        // Commit the batch
+        batch.commit()
+            .addOnSuccessListener(aVoid -> {
+                callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                callback.onFailure(e);
             });
     }
 

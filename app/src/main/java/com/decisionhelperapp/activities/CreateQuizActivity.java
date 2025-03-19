@@ -191,7 +191,7 @@ public class CreateQuizActivity extends BaseActivity {
             intent.putExtra("QUIZ_ID", previewQuiz.getId());
             intent.putExtra("QUIZ_TITLE", previewQuiz.getCustomTitle());
             intent.putExtra("IS_PREVIEW", true);
-            intent.putParcelableArrayListExtra("QUESTIONS", new ArrayList<>(viewModel.getQuestionsList().getValue()));
+            intent.putParcelableArrayListExtra("QUESTIONS", new ArrayList<>(Objects.requireNonNull(viewModel.getQuestionsList().getValue())));
             startActivity(intent);
         }
     }

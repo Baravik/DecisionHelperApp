@@ -3,13 +3,11 @@ package com.decisionhelperapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.SharedPreferences;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.OpenU.decisionhelperapp.R;
@@ -17,6 +15,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.viewmodel.MainViewModel;
+
+import java.text.MessageFormat;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
@@ -52,7 +52,7 @@ public class MainActivity extends BaseActivity {
         mainViewModel.getErrorMessage().observe(this, errorMsg -> {
             if (errorMsg != null && !errorMsg.isEmpty()) {
                 Log.e(TAG, "Error: " + errorMsg);
-                userTextView.setText("Error: " + errorMsg);
+                userTextView.setText(MessageFormat.format("Error: {0}", errorMsg));
             }
         });
         
