@@ -37,7 +37,7 @@ public class Question implements Parcelable {
         answers = in.createTypedArrayList(Answer.CREATOR);
     }
 
-    public static final Creator<Question> CREATOR = new Creator<Question>() {
+    public static final Creator<Question> CREATOR = new Creator<>() {
         @Override
         public Question createFromParcel(Parcel in) {
             return new Question(in);
@@ -165,15 +165,13 @@ public class Question implements Parcelable {
         int currentPercentage = 0;
         
         String[] lines = description.split("\n");
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            
+        for (String line : lines) {
             if (line.startsWith("option:")) {
                 // If we have a complete option from previous iteration, add it
                 if (currentOptionText != null) {
                     loadedAnswers.add(new Answer(currentOptionText, currentPercentage));
                 }
-                
+
                 currentOptionText = line.substring("option:".length());
                 currentPercentage = 0; // Reset percentage
             } else if (line.startsWith("percentage:") && currentOptionText != null) {
@@ -208,7 +206,7 @@ public class Question implements Parcelable {
             percentage = in.readInt();
         }
 
-        public static final Creator<Answer> CREATOR = new Creator<Answer>() {
+        public static final Creator<Answer> CREATOR = new Creator<>() {
             @Override
             public Answer createFromParcel(Parcel in) {
                 return new Answer(in);

@@ -1,26 +1,23 @@
 package com.decisionhelperapp.database;
 
+import static com.decisionhelperapp.database.DatabaseHelper.Table_QuizQuestions;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.decisionhelperapp.models.QuizQuestions;
 import com.decisionhelperapp.models.Question;
 import java.util.ArrayList;
 import java.util.List;
-import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 public class QuizQuestionsDAO {
-    private FirebaseFirestore db;
-    private static final String COLLECTION_NAME = "QuizQuestions";
+    private final FirebaseFirestore db;
 
     public QuizQuestionsDAO() {
         db = FirebaseFirestore.getInstance();
     }
 
     public void getAllQuizQuestions(final QuizQuestionsCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+        db.collection(Table_QuizQuestions).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<QuizQuestions> quizQuestionsList = new ArrayList<>();
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -37,7 +34,7 @@ public class QuizQuestionsDAO {
 
     // Get questions for a specific quiz
     public void getQuestionsByQuizId(String quizId, final QuizQuestionsCallback callback) {
-        db.collection(COLLECTION_NAME)
+        db.collection(Table_QuizQuestions)
             .whereEqualTo("quizId", quizId)
             .orderBy("order") // Order by the order field
             .get()
@@ -58,7 +55,7 @@ public class QuizQuestionsDAO {
 
     // Get a specific quiz question relationship
     public void getQuizQuestionsById(String id, final SingleQuizQuestionsCallback callback) {
-        db.collection(COLLECTION_NAME)
+        db.collection(Table_QuizQuestions)
             .document(id)
             .get()
             .addOnSuccessListener(documentSnapshot -> {
@@ -75,9 +72,9 @@ public class QuizQuestionsDAO {
 
     // Add a new quiz-questions relationship
     public void addQuizQuestions(QuizQuestions quizQuestions, final ActionCallback callback) {
-        // Let Firestore generate an ID if none is provided
+        // Let Firebase generate an ID if none is provided
         if (quizQuestions.getId() == null || quizQuestions.getId().isEmpty()) {
-            db.collection(COLLECTION_NAME)
+            db.collection(Table_QuizQuestions)
                 .add(quizQuestions)
                 .addOnSuccessListener(documentReference -> {
                     quizQuestions.setId(documentReference.getId());
@@ -86,7 +83,7 @@ public class QuizQuestionsDAO {
                 .addOnFailureListener(callback::onFailure);
         } else {
             // Use the provided ID
-            db.collection(COLLECTION_NAME)
+            db.collection(Table_QuizQuestions)
                 .document(quizQuestions.getId())
                 .set(quizQuestions)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
@@ -101,7 +98,7 @@ public class QuizQuestionsDAO {
             return;
         }
 
-        db.collection(COLLECTION_NAME)
+        db.collection(Table_QuizQuestions)
             .document(quizQuestions.getId())
             .set(quizQuestions)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
@@ -110,7 +107,7 @@ public class QuizQuestionsDAO {
 
     // Delete a quiz-questions relationship
     public void deleteQuizQuestions(String id, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME)
+        db.collection(Table_QuizQuestions)
             .document(id)
             .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
@@ -147,7 +144,7 @@ public class QuizQuestionsDAO {
             return;
         }
         
-        // Firestore has limitations on 'in' queries, so for large lists we might need to batch
+        // Firebase has limitations on 'in' queries, so for large lists we might need to batch
         db.collection("Question")
             .whereIn("id", questionIds)
             .get()

@@ -18,6 +18,12 @@ public class QuizQuestions {
         this.order = order;
     }
 
+    // Added constructor for single question
+    public QuizQuestions(String quizId, String questionId) {
+        this.quizId = quizId;
+        this.questionsId = List.of(questionId);
+    }
+
     public List<String> getQuestionsId() {
         return questionsId;
     }
@@ -48,5 +54,13 @@ public class QuizQuestions {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    // Get the first question ID from the list
+    public String getQuestionId() {
+        if (questionsId != null && !questionsId.isEmpty()) {
+            return questionsId.get(0);
+        }
+        return null;
     }
 }

@@ -66,15 +66,6 @@
 
     <!-- View Users Button -->
 
-    <Button
-        android:id="@+id/btnRateQuestions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/secondary"
-        android:text="@string/rate_questions"
-        android:textColor="@color/white" />
-
     <!-- Add Questions/Quiz Button -->
     <Button
         android:id="@+id/btnAddQuestions"

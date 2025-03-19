@@ -1,5 +1,7 @@
 package com.decisionhelperapp.database;
 
+import static com.decisionhelperapp.database.DatabaseHelper.Table_Quizzes;
+
 import com.decisionhelperapp.models.Quiz;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -11,14 +13,13 @@ import java.util.List;
 
 public class QuizDAO {
     private final FirebaseFirestore db;
-    private static final String COLLECTION_NAME = "Quiz";
 
     public QuizDAO() {
         db = FirebaseFirestore.getInstance();
     }
 
     public void getAllQuizzes(final QuizCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+        db.collection(Table_Quizzes).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<Quiz> quizList = new ArrayList<>();
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -33,7 +34,7 @@ public class QuizDAO {
     }
     
     public void getQuizById(String quizId, final SingleQuizCallback callback) {
-        db.collection(COLLECTION_NAME).document(quizId)
+        db.collection(Table_Quizzes).document(quizId)
             .get()
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -51,13 +52,13 @@ public class QuizDAO {
     }
     
     public void addQuiz(Quiz quiz, final ActionCallback callback) {
-        // If the quiz doesn't have an ID yet, let Firestore generate one
+        // If the quiz doesn't have an ID yet, let Firebase generate one
         if (quiz.getId() == null || quiz.getId().isEmpty()) {
-            DocumentReference docRef = db.collection(COLLECTION_NAME).document();
+            DocumentReference docRef = db.collection(Table_Quizzes).document();
             quiz.setId(docRef.getId());
         }
         
-        db.collection(COLLECTION_NAME).document(quiz.getId())
+        db.collection(Table_Quizzes).document(quiz.getId())
             .set(quiz)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -69,7 +70,7 @@ public class QuizDAO {
     }
     
     public void updateQuiz(Quiz quiz, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME).document(quiz.getId())
+        db.collection(Table_Quizzes).document(quiz.getId())
             .set(quiz)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -81,7 +82,7 @@ public class QuizDAO {
     }
     
     public void deleteQuiz(String quizId, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME).document(quizId)
+        db.collection(Table_Quizzes).document(quizId)
             .delete()
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {

@@ -2,18 +2,13 @@ package com.decisionhelperapp.database;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.decisionhelperapp.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
 public class UserDAO {
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
     private static final String COLLECTION_NAME = "Users";
 
     public UserDAO() {
@@ -21,19 +16,16 @@ public class UserDAO {
     }
 
     public void getAllUsers(final UserCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<User> userList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        User user = document.toObject(User.class);
-                        userList.add(user);
-                    }
-                    callback.onCallback(userList);
-                } else {
-                    callback.onFailure(task.getException());
+        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<User> userList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    User user = document.toObject(User.class);
+                    userList.add(user);
                 }
+                callback.onCallback(userList);
+            } else {
+                callback.onFailure(task.getException());
             }
         });
     }
@@ -48,7 +40,7 @@ public class UserDAO {
                     callback.onCallback(null);
                 }
             })
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public void getUserByEmail(String email, final SingleUserCallback callback) {
@@ -77,14 +69,14 @@ public class UserDAO {
                     user.setId(documentReference.getId());
                     callback.onSuccess();
                 })
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         } else {
             // Use the provided ID
             db.collection(COLLECTION_NAME)
                 .document(user.getId())
                 .set(user)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         }
     }
 
@@ -98,7 +90,7 @@ public class UserDAO {
             .document(user.getId())
             .set(user)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public void deleteUser(String id, final ActionCallback callback) {
@@ -106,7 +98,7 @@ public class UserDAO {
             .document(id)
             .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     public interface UserCallback {

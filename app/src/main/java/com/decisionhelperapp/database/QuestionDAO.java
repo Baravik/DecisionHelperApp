@@ -1,5 +1,7 @@
 package com.decisionhelperapp.database;
 
+import static com.decisionhelperapp.database.DatabaseHelper.Table_Question;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -11,14 +13,13 @@ import java.util.List;
 
 public class QuestionDAO {
     private final FirebaseFirestore db;
-    private static final String COLLECTION_NAME = "Question";
 
     public QuestionDAO() {
         db = FirebaseFirestore.getInstance();
     }
 
     public void getAllQuestions(final QuestionCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+        db.collection(Table_Question).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<Question> questionList = new ArrayList<>();
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -33,7 +34,7 @@ public class QuestionDAO {
     }
 
     public void getQuestionById(String questionId, final SingleQuestionCallback callback) {
-        db.collection(COLLECTION_NAME).document(questionId)
+        db.collection(Table_Question).document(questionId)
             .get()
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -53,11 +54,11 @@ public class QuestionDAO {
     public void addQuestion(Question question, final ActionCallback callback) {
         // If the question doesn't have an ID yet, let Firestore generate one
         if (question.getId() == null || question.getId().isEmpty()) {
-            DocumentReference docRef = db.collection(COLLECTION_NAME).document();
+            DocumentReference docRef = db.collection(Table_Question).document();
             question.setId(docRef.getId());
         }
         
-        db.collection(COLLECTION_NAME).document(question.getId())
+        db.collection(Table_Question).document(question.getId())
             .set(question)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -69,7 +70,7 @@ public class QuestionDAO {
     }
 
     public void updateQuestion(Question question, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME).document(question.getId())
+        db.collection(Table_Question).document(question.getId())
             .set(question)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -97,7 +98,7 @@ public class QuestionDAO {
         // Add each question to the batch
         for (Question question : questions) {
             if (question.getId() != null && !question.getId().isEmpty()) {
-                DocumentReference docRef = db.collection(COLLECTION_NAME).document(question.getId());
+                DocumentReference docRef = db.collection(Table_Question).document(question.getId());
                 batch.set(docRef, question);
             }
         }
@@ -109,7 +110,7 @@ public class QuestionDAO {
     }
 
     public void deleteQuestion(String questionId, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME).document(questionId)
+        db.collection(Table_Question).document(questionId)
             .delete()
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
