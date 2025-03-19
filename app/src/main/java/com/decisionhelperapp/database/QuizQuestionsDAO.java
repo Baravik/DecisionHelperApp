@@ -20,20 +20,17 @@ public class QuizQuestionsDAO {
     }
 
     public void getAllQuizQuestions(final QuizQuestionsCallback callback) {
-        db.collection(COLLECTION_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<QuizQuestions> quizQuestionsList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        QuizQuestions quizQuestions = document.toObject(QuizQuestions.class);
-                        quizQuestions.setId(document.getId());
-                        quizQuestionsList.add(quizQuestions);
-                    }
-                    callback.onCallback(quizQuestionsList);
-                } else {
-                    callback.onFailure(task.getException());
+        db.collection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<QuizQuestions> quizQuestionsList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    QuizQuestions quizQuestions = document.toObject(QuizQuestions.class);
+                    quizQuestions.setId(document.getId());
+                    quizQuestionsList.add(quizQuestions);
                 }
+                callback.onCallback(quizQuestionsList);
+            } else {
+                callback.onFailure(task.getException());
             }
         });
     }
@@ -73,7 +70,7 @@ public class QuizQuestionsDAO {
                     callback.onCallback(null);
                 }
             })
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     // Add a new quiz-questions relationship
@@ -86,14 +83,14 @@ public class QuizQuestionsDAO {
                     quizQuestions.setId(documentReference.getId());
                     callback.onSuccess();
                 })
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         } else {
             // Use the provided ID
             db.collection(COLLECTION_NAME)
                 .document(quizQuestions.getId())
                 .set(quizQuestions)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
-                .addOnFailureListener(e -> callback.onFailure(e));
+                .addOnFailureListener(callback::onFailure);
         }
     }
 
@@ -108,7 +105,7 @@ public class QuizQuestionsDAO {
             .document(quizQuestions.getId())
             .set(quizQuestions)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     // Delete a quiz-questions relationship
@@ -117,7 +114,7 @@ public class QuizQuestionsDAO {
             .document(id)
             .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(e -> callback.onFailure(e));
+            .addOnFailureListener(callback::onFailure);
     }
 
     // Added to match repository method signature
@@ -154,19 +151,16 @@ public class QuizQuestionsDAO {
         db.collection("Question")
             .whereIn("id", questionIds)
             .get()
-            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        List<Question> questions = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Question question = document.toObject(Question.class);
-                            questions.add(question);
-                        }
-                        callback.onCallback(questions);
-                    } else {
-                        callback.onFailure(task.getException());
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    List<Question> questions = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Question question = document.toObject(Question.class);
+                        questions.add(question);
                     }
+                    callback.onCallback(questions);
+                } else {
+                    callback.onFailure(task.getException());
                 }
             });
     }

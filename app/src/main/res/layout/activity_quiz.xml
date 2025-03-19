@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:padding="16dp"
     android:background="@color/white">
 
@@ -15,111 +14,142 @@
         android:text="@string/quiz_title"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:paddingBottom="16dp"
         android:textColor="@color/black" />
 
-    <!-- Question Progress -->
-    <TextView
-        android:id="@+id/tvQuestionProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/question_progress"
-        android:textSize="16sp"
-        android:layout_gravity="center"
-        android:paddingBottom="16dp"
-        android:textColor="@color/black" />
-
-    <!-- Question Text -->
-    <TextView
-        android:id="@+id/tvQuestion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/question_text"
-        android:textSize="18sp"
-        android:textStyle="italic"
-        android:paddingBottom="24dp"
-        android:textColor="@color/black" />
-
-    <!-- Answer Buttons -->
-    <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/btnYes"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/yes"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/white"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/btnNo"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no"
-            android:backgroundTint="@color/error"
-            android:textColor="@color/white"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <!-- Navigation Buttons -->
-    <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="24dp">
-
-        <Button
-            android:id="@+id/btnPrevious"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/previous"
-            android:backgroundTint="@color/gray"
-            android:textColor="@color/white"
-            android:layout_marginEnd="8dp"
-            android:enabled="false" />
-
-        <Button
-            android:id="@+id/btnNext"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/next"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/white"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <!-- Submit Button -->
-    <Button
-        android:id="@+id/btnSubmitQuiz"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/submit_quiz"
-        android:backgroundTint="@color/secondary"
-        android:textColor="@color/white"
-        android:layout_marginTop="24dp"
-        android:visibility="gone"  />
-
-    <!-- Inserted RecyclerView with id recycler_view inside the root layout -->
+    <!-- RecyclerView for quizzes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvQuizTitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
+    <!-- Empty View -->
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No quizzes available"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
+    <!-- Rest of the quiz UI elements (preserved but made invisible by default since they seem to be for quiz taking) -->
+    <LinearLayout
+        android:id="@+id/quizContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvQuizTitle"
+        android:visibility="gone">
+        
+        <!-- Question Progress -->
+        <TextView
+            android:id="@+id/tvQuestionProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/question_progress"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:paddingBottom="16dp"
+            android:textColor="@color/black" />
+            
+        <!-- Question Text -->
+        <TextView
+            android:id="@+id/tvQuestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/question_text"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:paddingBottom="24dp"
+            android:textColor="@color/black" />
+            
+        <!-- Answer Buttons -->
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <Button
+                android:id="@+id/btnYes"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/yes"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/white"
+                android:layout_marginEnd="8dp" />
+            <Button
+                android:id="@+id/btnNo"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no"
+                android:backgroundTint="@color/error"
+                android:textColor="@color/white"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+            
+        <!-- Navigation Buttons -->
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="24dp">
+            <Button
+                android:id="@+id/btnPrevious"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/previous"
+                android:backgroundTint="@color/gray"
+                android:textColor="@color/white"
+                android:layout_marginEnd="8dp"
+                android:enabled="false" />
+            <Button
+                android:id="@+id/btnNext"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/white"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+            
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/btnSubmitQuiz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/submit_quiz"
+            android:backgroundTint="@color/secondary"
+            android:textColor="@color/white"
+            android:layout_marginTop="24dp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

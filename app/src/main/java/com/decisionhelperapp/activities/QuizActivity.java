@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuizAdapter;
-import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.viewmodel.QuizViewModel;
 
 public class QuizActivity extends BaseActivity {
@@ -48,9 +47,15 @@ public class QuizActivity extends BaseActivity {
         // Observe quiz list
         quizViewModel.getQuizList().observe(this, quizzes -> {
             if (quizzes != null && !quizzes.isEmpty()) {
+                // Create adapter with click listener implementation
                 quizAdapter = new QuizAdapter(quizzes, quiz -> {
-                    // Handle quiz selection
-                    quizViewModel.loadQuizById(quiz.getId());
+                    // Handle quiz selection - use the getId() method here
+                    String quizId = quiz.getId();
+                    if (quizId != null && !quizId.isEmpty()) {
+                        quizViewModel.loadQuizById(quizId);
+                    } else {
+                        Toast.makeText(this, "Invalid quiz ID", Toast.LENGTH_SHORT).show();
+                    }
                 });
                 recyclerView.setAdapter(quizAdapter);
                 recyclerView.setVisibility(View.VISIBLE);
@@ -62,9 +67,7 @@ public class QuizActivity extends BaseActivity {
         });
         
         // Observe loading state
-        quizViewModel.getIsLoading().observe(this, isLoading -> {
-            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        });
+        quizViewModel.getIsLoading().observe(this, isLoading -> progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE));
         
         // Observe errors
         quizViewModel.getErrorMessage().observe(this, errorMsg -> {
@@ -81,8 +84,8 @@ public class QuizActivity extends BaseActivity {
         // Observe current quiz
         quizViewModel.getCurrentQuiz().observe(this, quiz -> {
             if (quiz != null) {
-                // Could navigate to quiz detail/questions activity here
-                Toast.makeText(this, "Selected quiz: " + quiz.getTitle(), Toast.LENGTH_SHORT).show();
+                // Fixed: using getCustomTitle() instead of getTitle()
+                Toast.makeText(this, "Selected quiz: " + quiz.getCustomTitle(), Toast.LENGTH_SHORT).show();
             }
         });
     }
