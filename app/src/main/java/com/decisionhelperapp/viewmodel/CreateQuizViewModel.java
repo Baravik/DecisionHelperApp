@@ -2,7 +2,6 @@ package com.decisionhelperapp.viewmodel;
 
 import android.app.Application;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -17,6 +16,8 @@ import com.decisionhelperapp.models.QuizQuestions;
 import com.decisionhelperapp.repository.DecisionRepository;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,12 +39,14 @@ public class CreateQuizViewModel extends AndroidViewModel {
     
     private DecisionRepository repository;
     private StorageReference storageRef;
+    private FirebaseFirestore db;
 
     public CreateQuizViewModel(Application application) {
         super(application);
         repository = new DecisionRepository(application.getApplicationContext());
         FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
+        db = FirebaseFirestore.getInstance();
     }
 
     // LiveData getters
@@ -92,12 +95,11 @@ public class CreateQuizViewModel extends AndroidViewModel {
         newQuestion.setType("multiple_choice");  // Default type
         
         // Add default options with equal percentages
-        StringBuilder defaultDesc = new StringBuilder();
-        defaultDesc.append("option:Option 1\n");
-        defaultDesc.append("percentage:50\n");
-        defaultDesc.append("option:Option 2\n");
-        defaultDesc.append("percentage:50\n");
-        newQuestion.setDescription(defaultDesc.toString());
+        String defaultDesc = "option:Option 1\n" +
+                "percentage:50\n" +
+                "option:Option 2\n" +
+                "percentage:50\n";
+        newQuestion.setDescription(defaultDesc);
         
         newQuestion.setScore(0);  // Default score
         
@@ -342,13 +344,11 @@ public class CreateQuizViewModel extends AndroidViewModel {
                         Map<String, Object> quizData = new HashMap<>();
                         quizData.put("isPublic", isPublic);
                         
-                        // We're using Firebase directly here as our Repository doesn't have a method for metadata
-                        // In a full implementation, this would be added to the Repository
-                        FirebaseStorage.getInstance().getReference()
-                                .child("quizMetadata")
-                                .child(quiz.getId())
-                                .putBytes(String.valueOf(quizData).getBytes())
-                                .addOnSuccessListener(taskSnapshot -> {
+                        // Use Firestore instead of Storage for storing metadata
+                        db.collection("quizMetadata")
+                                .document(quiz.getId())
+                                .set(quizData)
+                                .addOnSuccessListener(aVoid -> {
                                     createdQuiz.setValue(quiz);
                                     quizSaved.setValue(true);
                                     isLoading.setValue(false);
