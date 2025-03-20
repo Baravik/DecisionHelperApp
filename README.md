@@ -5,33 +5,40 @@ DecisionHelperApp is an Android application designed to help users make informed
 ---
 
 ## **Features**
-- Create and answer quizzes to evaluate decisions.
-- Rate the importance of questions for personalized results.
-- Save or discard quiz results.
-- Admin panel for approving or rejecting new quizzes and questions.
-- User management system for tracking individual progress.
-- Scoring system to evaluate and compare decisions.
-- Offline synchronization capabilities for uninterrupted usage.
+- Create and answer quizzes to evaluate decisions
+- Multiple question types (multiple choice, yes/no) with customizable options
+- Upload images to enhance quiz questions
+- User authentication with email/password or Google Sign-In
+- Save quiz results and track progress over time
+- Public and private quiz sharing options
+- View and compare scores across different quizzes
+- Responsive UI with intuitive navigation
 
 ---
 
 ## **Technologies Used**
 
 1. **Android (Java)**:  
-   The entire application is built in Java within Android Studio. The Android framework handles the UI, lifecycle, and logic of the app, while ensuring compatibility with Android devices.
+   The entire application is built in Java within Android Studio, utilizing Android's lifecycle components and UI framework.
 
 2. **XML**:  
-   Used for defining the layout and design of the app's UI.  
-   - Example: `activity_main.xml` defines the main menu layout, including buttons and text.
+   Used for defining the layout and design of the app's UI.
 
-3. **JDBC**:  
-   Used to establish communication with the SQLite database. JDBC facilitates querying, inserting, updating, and deleting data.
+3. **Firebase Authentication**:  
+   Handles user authentication, supporting both email/password and Google Sign-In methods.
 
-4. **SQLite**:  
-   A lightweight database embedded within the app, used to store user data, quiz details, questions, ratings, and admin-related information.
+4. **Cloud Firestore**:  
+   A NoSQL cloud database to store and sync app data at scale, including users, quizzes, questions, and scores.
 
-5. **Web Services (Optional)**:  
-   If extended to support centralized data, REST APIs can be used for cloud integration to manage quizzes and users centrally. The app includes ApiService for this functionality.
+5. **Firebase Storage**:  
+   Cloud storage solution for user-generated content such as question images.
+
+6. **SQLite (Local Cache)**:  
+   A lightweight local database used for offline access and caching.
+
+7. **Android Architecture Components**:  
+   - LiveData: For observable data holder classes
+   - ViewModel: For UI-related data handling that survives configuration changes
 
 ---
 
@@ -40,111 +47,99 @@ DecisionHelperApp is an Android application designed to help users make informed
 DecisionHelperApp follows the **MVVM architecture** to ensure a clear separation of concerns, modularity, and ease of maintenance.
 
 ### **Model**  
-The **Model** layer represents the data and business logic of the application. It is responsible for handling data operations, such as fetching data from the database or network.  
+The **Model** layer represents the data structures and business logic of the application.
 
 Files in this layer:
-- `models/`
-  - `Quiz.java`: Represents a quiz.
-  - `Question.java`: Represents a question.
-  - `User.java`: Represents a user in the system.
-  - `QuizQuestions.java`: Maps the relationship between quizzes and their questions.
-  - `QuizUser.java`: Maps the relationship between quizzes and users.
-  - `Rating.java`: Stores importance ratings for questions.
-  - `Scores.java`: Tracks user scores across different quizzes.
-- `database/`
-  - `DatabaseHelper.java`: Handles database creation and schema.
-  - `QuizDAO.java`, `QuestionDAO.java`, `UserDAO.java`, `RatingDAO.java`, `ScoresDAO.java`: Manage CRUD operations on respective entities.
-  - `QuizUserDAO.java`, `QuizQuestionsDAO.java`: Handle relationship data management.
-- `repository/`
-  - `DecisionRepository.java`: Central data handler implementing repository pattern.
+- **Data Models**:
+  - `Quiz.java`: Represents a quiz with metadata such as title, description, category.
+  - `Question.java`: Represents quiz questions, supporting multiple choice and yes/no types.
+  - `User.java`: Represents a user with authentication and profile information.
+  - `QuizQuestions.java`: Manages relationships between quizzes and their questions.
+  - `QuizUser.java`: Tracks user interactions with quizzes including completion status.
+  - `Scores.java`: Stores score ranges and their interpretations.
+  - `Answer.java`: Represents answer options with associated percentages.
 
----
+- **Data Access**:
+  - `DatabaseHelper.java`: Manages SQLite database operations for offline functionality.
+  - Various DAO classes: Implement Firebase Firestore operations for each entity type.
+    - `QuizDAO.java`, `QuestionDAO.java`, `UserDAO.java`, `ScoresDAO.java`
+    - `QuizUserDAO.java`, `QuizQuestionsDAO.java`
+
+- **Repository**:
+  - `DecisionRepository.java`: Centralizes data operations and abstracts data sources from the rest of the app.
 
 ### **View**  
-The **View** layer is responsible for the UI and user interaction. It is implemented using XML layouts and Activities in the app.  
+The **View** layer handles UI rendering and user interaction.
 
-Files in this layer:
-- **XML Layouts** (res/layout/):
-  - `activity_main.xml`: Main menu layout.
-  - `activity_quiz.xml`: Quiz answering layout.
-  - `activity_rating.xml`: Question rating layout.
-  - `activity_admin.xml`: Admin panel layout.
-  - `activity_login.xml`: User authentication layout.
-  - `activity_splash.xml`: App launch screen.
-  - `activity_scores.xml`: Displays user scores.
-  - `activity_users.xml`: User management interface.
-  - `dialog_registration.xml`: User registration form.
-  - `item_question.xml`: Template for question display in lists.
-
-- **Activities** (activities/):
+Components in this layer:
+- **Activities**:
   - `BaseActivity.java`: Parent class with shared functionality for all activities.
-  - `MainActivity.java`: Handles user navigation from the main menu.
-  - `QuizActivity.java`: Displays quizzes for answering.
-  - `RatingActivity.java`: Allows users to rate question importance.
-  - `AdminActivity.java`: Provides admin functionalities.
-  - `LoginActivity.java`: Manages user authentication.
-  - `SplashActivity.java`: Manages app startup sequence.
-  - `ScoresActivity.java`: Displays user performance metrics.
-  - `UsersActivity.java`: Manages user accounts.
+  - `MainActivity.java`: Primary navigation hub for the application.
+  - `LoginActivity.java`: Handles user authentication flow.
+  - `CreateQuizActivity.java`: Interface for creating and editing quizzes.
+  - `QuizActivity.java`: Displays and processes quiz questions.
+  - `ScoresActivity.java`: Shows user performance metrics.
 
----
+- **Adapters**:
+  - `QuizAdapter.java`: Binds quiz data to RecyclerView items.
+  - `QuestionAdapter.java`: Manages display of questions in lists.
+  - `ScoresAdapter.java`: Handles score data visualization.
+
+- **Layouts**:
+  - Various XML layouts defining the UI structure of each screen.
 
 ### **ViewModel**  
-The **ViewModel** layer bridges the View and Model layers. It processes data from the Model and prepares it for the View. It also contains logic for managing UI-related data in a lifecycle-aware manner.  
+The **ViewModel** layer processes data for the UI and manages UI-related data in a lifecycle-conscious way.
 
-Files in this layer:
-- **ViewModels** (viewmodel/):
-  - `MainViewModel.java`: Handles main screen data operations.
-  - `QuizViewModel.java`: Manages quiz data and user interactions.
-  - `RatingViewModel.java`: Processes rating submissions and calculations.
-  - `AdminViewModel.java`: Handles admin panel operations.
-  - `ScoresViewModel.java`: Manages score data processing and display.
-  - `UsersViewModel.java`: Handles user data operations.
-
-- **Adapters** (adapters/):  
-  Handle the binding of data to Views in dynamic UI components like RecyclerViews.
-  - `QuizAdapter.java`: Manages the display of quizzes in a list.
-  - `ScoresAdapter.java`: Handles score data display in lists.
-  - `UserAdapter.java`: Manages user data display in lists.
-
-- **Utilities** (utils/):  
-  - `ApiService.java`: Handles communication with Web Services (if used).
-  - `Utils.java`: Contains helper methods for processing and formatting data.
-  - `Constants.java`: Stores static configuration and constants.
-  - `OfflineSyncManager.java`: Manages data synchronization for offline usage.
+Key ViewModels:
+- `MainViewModel.java`: Manages main screen state and user data.
+- `LoginViewModel.java`: Handles authentication logic and user session state.
+- `CreateQuizViewModel.java`: Manages quiz creation workflow, including question management and image uploads.
+- `QuizViewModel.java`: Controls quiz interaction flow and question navigation.
+- `ScoresViewModel.java`: Processes and formats score data for display.
 
 ---
 
-## **How It Works**
+## **Key Functionality**
 
-1. **User Authentication**:
-   - Users can log in or register to access personalized content.
-   - Authentication state is managed throughout the app session.
+### **User Authentication**
+- Email/password registration and login
+- Google authentication integration
+- User profile management
+- Session persistence
 
-2. **Quizzes and Questions**:
-   - Users can select or create quizzes.
-   - Questions are rated for importance and answered to compute a "recommendation score."
+### **Quiz Creation and Management**
+- Multi-step quiz creation process
+- Support for multiple choice and yes/no question types
+- Image upload capability for questions
+- Input validation for quiz content
+- Public/private visibility options
 
-3. **Admin Panel**:
-   - Allows an admin to approve or reject new quizzes and questions.
-   - Manages user accounts and permissions.
+### **Quiz Taking**
+- Sequential or random question presentation
+- Progress tracking during quiz sessions
+- Score calculation based on answer weights
+- Result storage and historical comparison
 
-4. **Scoring System**:
-   - Tracks user performance across different quizzes.
-   - Provides metrics for decision quality evaluation.
+### **Scoring System**
+- Customizable scoring ranges
+- Interpretive feedback based on score brackets
+- Performance metrics visualization
 
-5. **Database Operations**:
-   - All user data, ratings, and quiz results are stored locally in SQLite via JDBC.
-   - Optional synchronization with cloud services when available.
+### **Cloud Integration**
+- Data synchronization between devices
+- Backup and restore capabilities
+- Real-time updates for collaborative features
 
 ---
 
 ## **Getting Started**
 
 ### **Prerequisites**
-- Android Studio installed on your system.
-- Basic knowledge of Java and Android development.
-- A physical or virtual Android device for testing.
+- Android Studio (latest stable version recommended)
+- JDK 8 or higher
+- An Android device (physical or emulator) running Android 5.0 (API 21) or higher
+- A Firebase account for backend services
 
 ### **Setup**
 1. Clone the repository:
@@ -152,8 +147,11 @@ Files in this layer:
    git clone https://github.com/your-username/DecisionHelperApp.git
    ```
 2. Open the project in Android Studio.
-3. Build the project and ensure there are no errors.
-4. Run the app on an emulator or physical device.
+3. Connect your Firebase project:
+   - Add your `google-services.json` file to the app directory
+   - Ensure Firebase services (Authentication, Firestore, Storage) are enabled
+4. Build the project and ensure there are no errors.
+5. Run the app on an emulator or physical device.
 
 ---
 
