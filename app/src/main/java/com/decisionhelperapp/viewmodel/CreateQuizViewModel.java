@@ -342,7 +342,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
                         Map<String, Object> quizData = new HashMap<>();
                         quizData.put("isPublic", isPublic);
                         
-                        // We're using Firestore directly here as our Repository doesn't have a method for metadata
+                        // We're using Firebase directly here as our Repository doesn't have a method for metadata
                         // In a full implementation, this would be added to the Repository
                         FirebaseStorage.getInstance().getReference()
                                 .child("quizMetadata")
