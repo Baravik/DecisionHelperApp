@@ -17,7 +17,6 @@ import com.decisionhelperapp.repository.DecisionRepository;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,18 +182,18 @@ public class CreateQuizViewModel extends AndroidViewModel {
     public boolean validateQuiz(String quizName, String quizDescription) {
         if (quizName.isEmpty()) {
             errorMessage.setValue("Quiz name is required");
-            return false;
+            return true;
         }
         
         if (quizDescription.isEmpty()) {
             errorMessage.setValue("Description is required");
-            return false;
+            return true;
         }
         
         List<Question> currentList = questionsList.getValue();
         if (currentList == null || currentList.isEmpty()) {
             errorMessage.setValue("Add at least one question");
-            return false;
+            return true;
         }
         
         // Validate each question
@@ -202,7 +201,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
             Question question = currentList.get(i);
             if (question.getTitle().trim().isEmpty()) {
                 errorMessage.setValue("Question " + (i + 1) + " text is empty");
-                return false;
+                return true;
             }
             
             if (question.getType().equals("multiple_choice")) {
@@ -211,7 +210,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
                 if (!description.contains("option:")) {
                     errorMessage.setValue("Multiple choice question " + (i + 1) + 
                             " needs at least 2 options");
-                    return false;
+                    return true;
                 }
                 
                 // Count options and check percentages
@@ -235,21 +234,21 @@ public class CreateQuizViewModel extends AndroidViewModel {
                 if (optionCount < 2) {
                     errorMessage.setValue("Multiple choice question " + (i + 1) + 
                             " needs at least 2 options");
-                    return false;
+                    return true;
                 }
                 
                 // Check if percentages are defined properly
                 if (!hasPercentages) {
                     errorMessage.setValue("Question " + (i + 1) + 
                             " is missing percentages for options");
-                    return false;
+                    return true;
                 }
                 
                 // Check if total percentage isn't 0%
                 if (totalPercentage == 0) {
                     errorMessage.setValue("Question " + (i + 1) + 
                             " needs at least one option with a non-zero percentage");
-                    return false;
+                    return true;
                 }
             }
             else if (question.getType().equals("yes_no_question")) {
@@ -258,23 +257,23 @@ public class CreateQuizViewModel extends AndroidViewModel {
                 if (!description.contains("yes_full_score:")) {
                     errorMessage.setValue("Yes/No question " + (i + 1) + 
                             " needs to define which answer gives 100% score");
-                    return false;
+                    return true;
                 }
             }
             else {
                 // Invalid question type
                 errorMessage.setValue("Question " + (i + 1) + 
                         " has an invalid type");
-                return false;
+                return true;
             }
         }
         
-        return true;
+        return false;
     }
     
     // Save the quiz
     public void saveQuiz(String category, String description, String name, String userId, boolean isPublic) {
-        if (!validateQuiz(name, description)) {
+        if (validateQuiz(name, description)) {
             return;
         }
 
@@ -378,7 +377,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
     
     // Create a preview quiz without saving to database
     public Quiz createPreviewQuiz(String category, String description, String name, String userId) {
-        if (!validateQuiz(name, description)) {
+        if (validateQuiz(name, description)) {
             return null;
         }
         
