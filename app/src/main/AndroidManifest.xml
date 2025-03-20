@@ -41,11 +41,6 @@
             android:exported="false" />
 
         <activity
-            android:name="com.decisionhelperapp.activities.RatingActivity"
-            android:label="@string/rating_title"
-            android:exported="false" />
-
-        <activity
             android:name="com.decisionhelperapp.activities.ScoresActivity"
             android:label="Scores"
             android:exported="false" />

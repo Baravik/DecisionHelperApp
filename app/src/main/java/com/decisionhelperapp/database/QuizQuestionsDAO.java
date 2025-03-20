@@ -1,5 +1,6 @@
 package com.decisionhelperapp.database;
 
+import static com.decisionhelperapp.database.DatabaseHelper.Table_Question;
 import static com.decisionhelperapp.database.DatabaseHelper.Table_QuizQuestions;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -145,7 +146,7 @@ public class QuizQuestionsDAO {
         }
         
         // Firebase has limitations on 'in' queries, so for large lists we might need to batch
-        db.collection("Question")
+        db.collection(Table_Question)
             .whereIn("id", questionIds)
             .get()
             .addOnCompleteListener(task -> {
