@@ -9,6 +9,13 @@ import com.decisionhelperapp.models.Quiz; // added import
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "decision_helper.db";
+    protected static final String Table_Question = "questions";
+    protected static final String Table_Quizzes = "quizzes";
+    protected static final String Table_QuizQuestions = "quizQuestions";
+    protected static final String Table_QuizUser = "quizUser";
+
+
+
     private static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {
@@ -17,7 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createQuestionsTable = "CREATE TABLE questions (" +
+        String createQuestionsTable = "CREATE TABLE " + Table_Question +" (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "question_text TEXT, " +
                 "quiz_name TEXT" +
@@ -32,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createResultsTable);
 
         // Added quiz table creation
-        String createQuizTable = "CREATE TABLE quiz (" +
+        String createQuizTable = "CREATE TABLE "+Table_Quizzes+" (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "quiz_name TEXT" +
                 ");";
@@ -41,10 +48,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS questions");
+        db.execSQL("DROP TABLE IF EXISTS " + Table_Question);
         db.execSQL("DROP TABLE IF EXISTS results");
         // Drop quiz table as well
-        db.execSQL("DROP TABLE IF EXISTS quiz");
+        db.execSQL("DROP TABLE IF EXISTS " + Table_Quizzes);
         onCreate(db);
     }
 
@@ -54,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put("question_text", questionText);
         values.put("quiz_name", quizName);
-        long id = db.insert("questions", null, values);
+        long id = db.insert(Table_Question, null, values);
         db.close();
         return id;
     }
@@ -63,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getQuestionsForQuiz(String quizName) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(
-                "questions",       // Table name
+                Table_Question,       // Table name
                 null,              // All columns
                 "quiz_name = ?",   // Where clause
                 new String[]{quizName}, // Where args
@@ -87,25 +94,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Added getQuiz method to retrieve a Quiz by id
     public Quiz getQuiz(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(
-                "quiz",
+        try (Cursor cursor = db.query(
+                Table_Quizzes,
                 null,
                 "id = ?",
                 new String[]{String.valueOf(id)},
                 null,
                 null,
                 null
-        );
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    Quiz quiz = new Quiz();
-                    quiz.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("id"))));
-                    quiz.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("quiz_name")));
-                    return quiz;
-                }
-            } finally {
-                cursor.close();
+        )) {
+            if (cursor.moveToFirst()) {
+                Quiz quiz = new Quiz();
+                quiz.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("id"))));
+                quiz.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("quiz_name")));
+                return quiz;
             }
         }
         return null;

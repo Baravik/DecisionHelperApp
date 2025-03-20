@@ -51,6 +51,15 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         this.questions = questions;
         this.listener = listener;
     }
+    
+    /**
+     * Updates the questions list and refreshes the adapter
+     * @param newQuestions The new list of questions to display
+     */
+    public void updateQuestions(List<Question> newQuestions) {
+        this.questions = newQuestions;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override

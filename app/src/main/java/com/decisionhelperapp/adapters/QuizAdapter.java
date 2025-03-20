@@ -12,15 +12,22 @@ import java.util.List;
 
 public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder> {
     private final List<Quiz> quizList;
+    private final OnQuizClickListener listener;
 
-    public QuizAdapter(List<Quiz> quizList) {
+    // Interface for handling quiz clicks
+    public interface OnQuizClickListener {
+        void onQuizClick(Quiz quiz);
+    }
+
+    public QuizAdapter(List<Quiz> quizList, OnQuizClickListener listener) {
         this.quizList = quizList;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_quiz, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_quiz, parent, false);
         return new QuizViewHolder(view);
     }
 
@@ -28,7 +35,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
         Quiz quiz = quizList.get(position);
         holder.tvTitle.setText(quiz.getCustomTitle());
-        holder.tvQuestion.setText(quiz.getDescription());
+        holder.tvDescription.setText(quiz.getDescription());
+        
+        // Set click listener
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onQuizClick(quiz);
+            }
+        });
     }
 
     @Override
@@ -38,12 +52,12 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
     public static class QuizViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;
-        TextView tvQuestion;
+        TextView tvDescription;
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTitle = itemView.findViewById(R.id.tvQuizTitle);
-            tvQuestion = itemView.findViewById(R.id.tvQuestion);
+            tvTitle = itemView.findViewById(R.id.tvQuizItemTitle);
+            tvDescription = itemView.findViewById(R.id.tvQuizItemDescription);
         }
     }
 }

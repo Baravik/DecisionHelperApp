@@ -20,12 +20,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
 import com.decisionhelperapp.models.Question;
-import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.models.QuizQuestions;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +37,6 @@ import java.util.Map;
 public class TakeQuizActivity extends BaseActivity {
 
     private String quizId;
-    private String quizTitle;
     private boolean isPreview;
     private ArrayList<Question> previewQuestions;
 
@@ -56,7 +53,6 @@ public class TakeQuizActivity extends BaseActivity {
     
     private List<Question> questions = new ArrayList<>();
     private int currentQuestionIndex = 0;
-    private double totalScore = 0;
     private Map<String, String> userAnswers = new HashMap<>();
     
     private FirebaseFirestore db;
@@ -81,7 +77,7 @@ public class TakeQuizActivity extends BaseActivity {
         
         // Get data from intent
         quizId = getIntent().getStringExtra("QUIZ_ID");
-        quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
+        String quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
         isPreview = getIntent().getBooleanExtra("IS_PREVIEW", false);
         
         if (isPreview) {
@@ -345,7 +341,7 @@ public class TakeQuizActivity extends BaseActivity {
     }
     
     private void calculateScore() {
-        totalScore = 0;
+        double totalScore = 0;
         double maxPossibleScore = 0;
         
         for (Question question : questions) {
