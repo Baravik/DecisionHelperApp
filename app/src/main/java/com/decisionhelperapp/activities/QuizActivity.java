@@ -1,5 +1,6 @@
 package com.decisionhelperapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -84,9 +85,22 @@ public class QuizActivity extends BaseActivity {
         // Observe current quiz
         quizViewModel.getCurrentQuiz().observe(this, quiz -> {
             if (quiz != null) {
-                // Fixed: using getCustomTitle() instead of getTitle()
+                // Show Toast with quiz title
                 Toast.makeText(this, "Selected quiz: " + quiz.getCustomTitle(), Toast.LENGTH_SHORT).show();
+//                 Create Intent to open TakeQuizActivity
+                Intent intent = new Intent(QuizActivity.this, TakeQuizActivity.class);
+
+//                // Optionally, pass any quiz-related information (e.g., quiz ID, title) to TakeQuizActivity
+                intent.putExtra("QUIZ_TITLE", quiz.getCustomTitle()); // You can send other details if needed
+                intent.putExtra("QUIZ_ID", quiz.getId()); // You can send other details if needed
+
+//                // Start the TakeQuizActivity
+                startActivity(intent);
+            } else {
+//                // Handle case where quiz is null (optional)
+                Toast.makeText(this, "No quiz selected", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 }

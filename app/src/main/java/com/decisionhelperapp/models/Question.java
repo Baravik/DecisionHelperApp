@@ -196,6 +196,7 @@ public class Question implements Parcelable {
         private String text;
         private int percentage;
 
+        public Answer() {}
         public Answer(String text, int percentage) {
             this.text = text;
             this.percentage = percentage;

@@ -1,6 +1,7 @@
 package com.decisionhelperapp.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,12 +69,12 @@ public class TakeQuizActivity extends BaseActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         
         // Set up toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
         
         // Get data from intent
         quizId = getIntent().getStringExtra("QUIZ_ID");
@@ -85,14 +86,14 @@ public class TakeQuizActivity extends BaseActivity {
         }
         
         // Set toolbar title
-        if (actionBar != null) {
-            if (isPreview) {
-                actionBar.setTitle("Preview: " + quizTitle);
-            } else {
-                actionBar.setTitle(quizTitle);
-            }
-        }
-        
+//        if (actionBar != null) {
+//            if (isPreview) {
+//                actionBar.setTitle("Preview: " + quizTitle);
+//            } else {
+//                actionBar.setTitle(quizTitle);
+//            }
+//        }
+//
         // Initialize views
         textQuestionTitle = findViewById(R.id.text_question_title);
         textQuestionNumber = findViewById(R.id.text_question_number);
@@ -110,7 +111,12 @@ public class TakeQuizActivity extends BaseActivity {
         btnPrevious.setOnClickListener(v -> goToPreviousQuestion());
         btnYes.setOnClickListener(v -> selectYesNoAnswer("YES"));
         btnNo.setOnClickListener(v -> selectYesNoAnswer("NO"));
-        
+
+        // Disable next button initially
+        btnNext.setEnabled(false);
+        btnYes.setBackgroundColor(Color.GRAY);
+        btnNo.setBackgroundColor(Color.GRAY);
+
         // Load quiz data
         if (isPreview) {
             // Use preview questions directly
@@ -188,7 +194,12 @@ public class TakeQuizActivity extends BaseActivity {
         
         currentQuestionIndex = index;
         Question question = questions.get(index);
-        
+
+        // Reset button states before setting up the new question
+        btnNext.setEnabled(false);
+        btnYes.setBackgroundColor(Color.GRAY);
+        btnNo.setBackgroundColor(Color.GRAY);
+
         // Update progress
         textQuestionNumber.setText(String.format(Locale.getDefault(), 
                 "Question %d of %d", index + 1, questions.size()));
@@ -271,6 +282,7 @@ public class TakeQuizActivity extends BaseActivity {
                     if (isChecked) {
                         // Record this answer
                         userAnswers.put(question.getId(), optionText);
+                        btnNext.setEnabled(true);
                     }
                 });
                 
@@ -299,9 +311,14 @@ public class TakeQuizActivity extends BaseActivity {
         // Update button state
         btnYes.setSelected("YES".equals(answer));
         btnNo.setSelected("NO".equals(answer));
+
+        btnYes.setBackgroundColor("YES".equals(answer) ? Color.RED : Color.GRAY);
+        btnNo.setBackgroundColor("NO".equals(answer) ? Color.RED : Color.GRAY);
         
         // Record answer
         userAnswers.put(question.getId(), answer);
+        // Enable "Next" button
+        btnNext.setEnabled(true);
     }
     
     private void restorePreviousAnswers(Question question) {
@@ -322,6 +339,11 @@ public class TakeQuizActivity extends BaseActivity {
         } else if ("yes_no_question".equals(question.getType())) {
             btnYes.setSelected("YES".equals(previousAnswer));
             btnNo.setSelected("NO".equals(previousAnswer));
+
+            btnYes.setBackgroundColor("YES".equals(previousAnswer) ? Color.RED : Color.GRAY);
+            btnNo.setBackgroundColor("NO".equals(previousAnswer) ? Color.RED : Color.GRAY);
+
+            btnNext.setEnabled(true); // Ensure next button is enabled if answer exists
         }
     }
     
@@ -425,17 +447,14 @@ public class TakeQuizActivity extends BaseActivity {
     }
     
     private void saveScore(int score) {
-        if (currentUser == null || isPreview) {
-            return;
-        }
-        
         // Update quiz with completion info
         Map<String, Object> completionData = new HashMap<>();
         completionData.put("score", score);
         completionData.put("completedAt", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 .format(new Date()));
         completionData.put("userId", currentUser.getUid());
-        
+        completionData.put("quizId", quizId);
+
         db.collection("userQuizScores").document(currentUser.getUid() + "_" + quizId)
                 .set(completionData)
                 .addOnFailureListener(e -> 
