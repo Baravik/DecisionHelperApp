@@ -1,5 +1,7 @@
 package com.decisionhelperapp.models;
 
+import com.google.firebase.firestore.PropertyName;
+
 public class Quiz {
     // Added no-argument constructor
     public Quiz() {}
@@ -11,8 +13,11 @@ public class Quiz {
     private String userId;
     private int score;
     private String completedAt;
+    
+    @PropertyName("isPublic")
+    private boolean isPublic;
 
-    public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt) {
+    public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt, boolean isPublic) {
         this.id = id;
         this.topic = topic;
         this.description = description;
@@ -20,6 +25,7 @@ public class Quiz {
         this.userId = userId;
         this.score = score;
         this.completedAt = completedAt;
+        this.isPublic = isPublic;
     }
 
     public String getId() {
@@ -76,5 +82,15 @@ public class Quiz {
 
     public void setCompletedAt(String completedAt) {
         this.completedAt = completedAt;
+    }
+    
+    @PropertyName("isPublic")
+    public boolean isPublic() {
+        return isPublic;
+    }
+    
+    @PropertyName("isPublic")
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }
