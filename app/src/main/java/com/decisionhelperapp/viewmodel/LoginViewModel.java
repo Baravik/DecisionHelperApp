@@ -16,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Objects;
+
 public class LoginViewModel extends AndroidViewModel {
     private static final String TAG = "LoginViewModel";
 
@@ -58,21 +60,73 @@ public class LoginViewModel extends AndroidViewModel {
 
         isLoading.setValue(true);
         
-        // Check if user exists in database using repository
+        // First authenticate with Firebase
+        mAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                    if (firebaseUser != null) {
+                        // Now get the user from our database using the Firebase UID
+                        repository.getUserById(firebaseUser.getUid(), new UserDAO.SingleUserCallback() {
+                            @Override
+                            public void onCallback(User user) {
+                                if (user != null) {
+                                    // Update last login date
+                                    user.setLastLoginDate(new java.util.Date());
+                                    repository.updateUser(user, new UserDAO.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            loggedInUser.setValue(user);
+                                            isAuthSuccessful.setValue(true);
+                                            isLoading.setValue(false);
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Log.e(TAG, "Failed to update user login date", e);
+                                            // Still proceed with login even if update fails
+                                            loggedInUser.setValue(user);
+                                            isAuthSuccessful.setValue(true);
+                                            isLoading.setValue(false);
+                                        }
+                                    });
+                                } else {
+                                    // This should not happen - Firebase auth succeeded but user not in our DB
+                                    // Create or fetch the user based on the email instead
+                                    getUserByEmail(email, firebaseUser);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.e(TAG, "Failed to fetch user by ID", e);
+                                // Try fallback to email
+                                getUserByEmail(email, firebaseUser);
+                            }
+                        });
+                    } else {
+                        errorMessage.setValue("Authentication succeeded but user data is missing");
+                        isLoading.setValue(false);
+                    }
+                } else {
+                    // Authentication failed
+                    Log.e(TAG, "Firebase auth failed", task.getException());
+                    errorMessage.setValue("Login failed: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                    isLoading.setValue(false);
+                }
+            });
+    }
+    
+    // Helper method to get user by email as fallback
+    private void getUserByEmail(String email, FirebaseUser firebaseUser) {
         repository.getUserByEmail(email, new UserDAO.SingleUserCallback() {
             @Override
             public void onCallback(User user) {
-                if (user == null) {
-                    errorMessage.setValue("Email/password doesn't exist");
-                    isLoading.setValue(false);
-                    return;
-                }
-
-                // Verify password
-                String hashedPassword = Utils.hashPassword(password);
-                if (user.getPasswordHash() != null && user.getPasswordHash().equals(hashedPassword)) {
-                    // Update last login date
+                if (user != null) {
+                    // Found by email, but make sure ID is synced with Firebase
+                    user.setId(firebaseUser.getUid());
                     user.setLastLoginDate(new java.util.Date());
+                    
                     repository.updateUser(user, new UserDAO.ActionCallback() {
                         @Override
                         public void onSuccess() {
@@ -83,16 +137,33 @@ public class LoginViewModel extends AndroidViewModel {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Log.e(TAG, "Failed to update user login date", e);
-                            // Still proceed with login even if update fails
+                            Log.e(TAG, "Failed to update user", e);
                             loggedInUser.setValue(user);
                             isAuthSuccessful.setValue(true);
                             isLoading.setValue(false);
                         }
                     });
                 } else {
-                    errorMessage.setValue("Invalid password");
-                    isLoading.setValue(false);
+                    // Create a new user based on Firebase info
+                    User newUser = new User(email, firebaseUser.getDisplayName() != null ? 
+                                           firebaseUser.getDisplayName() : "User", 
+                                           firebaseUser.getUid(), "");
+                    
+                    repository.addUser(newUser, new UserDAO.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            loggedInUser.setValue(newUser);
+                            isAuthSuccessful.setValue(true);
+                            isLoading.setValue(false);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.e(TAG, "Failed to create user", e);
+                            errorMessage.setValue("Login succeeded but failed to create user data");
+                            isLoading.setValue(false);
+                        }
+                    });
                 }
             }
 
@@ -195,7 +266,7 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     // Register a new user
-    public void registerUser(String name, String email, String password, String confirmPassword) {
+    /*public void registerUser(String name, String email, String password, String confirmPassword) {
         if (name == null || name.isEmpty() || 
             email == null || email.isEmpty() || 
             password == null || password.isEmpty()) {
@@ -249,5 +320,61 @@ public class LoginViewModel extends AndroidViewModel {
                 isLoading.setValue(false);
             }
         });
+    }*/
+    public void registerUser(String name, String email, String password, String confirmPassword) {
+        if (name == null || name.isEmpty() ||
+                email == null || email.isEmpty() ||
+                password == null || password.isEmpty()) {
+            errorMessage.setValue("All fields are required");
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            errorMessage.setValue("Passwords don't match");
+            return;
+        }
+
+        if (password.length()<6){
+            errorMessage.setValue("Password must be at least 6 characters long");
+            return;
+        }
+
+        isLoading.setValue(true);
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
+
+                            String hashedPassword = Utils.hashPassword(password);
+                            User newUser = new User(email, name, userId, hashedPassword);
+
+                            repository.addUser(newUser, new UserDAO.ActionCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    loggedInUser.setValue(newUser);
+                                    isAuthSuccessful.setValue(true);
+                                    isLoading.setValue(false);
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Log.e(TAG, "Failed to save user to Firestore", e);
+                                    errorMessage.setValue("Registration failed: " + e.getMessage());
+                                    isLoading.setValue(false);
+                                }
+                            });
+                        } else {
+                            errorMessage.setValue("User creation failed. Please try again.");
+                            isLoading.setValue(false);
+                        }
+                    } else {
+                        Log.e(TAG, "FirebaseAuth registration failed", task.getException());
+                        errorMessage.setValue("Registration failed: " + Objects.requireNonNull(task.getException()).getMessage());
+                        isLoading.setValue(false);
+                    }
+                });
     }
 }

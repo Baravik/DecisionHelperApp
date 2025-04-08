@@ -39,6 +39,10 @@ public class MainActivity extends BaseActivity {
         userTextView = findViewById(R.id.userStatusTextView);
         userProfileImageView = findViewById(R.id.userProfileImageView);
         
+        // Set click listeners for profile image and username
+        userProfileImageView.setOnClickListener(v -> navigateToUserProfile());
+        userTextView.setOnClickListener(v -> navigateToUserProfile());
+       
         // Setup LiveData observers
         mainViewModel.getCurrentUserObject().observe(this, user -> {
             if (user != null) {
@@ -106,6 +110,15 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+    
+    private void navigateToUserProfile() {
+        Intent intent = new Intent(MainActivity.this, UserActivity.class);
+        User currentUser = mainViewModel.getCurrentUserObject().getValue();
+        if (currentUser != null) {
+            intent.putExtra("USER_ID", currentUser.getId());
+        }
+        startActivity(intent);
     }
     
     private void updateUIWithUser(User user) {

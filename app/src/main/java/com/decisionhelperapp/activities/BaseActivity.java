@@ -25,6 +25,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        
+        // Update the user menu icon with profile photo
+        com.decisionhelperapp.utils.MenuHelper.updateUserMenuIcon(this, menu);
+        
         return true;
     }
 
@@ -32,8 +36,8 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-        if (id == R.id.action_user) { // Also open LoginActivity when action_user is selected
-            Intent intent = new Intent(this, LoginActivity.class);
+        if (id == R.id.action_user) { // Open UserActivity when user icon is clicked
+            Intent intent = new Intent(this, UserActivity.class);
             startActivity(intent);
             return true;
         } else if (id == android.R.id.home) { // Navigate back to MainActivity

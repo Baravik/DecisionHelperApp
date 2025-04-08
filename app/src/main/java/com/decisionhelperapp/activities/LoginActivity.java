@@ -59,6 +59,7 @@ public class LoginActivity extends BaseActivity {
         setupObservers();
         
         loginButton.setOnClickListener(v -> {
+            
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
             loginViewModel.loginWithEmailPassword(email, password);
@@ -161,5 +162,15 @@ public class LoginActivity extends BaseActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    
+    // Static method to create a Google Sign-In intent from any activity
+    public static Intent createGoogleSignInIntent(android.content.Context context) {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(context, gso);
+        return googleSignInClient.getSignInIntent();
     }
 }
