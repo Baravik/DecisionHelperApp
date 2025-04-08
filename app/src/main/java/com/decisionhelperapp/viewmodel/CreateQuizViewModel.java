@@ -329,14 +329,14 @@ public class CreateQuizViewModel extends AndroidViewModel {
     
     private void saveQuizAfterQuestions(Quiz quiz, List<String> questionIds, boolean isPublic) {
         // Create QuizQuestions relationship
-        QuizQuestions quizQuestions = new QuizQuestions(questionIds, quiz.getId(), 0);
+        QuizQuestions quizQuestions = new QuizQuestions(questionIds);
         
         // Save quiz
         repository.addQuiz(quiz, new QuizDAO.ActionCallback() {
             @Override
             public void onSuccess() {
                 // Save quiz questions relationship
-                repository.addQuizQuestion(quizQuestions, new QuizQuestionsDAO.ActionCallback() {
+                repository.addQuizQuestion(quizQuestions,quiz.getId(), new QuizQuestionsDAO.ActionCallback() {
                     @Override
                     public void onSuccess() {
                         // Save quiz metadata (public/private status)
