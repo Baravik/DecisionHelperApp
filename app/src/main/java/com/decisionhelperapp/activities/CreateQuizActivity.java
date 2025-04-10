@@ -78,12 +78,6 @@ public class CreateQuizActivity extends BaseActivity {
         recyclerQuestions = findViewById(R.id.recycler_questions);
         progressIndicator = findViewById(R.id.progress_indicator);
         switchPublic = findViewById(R.id.switch_public);
-        spinnerCategory = findViewById(R.id.spinner_category);
-        
-        // Set up category spinner
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_dropdown_item, categories);
-        spinnerCategory.setAdapter(categoryAdapter);
         
         // Set up observers
         setupObservers();
@@ -157,12 +151,10 @@ public class CreateQuizActivity extends BaseActivity {
         // Get data from views
         String quizName = Objects.requireNonNull(editQuizName.getText()).toString().trim();
         String quizDescription = Objects.requireNonNull(editQuizDescription.getText()).toString().trim();
-        String category = spinnerCategory.getSelectedItem().toString();
         boolean isPublic = switchPublic.isChecked();
         
         // Save quiz using ViewModel
         viewModel.saveQuiz(
-            category,
             quizDescription,
             quizName,
             currentUser.getUid(),

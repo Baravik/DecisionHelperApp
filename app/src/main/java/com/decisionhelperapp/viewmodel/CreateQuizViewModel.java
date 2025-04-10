@@ -270,7 +270,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
     }
     
     // Save the quiz
-    public void saveQuiz(String category, String description, String name, String userId, boolean isPublic) {
+    public void saveQuiz(String description, String name, String userId, boolean isPublic) {
         if (validateQuiz(name, description)) {
             return;
         }
@@ -281,7 +281,6 @@ public class CreateQuizViewModel extends AndroidViewModel {
         String quizId = UUID.randomUUID().toString();
         Quiz quiz = new Quiz(
                 quizId,
-                category,
                 description,
                 name,
                 userId,

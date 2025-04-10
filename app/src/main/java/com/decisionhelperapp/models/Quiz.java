@@ -8,7 +8,6 @@ public class Quiz {
 
     private String description;
     private String id;
-    private String topic;
     private String customTitle;
     private String userId;
     private int score;
@@ -17,9 +16,8 @@ public class Quiz {
     @PropertyName("isPublic")
     private boolean isPublic;
 
-    public Quiz(String id, String topic, String description, String customTitle, String userId, int score, String completedAt, boolean isPublic) {
+    public Quiz(String id, String description, String customTitle, String userId, int score, String completedAt, boolean isPublic) {
         this.id = id;
-        this.topic = topic;
         this.description = description;
         this.customTitle = customTitle;
         this.userId = userId;
@@ -34,14 +32,6 @@ public class Quiz {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
     }
 
     public String getDescription() {
