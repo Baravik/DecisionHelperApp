@@ -54,6 +54,10 @@
             android:name="com.decisionhelperapp.activities.BaseActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.decisionhelperapp.activities.UserActivity"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

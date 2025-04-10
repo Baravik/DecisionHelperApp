@@ -146,8 +146,8 @@ public class DecisionRepository {
         quizQuestionsDAO.getQuestionsForQuiz(quizId, callback);
     }
 
-    public void addQuizQuestion(QuizQuestions quizQuestion, QuizQuestionsDAO.ActionCallback callback) {
-        quizQuestionsDAO.addQuizQuestion(quizQuestion, callback);
+    public void addQuizQuestion(QuizQuestions quizQuestion, String quizID,QuizQuestionsDAO.ActionCallback callback) {
+        quizQuestionsDAO.addQuizQuestion(quizQuestion, quizID, callback);
     }
 
     // QuizUser related methods

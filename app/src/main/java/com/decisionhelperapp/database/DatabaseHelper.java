@@ -13,7 +13,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     protected static final String Table_Quizzes = "quizzes";
     protected static final String Table_QuizQuestions = "quizQuestions";
     protected static final String Table_QuizUser = "quizUser";
-    public static final String Table_QuizMetadata = "quizMetadata";
 
 
 

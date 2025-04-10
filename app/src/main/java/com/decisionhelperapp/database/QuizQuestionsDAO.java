@@ -23,7 +23,7 @@ public class QuizQuestionsDAO {
                 List<QuizQuestions> quizQuestionsList = new ArrayList<>();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     QuizQuestions quizQuestions = document.toObject(QuizQuestions.class);
-                    quizQuestions.setId(document.getId());
+                    // No need to set ID as we've removed this field
                     quizQuestionsList.add(quizQuestions);
                 }
                 callback.onCallback(quizQuestionsList);
@@ -33,36 +33,33 @@ public class QuizQuestionsDAO {
         });
     }
 
-    // Get questions for a specific quiz
+    // Get questions for a specific quiz - simplified to use document ID
     public void getQuestionsByQuizId(String quizId, final QuizQuestionsCallback callback) {
+        // Since we're now using quizId as the document ID, we can get it directly
         db.collection(Table_QuizQuestions)
-            .whereEqualTo("quizId", quizId)
-            .orderBy("order") // Order by the order field
+            .document(quizId)
             .get()
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<QuizQuestions> quizQuestionsList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        QuizQuestions quizQuestions = document.toObject(QuizQuestions.class);
-                        quizQuestions.setId(document.getId());
+            .addOnSuccessListener(documentSnapshot -> {
+                List<QuizQuestions> quizQuestionsList = new ArrayList<>();
+                if (documentSnapshot.exists()) {
+                    QuizQuestions quizQuestions = documentSnapshot.toObject(QuizQuestions.class);
+                    if (quizQuestions != null) {
                         quizQuestionsList.add(quizQuestions);
                     }
-                    callback.onCallback(quizQuestionsList);
-                } else {
-                    callback.onFailure(task.getException());
                 }
-            });
+                callback.onCallback(quizQuestionsList);
+            })
+            .addOnFailureListener(e -> callback.onFailure(e));
     }
 
-    // Get a specific quiz question relationship
-    public void getQuizQuestionsById(String id, final SingleQuizQuestionsCallback callback) {
+    // Get a specific quiz question relationship (renamed to better reflect that quizId is the document ID)
+    public void getQuizQuestionsById(String quizId, final SingleQuizQuestionsCallback callback) {
         db.collection(Table_QuizQuestions)
-            .document(id)
+            .document(quizId)
             .get()
             .addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
                     QuizQuestions quizQuestions = documentSnapshot.toObject(QuizQuestions.class);
-                    quizQuestions.setId(documentSnapshot.getId());
                     callback.onCallback(quizQuestions);
                 } else {
                     callback.onCallback(null);
@@ -72,35 +69,29 @@ public class QuizQuestionsDAO {
     }
 
     // Add a new quiz-questions relationship
-    public void addQuizQuestions(QuizQuestions quizQuestions, final ActionCallback callback) {
-        // Let Firebase generate an ID if none is provided
-        if (quizQuestions.getId() == null || quizQuestions.getId().isEmpty()) {
-            db.collection(Table_QuizQuestions)
-                .add(quizQuestions)
-                .addOnSuccessListener(documentReference -> {
-                    quizQuestions.setId(documentReference.getId());
-                    callback.onSuccess();
-                })
-                .addOnFailureListener(callback::onFailure);
-        } else {
-            // Use the provided ID
-            db.collection(Table_QuizQuestions)
-                .document(quizQuestions.getId())
-                .set(quizQuestions)
-                .addOnSuccessListener(aVoid -> callback.onSuccess())
-                .addOnFailureListener(callback::onFailure);
+    public void addQuizQuestions(QuizQuestions quizQuestions, String quizId, final ActionCallback callback) {
+        if (quizId == null || quizId.isEmpty()) {
+            callback.onFailure(new IllegalArgumentException("QuizId cannot be null or empty"));
+            return;
         }
+        
+        // Use the quizId as the document ID directly
+        db.collection(Table_QuizQuestions)
+            .document(quizId)
+            .set(quizQuestions)
+            .addOnSuccessListener(aVoid -> callback.onSuccess())
+            .addOnFailureListener(callback::onFailure);
     }
 
     // Update a quiz-questions relationship
-    public void updateQuizQuestions(QuizQuestions quizQuestions, final ActionCallback callback) {
-        if (quizQuestions.getId() == null || quizQuestions.getId().isEmpty()) {
-            callback.onFailure(new IllegalArgumentException("QuizQuestions ID cannot be null or empty for update operation"));
+    public void updateQuizQuestions(QuizQuestions quizQuestions, String quizId, final ActionCallback callback) {
+        if (quizId == null || quizId.isEmpty()) {
+            callback.onFailure(new IllegalArgumentException("QuizId cannot be null or empty for update operation"));
             return;
         }
 
         db.collection(Table_QuizQuestions)
-            .document(quizQuestions.getId())
+            .document(quizId)
             .set(quizQuestions)
             .addOnSuccessListener(aVoid -> callback.onSuccess())
             .addOnFailureListener(callback::onFailure);
@@ -124,7 +115,7 @@ public class QuizQuestionsDAO {
                 // based on the question IDs in the quizQuestionsList
                 List<String> questionIds = new ArrayList<>();
                 for (QuizQuestions quizQuestion : quizQuestionsList) {
-                    questionIds.add(quizQuestion.getQuestionId());
+                    questionIds = quizQuestion.getQuestionsId();
                 }
                 
                 // Now fetch all those questions and return them
@@ -164,8 +155,8 @@ public class QuizQuestionsDAO {
     }
     
     // Added to match repository method signature
-    public void addQuizQuestion(QuizQuestions quizQuestion, final ActionCallback callback) {
-        addQuizQuestions(quizQuestion, callback);
+    public void addQuizQuestion(QuizQuestions quizQuestion, String quizID, final ActionCallback callback) {
+        addQuizQuestions(quizQuestion, quizID, callback);
     }
 
     public interface QuizQuestionsCallback {

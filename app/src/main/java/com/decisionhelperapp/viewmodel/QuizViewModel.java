@@ -5,12 +5,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.decisionhelperapp.database.QuestionDAO;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.database.QuizQuestionsDAO;
 import com.decisionhelperapp.models.Question;
 import com.decisionhelperapp.models.Quiz;
-import com.decisionhelperapp.models.QuizQuestions;
 import com.decisionhelperapp.repository.DecisionRepository;
 
 import java.util.ArrayList;
@@ -193,41 +191,7 @@ public class QuizViewModel extends AndroidViewModel {
             }
         });
     }
-    
-    // Add a question to a quiz
-    public void addQuestionToQuiz(Question question, String quizId) {
-        isLoading.setValue(true);
-        
-        // First add the question
-        repository.addQuestion(question, new QuestionDAO.ActionCallback() {
-            @Override
-            public void onSuccess() {
-                // Now create the quiz-question relationship
-                QuizQuestions quizQuestion = new QuizQuestions(quizId, question.getId());
-                repository.addQuizQuestion(quizQuestion, new QuizQuestionsDAO.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        quizStatus.setValue("Question added to quiz");
-                        // Reload questions for the quiz
-                        loadQuestionsForQuiz(quizId);
-                    }
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        errorMessage.setValue("Failed to link question to quiz: " + e.getMessage());
-                        isLoading.setValue(false);
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                errorMessage.setValue("Failed to add question: " + e.getMessage());
-                isLoading.setValue(false);
-            }
-        });
-    }
-    
     // Move to next question
     public void nextQuestion() {
         List<Question> questions = questionsList.getValue();

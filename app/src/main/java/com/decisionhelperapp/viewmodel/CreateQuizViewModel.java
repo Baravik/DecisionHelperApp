@@ -19,9 +19,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class CreateQuizViewModel extends AndroidViewModel {
@@ -288,7 +286,8 @@ public class CreateQuizViewModel extends AndroidViewModel {
                 name,
                 userId,
                 0,  // Default score
-                ""  // Completed at will be empty for new quiz
+                "",  // Completed at will be empty for new quiz
+                isPublic  // Include isPublic status directly in the Quiz object
         );
         
         // Get questions
@@ -329,34 +328,21 @@ public class CreateQuizViewModel extends AndroidViewModel {
     
     private void saveQuizAfterQuestions(Quiz quiz, List<String> questionIds, boolean isPublic) {
         // Create QuizQuestions relationship
-        QuizQuestions quizQuestions = new QuizQuestions(questionIds, quiz.getId(), 0);
+        QuizQuestions quizQuestions = new QuizQuestions(questionIds);
         
-        // Save quiz
+        // Save quiz - The isPublic flag is already part of the Quiz object
         repository.addQuiz(quiz, new QuizDAO.ActionCallback() {
             @Override
             public void onSuccess() {
                 // Save quiz questions relationship
-                repository.addQuizQuestion(quizQuestions, new QuizQuestionsDAO.ActionCallback() {
+                repository.addQuizQuestion(quizQuestions, quiz.getId(), new QuizQuestionsDAO.ActionCallback() {
                     @Override
                     public void onSuccess() {
-                        // Save quiz metadata (public/private status)
-                        Map<String, Object> quizData = new HashMap<>();
-                        quizData.put("isPublic", isPublic);
-                        
-                        // Use Firestore instead of Storage for storing metadata
-                        db.collection("quizMetadata")
-                                .document(quiz.getId())
-                                .set(quizData)
-                                .addOnSuccessListener(aVoid -> {
-                                    createdQuiz.setValue(quiz);
-                                    quizSaved.setValue(true);
-                                    isLoading.setValue(false);
-                                    quizStatus.setValue("Quiz saved successfully");
-                                })
-                                .addOnFailureListener(e -> {
-                                    errorMessage.setValue("Failed to save quiz metadata: " + e.getMessage());
-                                    isLoading.setValue(false);
-                                });
+                        // Quiz is saved successfully with all its data
+                        createdQuiz.setValue(quiz);
+                        quizSaved.setValue(true);
+                        isLoading.setValue(false);
+                        quizStatus.setValue("Quiz saved successfully");
                     }
 
                     @Override
@@ -374,23 +360,5 @@ public class CreateQuizViewModel extends AndroidViewModel {
             }
         });
     }
-    
-    // Create a preview quiz without saving to database
-    public Quiz createPreviewQuiz(String category, String description, String name, String userId) {
-        if (validateQuiz(name, description)) {
-            return null;
-        }
-        
-        // Create temporary quiz for preview
-        String previewQuizId = "preview_" + UUID.randomUUID().toString();
-        return new Quiz(
-                previewQuizId,
-                category,
-                description,
-                name,
-                userId,
-                0,
-                ""
-        );
-    }
+
 }

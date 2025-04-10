@@ -94,7 +94,6 @@ public class CreateQuizActivity extends BaseActivity {
         // Set up button listeners
         findViewById(R.id.btn_add_question).setOnClickListener(v -> viewModel.addNewQuestion());
         findViewById(R.id.btn_save).setOnClickListener(v -> saveQuiz());
-        findViewById(R.id.btn_preview).setOnClickListener(v -> previewQuiz());
     }
     
     private void setupObservers() {
@@ -171,31 +170,6 @@ public class CreateQuizActivity extends BaseActivity {
         );
     }
 
-    private void previewQuiz() {
-        // Get data from views
-        String quizName = Objects.requireNonNull(editQuizName.getText()).toString().trim();
-        String quizDescription = Objects.requireNonNull(editQuizDescription.getText()).toString().trim();
-        String category = spinnerCategory.getSelectedItem().toString();
-        
-        // Create preview quiz
-        Quiz previewQuiz = viewModel.createPreviewQuiz(
-            category,
-            quizDescription,
-            quizName,
-            currentUser.getUid()
-        );
-        
-        if (previewQuiz != null) {
-            // Open TakeQuizActivity with the preview quiz
-            Intent intent = new Intent(this, TakeQuizActivity.class);
-            intent.putExtra("QUIZ_ID", previewQuiz.getId());
-            intent.putExtra("QUIZ_TITLE", previewQuiz.getCustomTitle());
-            intent.putExtra("IS_PREVIEW", true);
-            intent.putParcelableArrayListExtra("QUESTIONS", new ArrayList<>(Objects.requireNonNull(viewModel.getQuestionsList().getValue())));
-            startActivity(intent);
-        }
-    }
-    
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_IMAGE_PICK);
