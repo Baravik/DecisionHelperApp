@@ -75,10 +75,10 @@ public class Quiz {
     }
     
     @PropertyName("isPublic")
-    public boolean isPublic() {
+    public boolean getIsPublic() {
         return isPublic;
     }
-    
+
     @PropertyName("isPublic")
     public void setIsPublic(boolean isPublic) {
         this.isPublic = isPublic;

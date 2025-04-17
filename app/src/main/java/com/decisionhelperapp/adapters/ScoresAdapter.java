@@ -1,5 +1,6 @@
 package com.decisionhelperapp.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +14,9 @@ import java.util.List;
 
 public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresViewHolder> {
     private List<Scores> scoresList;
-    private final OnScoreClickListener onScoreClickListener;
 
-    // Interface for handling click events
-    public interface OnScoreClickListener {
-        void onScoreClick(Scores score);
-    }
-
-    public ScoresAdapter(List<Scores> scoresList, OnScoreClickListener listener) {
+    public ScoresAdapter(List<Scores> scoresList) {
         this.scoresList = scoresList;
-        this.onScoreClickListener = listener;
     }
 
     @NonNull
@@ -36,13 +30,7 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
     public void onBindViewHolder(@NonNull ScoresViewHolder holder, int position) {
         Scores score = scoresList.get(position);
         holder.bindScore(score);
-        
-        // Set up click listener
-        holder.itemView.setOnClickListener(v -> {
-            if (onScoreClickListener != null) {
-                onScoreClickListener.onScoreClick(score);
-            }
-        });
+
     }
 
     @Override
@@ -50,6 +38,7 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
         return scoresList.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateData(List<Scores> newScores) {
         this.scoresList = newScores;
         notifyDataSetChanged();
@@ -65,9 +54,10 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
             scoreRangeTextView = itemView.findViewById(R.id.scoreRangeTextView);
         }
 
+        @SuppressLint("SetTextI18n")
         public void bindScore(Scores score) {
-            scoreDescriptionTextView.setText(score.getDescription());
-            scoreRangeTextView.setText("Score Range: " + score.getScoreRange());
+            scoreRangeTextView.setText("Quiz name: " + score.getQuizName() + "\n\nScore: " + score.getScore());
+
         }
     }
 }

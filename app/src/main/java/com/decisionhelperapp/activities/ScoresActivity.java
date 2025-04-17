@@ -11,13 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.decisionhelperapp.adapters.ScoresAdapter;
-import com.decisionhelperapp.models.Scores;
 import com.decisionhelperapp.viewmodel.ScoresViewModel;
 import com.OpenU.decisionhelperapp.R;
 
-public class ScoresActivity extends BaseActivity implements ScoresAdapter.OnScoreClickListener {
-    
-    private ScoresViewModel scoresViewModel;
+public class ScoresActivity extends BaseActivity {
+
     private RecyclerView recyclerView;
     private ScoresAdapter scoresAdapter;
     private ProgressBar progressBar;
@@ -37,12 +35,12 @@ public class ScoresActivity extends BaseActivity implements ScoresAdapter.OnScor
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         
         // Initialize ViewModel
-        scoresViewModel = new ViewModelProvider(this).get(ScoresViewModel.class);
-        
+        ScoresViewModel scoresViewModel = new ViewModelProvider(this).get(ScoresViewModel.class);
+
         // Observe the scores list
         scoresViewModel.getScoresList().observe(this, scores -> {
             if (scores != null && !scores.isEmpty()) {
-                scoresAdapter = new ScoresAdapter(scores, this);
+                scoresAdapter = new ScoresAdapter(scores);
                 recyclerView.setAdapter(scoresAdapter);
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyView.setVisibility(View.GONE);
@@ -64,12 +62,5 @@ public class ScoresActivity extends BaseActivity implements ScoresAdapter.OnScor
         
         // Load scores data
         scoresViewModel.loadScores();
-    }
-
-    @Override
-    public void onScoreClick(Scores score) {
-        // Handle score click - e.g., show details, edit, etc.
-        scoresViewModel.setSelectedScore(score);
-        Toast.makeText(this, "Selected score: " + score.getDescription(), Toast.LENGTH_SHORT).show();
     }
 }

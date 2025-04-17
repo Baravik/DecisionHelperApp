@@ -1,26 +1,22 @@
 package com.decisionhelperapp.models;
 
 public class Scores {
-    private String description;
+    private String quizName;
     private String id;
-    private String scoreRange;
+    private Integer score;
 
     // Empty constructor required for Firestore
     public Scores() {
     }
 
-    public Scores(String description, String id, String scoreRange) {
-        this.description = description;
+    public Scores(String description, String id, Integer score) {
+        this.quizName = description;
         this.id = id;
-        this.scoreRange = scoreRange;
+        this.score = score;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public String getQuizName() {
+        return quizName;
     }
 
     public String getId() {
@@ -31,11 +27,7 @@ public class Scores {
         this.id = id;
     }
 
-    public String getScoreRange() {
-        return scoreRange;
-    }
-
-    public void setScoreRange(String scoreRange) {
-        this.scoreRange = scoreRange;
+    public Integer getScore() {
+        return score;
     }
 }
