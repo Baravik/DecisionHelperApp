@@ -12,11 +12,11 @@ import java.util.List;
 
 public class ScoresViewModel extends AndroidViewModel {
 
-    private MutableLiveData<List<Scores>> scoresList = new MutableLiveData<>();
-    private MutableLiveData<Scores> selectedScore = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private DecisionRepository repository;
+    private final MutableLiveData<List<Scores>> scoresList = new MutableLiveData<>();
+    private final MutableLiveData<Scores> selectedScore = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    private final DecisionRepository repository;
 
     public ScoresViewModel(Application application) {
         super(application);

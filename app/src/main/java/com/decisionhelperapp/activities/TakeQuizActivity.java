@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -14,9 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
@@ -25,6 +24,7 @@ import com.decisionhelperapp.models.QuizQuestions;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -54,7 +54,7 @@ public class TakeQuizActivity extends BaseActivity {
     
     private List<Question> questions = new ArrayList<>();
     private int currentQuestionIndex = 0;
-    private Map<String, String> userAnswers = new HashMap<>();
+    private final Map<String, String> userAnswers = new HashMap<>();
     
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
@@ -68,14 +68,6 @@ public class TakeQuizActivity extends BaseActivity {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         
-        // Set up toolbar
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
-        
         // Get data from intent
         quizId = getIntent().getStringExtra("QUIZ_ID");
         String quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
@@ -84,16 +76,7 @@ public class TakeQuizActivity extends BaseActivity {
         if (isPreview) {
             previewQuestions = getIntent().getParcelableArrayListExtra("QUESTIONS");
         }
-        
-        // Set toolbar title
-//        if (actionBar != null) {
-//            if (isPreview) {
-//                actionBar.setTitle("Preview: " + quizTitle);
-//            } else {
-//                actionBar.setTitle(quizTitle);
-//            }
-//        }
-//
+
         // Initialize views
         textQuestionTitle = findViewById(R.id.text_question_title);
         textQuestionNumber = findViewById(R.id.text_question_number);
@@ -427,26 +410,82 @@ public class TakeQuizActivity extends BaseActivity {
         
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Quiz Complete");
-        builder.setMessage("Your score: " + roundedScore + "%");
-        
-        if (!isPreview && currentUser != null) {
-            // Save score to Firestore
-            saveScore(roundedScore);
-            
-            builder.setPositiveButton("View My Scores", (dialog, which) -> {
-                Intent intent = new Intent(TakeQuizActivity.this, ScoresActivity.class);
-                startActivity(intent);
-                finish();
-            });
-        }
-        
-        builder.setNegativeButton(isPreview ? "Back to Edit" : "Done", (dialog, which) -> finish());
-        
+        builder.setMessage("Your score: " + roundedScore + "%\nPlease enter a name for this quiz:");
+
+        final EditText input = new EditText(this);
+        input.setHint("Enter quiz name");
+        builder.setView(input);
+
         builder.setCancelable(false);
-        builder.show();
+        builder.setPositiveButton("View My Scores", null);
+        builder.setNegativeButton(isPreview ? "Back to Edit" : "Done", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(d -> {
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            positive.setEnabled(false);
+            negative.setEnabled(false);
+
+            input.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    boolean enabled = !s.toString().trim().isEmpty();
+                    positive.setEnabled(enabled);
+                    negative.setEnabled(enabled);
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+
+            View.OnClickListener saveAndFinish = v -> {
+                String quizName = input.getText().toString().trim();
+                if (!isPreview && currentUser != null) {
+                    db.collection("userQuizScores")
+                            .whereEqualTo("userId", currentUser.getUid())
+                            .whereEqualTo("quizName", quizName)
+                            .get()
+                            .addOnSuccessListener(snapshot -> {
+                                if (!snapshot.isEmpty()) {
+                                    new AlertDialog.Builder(TakeQuizActivity.this)
+                                            .setTitle("Name Exists")
+                                            .setMessage("This test name already exists. Continuing will replace the previous score. Do you want to continue?")
+                                            .setPositiveButton("Continue", (d2, which) -> {
+                                                for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                                                    doc.getReference().delete();
+                                                }
+                                                saveScore(roundedScore, quizName);
+                                                dialog.dismiss();
+                                                if (v == positive) {
+                                                    startActivity(new Intent(TakeQuizActivity.this, ScoresActivity.class));
+                                                }
+                                                finish();
+                                            })
+                                            .setNegativeButton("Cancel", (d2, which) -> d2.dismiss())
+                                            .show();
+                                } else {
+                                    saveScore(roundedScore, quizName);
+                                    dialog.dismiss();
+                                    if (v == positive) {
+                                        startActivity(new Intent(TakeQuizActivity.this, ScoresActivity.class));
+                                    }
+                                    finish();
+                                }
+                            });
+                } else {
+                    dialog.dismiss();
+                    finish();
+                }
+            };
+
+            positive.setOnClickListener(saveAndFinish);
+            negative.setOnClickListener(saveAndFinish);
+        });
+
+        dialog.show();
     }
-    
-    private void saveScore(int score) {
+
+    private void saveScore(int score, String quizName) {
         // Update quiz with completion info
         Map<String, Object> completionData = new HashMap<>();
         completionData.put("score", score);
@@ -454,9 +493,10 @@ public class TakeQuizActivity extends BaseActivity {
                 .format(new Date()));
         completionData.put("userId", currentUser.getUid());
         completionData.put("quizId", quizId);
+        completionData.put("quizName", quizName);
 
-        db.collection("userQuizScores").document(currentUser.getUid() + "_" + quizId)
-                .set(completionData)
+        db.collection("userQuizScores")
+                .add(completionData)
                 .addOnFailureListener(e -> 
                         Toast.makeText(this, "Failed to save score", Toast.LENGTH_SHORT).show());
     }
