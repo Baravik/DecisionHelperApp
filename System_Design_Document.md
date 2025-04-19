@@ -6,9 +6,9 @@ Decision Helper App follows the MVVM (Model-View-ViewModel) architecture pattern
 
 ```
 ┌─────────────┐     ┌───────────────┐     ┌────────────────┐     ┌─────────────┐
-│     View     │◄────│   ViewModel   │◄────│   Repository   │◄────│    Model    │
-│  Activities  │     │ LiveData/Obs. │     │ Data Access/   │     │  Entities   │
-│  Fragments   │────►│ Event Handlers│────►│ Business Logic │────►│   & DAOs    │
+│     View    │◄────│   ViewModel   │◄────│   Repository   │◄────│    Model    │
+│  Activities │     │ LiveData/Obs. │     │ Data Access/   │     │  Entities   │
+│  Fragments  │────►│ Event Handlers│────►│ Business Logic │────►│   & DAOs    │
 └─────────────┘     └───────────────┘     └────────────────┘     └─────────────┘
 ```
 
