@@ -8,7 +8,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
@@ -23,7 +22,6 @@ public class UserActivity extends BaseActivity {
     private TextView textUserName;
     private TextView textUserId;
     private TextView textLoginMethod;
-    private Button btnLogout;
     private Button btnConnectGmail;
     private FirebaseAuth firebaseAuth;
 
@@ -45,7 +43,7 @@ public class UserActivity extends BaseActivity {
         textUserName = findViewById(R.id.text_user_name);
         textUserId = findViewById(R.id.text_user_id);
         textLoginMethod = findViewById(R.id.text_login_method);
-        btnLogout = findViewById(R.id.btn_logout);
+        Button btnLogout = findViewById(R.id.btn_logout);
         btnConnectGmail = findViewById(R.id.btn_connect_gmail);
 
         // Load user data

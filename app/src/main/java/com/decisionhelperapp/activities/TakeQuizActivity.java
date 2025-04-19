@@ -70,7 +70,6 @@ public class TakeQuizActivity extends BaseActivity {
         
         // Get data from intent
         quizId = getIntent().getStringExtra("QUIZ_ID");
-        String quizTitle = getIntent().getStringExtra("QUIZ_TITLE");
         isPreview = getIntent().getBooleanExtra("IS_PREVIEW", false);
         
         if (isPreview) {
@@ -213,7 +212,7 @@ public class TakeQuizActivity extends BaseActivity {
         if ("multiple_choice".equals(question.getType())) {
             setupMultipleChoiceQuestion(question);
         } else if ("yes_no_question".equals(question.getType())) {
-            setupYesNoQuestion(question);
+            setupYesNoQuestion();
         }
         
         // Update navigation buttons
@@ -257,24 +256,30 @@ public class TakeQuizActivity extends BaseActivity {
                 }
                 
                 // Create radio button
-                RadioButton radioButton = new RadioButton(this);
-                radioButton.setText(optionText);
-                radioButton.setTag(percentage); // Store percentage as tag
-                
-                radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    if (isChecked) {
-                        // Record this answer
-                        userAnswers.put(question.getId(), optionText);
-                        btnNext.setEnabled(true);
-                    }
-                });
-                
+                RadioButton radioButton = getRadioButton(question, optionText, percentage);
+
                 radioOptions.addView(radioButton);
             }
         }
     }
-    
-    private void setupYesNoQuestion(Question question) {
+
+    @NonNull
+    private RadioButton getRadioButton(Question question, String optionText, int percentage) {
+        RadioButton radioButton = new RadioButton(this);
+        radioButton.setText(optionText);
+        radioButton.setTag(percentage); // Store percentage as tag
+
+        radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Record this answer
+                userAnswers.put(question.getId(), optionText);
+                btnNext.setEnabled(true);
+            }
+        });
+        return radioButton;
+    }
+
+    private void setupYesNoQuestion() {
         // Show yes/no buttons, hide radio buttons
         radioOptions.setVisibility(View.GONE);
         layoutYesNo.setVisibility(View.VISIBLE);
