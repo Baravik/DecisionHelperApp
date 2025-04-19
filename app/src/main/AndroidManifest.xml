@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.OpenU.decisionhelperapp">
 
@@ -14,8 +13,9 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="false">
 
+        <!-- SplashActivity is now the launcher -->
         <activity
-            android:name="com.decisionhelperapp.activities.MainActivity"
+            android:name="com.decisionhelperapp.activities.SplashActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
@@ -24,39 +24,15 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.decisionhelperapp.activities.CreateQuizActivity"
-            android:theme="@style/Theme.CreateQuizActivity"
-            android:label="@string/create_quiz_title"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.TakeQuizActivity"
-            android:label="Take Quiz"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.QuizActivity"
-            android:label="@string/quiz_title"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.ScoresActivity"
-            android:label="Scores"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.LoginActivity"
-            android:label="Login"
-            android:exported="true" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.BaseActivity"
-            android:exported="false" />
-
-        <activity
-            android:name="com.decisionhelperapp.activities.UserActivity"
-            android:exported="false" />
+        <!-- All other activities stay the same -->
+        <activity android:name="com.decisionhelperapp.activities.MainActivity" android:exported="true" />
+        <activity android:name="com.decisionhelperapp.activities.LoginActivity" android:exported="true" />
+        <activity android:name="com.decisionhelperapp.activities.CreateQuizActivity" android:exported="false" />
+        <activity android:name="com.decisionhelperapp.activities.TakeQuizActivity" android:exported="false" />
+        <activity android:name="com.decisionhelperapp.activities.QuizActivity" android:exported="false" />
+        <activity android:name="com.decisionhelperapp.activities.ScoresActivity" android:exported="false" />
+        <activity android:name="com.decisionhelperapp.activities.UserActivity" android:exported="false" />
+        <activity android:name="com.decisionhelperapp.activities.BaseActivity" android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -68,7 +44,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!-- Firebase Auth & Services Metadata -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="default_channel" />
@@ -80,7 +55,5 @@
                 android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
-
     </application>
-
 </manifest>

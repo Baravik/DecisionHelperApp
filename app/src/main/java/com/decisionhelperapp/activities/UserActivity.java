@@ -2,38 +2,46 @@ package com.decisionhelperapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
+import com.decisionhelperapp.auth.GoogleSignInHelper;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserActivity extends BaseActivity {
 
+    private static final String TAG = "UserActivity";
+
     private CircleImageView profileImage;
-    private TextView textUserName;
-    private TextView textUserId;
-    private TextView textLoginMethod;
+    private TextView textUserName, textUserId, textLoginMethod;
     private Button btnConnectGmail;
     private FirebaseAuth firebaseAuth;
+
+    private GoogleSignInHelper googleSignInHelper;
+    private ActivityResultLauncher<Intent> googleSignInLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
-        // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
+        googleSignInHelper = new GoogleSignInHelper(this);
 
-        // Set the title in the ActionBar (inherited from BaseActivity)
+        // Setup action bar title
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("User Profile");
         }
@@ -46,40 +54,57 @@ public class UserActivity extends BaseActivity {
         Button btnLogout = findViewById(R.id.btn_logout);
         btnConnectGmail = findViewById(R.id.btn_connect_gmail);
 
-        // Load user data
+        // Register Google Sign-In result handler
+        googleSignInLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        googleSignInHelper.handleSignInResult(result.getData(), new GoogleSignInHelper.SignInCallback() {
+                            @Override
+                            public void onSuccess(GoogleSignInAccount account) {
+                                Log.d(TAG, "Google account received: " + account.getEmail());
+                                firebaseAuthWithGoogle(account);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e(TAG, "Google Sign-In Failed", e);
+                                Toast.makeText(UserActivity.this, "Google Sign-In failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Log.w(TAG, "Google Sign-In canceled or failed");
+                    }
+                }
+        );
+
+        // Load user data and set up buttons
         loadUserData();
 
-        // Set up logout button
         btnLogout.setOnClickListener(v -> logoutUser());
-        
-        // Set up connect with Gmail button
         btnConnectGmail.setOnClickListener(v -> connectWithGmail());
     }
 
     private void loadUserData() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            // Display user information
             textUserName.setText(user.getDisplayName() != null ? user.getDisplayName() : "User");
             textUserId.setText(user.getUid());
-            
-            // Determine login method
+
             boolean isGmailLogin = user.getProviderData().stream()
-                    .anyMatch(userInfo -> userInfo.getProviderId().equals("google.com"));
+                    .anyMatch(info -> "google.com".equals(info.getProviderId()));
             textLoginMethod.setText(isGmailLogin ? "Google Account" : "Email/Password");
-            
-            // Show or hide the connect with Gmail button based on login method
+
             btnConnectGmail.setVisibility(isGmailLogin ? android.view.View.GONE : android.view.View.VISIBLE);
 
-            // Load profile image
             if (user.getPhotoUrl() != null) {
                 Glide.with(this)
-                    .load(user.getPhotoUrl())
-                    .placeholder(R.drawable.default_profile)
-                    .into(profileImage);
+                        .load(user.getPhotoUrl())
+                        .placeholder(R.drawable.default_profile)
+                        .into(profileImage);
             }
         } else {
-            // If somehow user is not logged in, redirect to login
+            Log.w(TAG, "User not logged in, redirecting to LoginActivity");
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             redirectToLogin();
         }
@@ -92,10 +117,23 @@ public class UserActivity extends BaseActivity {
     }
 
     private void connectWithGmail() {
-        // Create a Google Sign-In intent
-        Intent signInIntent = LoginActivity.createGoogleSignInIntent(this);
-        startActivity(signInIntent);
-        finish(); // Close this activity so when user returns they'll see updated profile
+        Log.d(TAG, "Launching Google Sign-In");
+        googleSignInHelper.launchSignIn(googleSignInLauncher);
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Google Sign-In with Firebase succeeded");
+                        Toast.makeText(this, "Connected to Gmail", Toast.LENGTH_SHORT).show();
+                        loadUserData(); // reload user data
+                    } else {
+                        Log.e(TAG, "Google Sign-In with Firebase failed", task.getException());
+                        Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void redirectToLogin() {
@@ -108,7 +146,7 @@ public class UserActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getOnBackPressedDispatcher();
             return true;
         }
         return super.onOptionsItemSelected(item);

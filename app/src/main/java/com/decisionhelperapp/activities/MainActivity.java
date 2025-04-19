@@ -22,61 +22,71 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private static final String PREF_NAME = "DecisionHelperPrefs";
     private static final String KEY_USER_ID = "userId";
-    
+
     private MainViewModel mainViewModel;
     private TextView userTextView;
     private ImageView userProfileImageView;
-    
+
+    private boolean hasCheckedUser = false;  // ensures we redirect only after loading completes
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        // Initialize MainViewModel
+
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        
-        // Setup UI components
+
         userTextView = findViewById(R.id.userStatusTextView);
         userProfileImageView = findViewById(R.id.userProfileImageView);
-        
-        // Set click listeners for profile image and username
+
         userProfileImageView.setOnClickListener(v -> navigateToUserProfile());
         userTextView.setOnClickListener(v -> navigateToUserProfile());
-       
-        // Setup LiveData observers
+
+        // Observers
         mainViewModel.getCurrentUserObject().observe(this, user -> {
+            Log.d(TAG, "Observed user: " + (user != null ? user.getEmail() : "null"));
             if (user != null) {
                 updateUIWithUser(user);
-            } else {
-                // Handle null user case
+            } else if (hasCheckedUser) {
+                Log.w(TAG, "User is null after loading completed. Redirecting to login.");
                 navigateToLogin();
             }
         });
-        
+
         mainViewModel.getErrorMessage().observe(this, errorMsg -> {
             if (errorMsg != null && !errorMsg.isEmpty()) {
                 Log.e(TAG, "Error: " + errorMsg);
                 userTextView.setText(MessageFormat.format("Error: {0}", errorMsg));
             }
         });
-        
-        // Get the user ID from the intent or shared preferences
+
+        mainViewModel.getLoading().observe(this, isLoading -> {
+            Log.d(TAG, "Loading: " + isLoading);
+            if (Boolean.FALSE.equals(isLoading)) {
+                hasCheckedUser = true;
+                User user = mainViewModel.getCurrentUserObject().getValue();
+                if (user == null) {
+                    Log.w(TAG, "No user found after loading finished. Redirecting to login.");
+                    navigateToLogin();
+                }
+            }
+        });
+
+        // Get userId
         String userId = getIntent().getStringExtra("USER_ID");
         if (userId == null) {
-            // If not in intent, try to get from SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
             userId = sharedPreferences.getString(KEY_USER_ID, null);
         }
-        
+
         if (userId != null) {
             mainViewModel.loadUserData(userId);
         } else {
-            // No user ID found, redirect to login
+            Log.w(TAG, "No user ID found. Redirecting to login.");
             navigateToLogin();
-            return;
         }
-        
-        // Button to start a quiz
+
+        // Buttons
         Button startQuizButton = findViewById(R.id.btnStartQuiz);
         startQuizButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
@@ -86,15 +96,12 @@ public class MainActivity extends BaseActivity {
             }
             startActivity(intent);
         });
-        
-        // Button to view scores
+
         Button viewScoresButton = findViewById(R.id.btnViewScores);
         viewScoresButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(MainActivity.this, ScoresActivity.class));
         });
-        
-        // Button to add/create questions and quizzes
+
         Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
         addQuestionsButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CreateQuizActivity.class);
@@ -105,13 +112,15 @@ public class MainActivity extends BaseActivity {
             startActivity(intent);
         });
     }
-    
+
     private void navigateToLogin() {
+        Log.d(TAG, "Redirecting to LoginActivity...");
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-    
+
     private void navigateToUserProfile() {
         Intent intent = new Intent(MainActivity.this, UserActivity.class);
         User currentUser = mainViewModel.getCurrentUserObject().getValue();
@@ -120,36 +129,26 @@ public class MainActivity extends BaseActivity {
         }
         startActivity(intent);
     }
-    
+
     private void updateUIWithUser(User user) {
-        String welcomeText;
-        
-        if ("Guest".equals(user.getName())) {
-            welcomeText = "Welcome, Guest! Create an account to save your progress.";
-        } else {
-            welcomeText = "Welcome, " + user.getName() + "!";
-        }
-        
+        String welcomeText = "Welcome, " + (user.getName().equals("Guest") ? "Guest! Create an account to save your progress." : user.getName() + "!");
         userTextView.setText(welcomeText);
-        
-        // Load profile picture if available
+
         if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
             Glide.with(this)
-                .load(user.getProfilePictureUrl())
-                .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.default_profile)
-                .error(R.drawable.default_profile)
-                .into(userProfileImageView);
+                    .load(user.getProfilePictureUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
+                    .into(userProfileImageView);
         } else {
-            // Set default profile picture
             userProfileImageView.setImageResource(R.drawable.default_profile);
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh user data when returning to this activity
         SharedPreferences sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
         if (userId != null) {
