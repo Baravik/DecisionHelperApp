@@ -7,15 +7,15 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuestionAdapter;
 import com.decisionhelperapp.models.Question;
-import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.viewmodel.CreateQuizViewModel;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -32,7 +31,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,11 +44,11 @@ public class CreateQuizActivity extends BaseActivity {
     private QuestionAdapter questionAdapter;
     private CircularProgressIndicator progressIndicator;
     private SwitchMaterial switchPublic;
-    private Spinner spinnerCategory;
-    
-    private final List<String> categories = Arrays.asList("General", "Business", "Education", "Health", "Technology", "Lifestyle");
+
     private FirebaseUser currentUser;
     private CreateQuizViewModel viewModel;
+
+    private ActivityResultLauncher<Intent> galleryLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +62,6 @@ public class CreateQuizActivity extends BaseActivity {
         viewModel = new ViewModelProvider(this).get(CreateQuizViewModel.class);
         
         // Set up toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -88,6 +84,41 @@ public class CreateQuizActivity extends BaseActivity {
         // Set up button listeners
         findViewById(R.id.btn_add_question).setOnClickListener(v -> viewModel.addNewQuestion());
         findViewById(R.id.btn_save).setOnClickListener(v -> saveQuiz());
+
+        // Set up image picker
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Uri selectedImage = result.getData().getData();
+                        // Continue your image handling logic
+                        if (selectedImage != null) {
+                            viewModel.uploadImage(selectedImage);
+                        }
+
+                    }
+                }
+        );
+
+        // Handle back button press
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!Objects.requireNonNull(editQuizName.getText()).toString().isEmpty() ||
+                        !Objects.requireNonNull(editQuizDescription.getText()).toString().isEmpty() ||
+                        (viewModel.getQuestionsList().getValue() != null && !viewModel.getQuestionsList().getValue().isEmpty())) {
+
+                    new AlertDialog.Builder(CreateQuizActivity.this)
+                            .setTitle("Discard Changes")
+                            .setMessage("Are you sure you want to discard your changes?")
+                            .setPositiveButton("Discard", (dialog, which) -> finish())
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                } else {
+                    finish();
+                }
+            }
+        });
     }
     
     private void setupObservers() {
@@ -130,17 +161,7 @@ public class CreateQuizActivity extends BaseActivity {
             public void onQuestionDeleted(int position) {
                 viewModel.deleteQuestion(position);
             }
-            
-            @Override
-            public void onImageRequested(int position) {
-                viewModel.setCurrentEditingQuestionPosition(position);
-                openGallery();
-            }
 
-            @Override
-            public void onImageRemoved(int position) {
-                viewModel.removeImageFromQuestion(position);
-            }
         });
         
         recyclerQuestions.setLayoutManager(new LinearLayoutManager(this));
@@ -164,7 +185,7 @@ public class CreateQuizActivity extends BaseActivity {
 
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+        galleryLauncher.launch(intent);
     }
 
     @Override
@@ -179,26 +200,10 @@ public class CreateQuizActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    
-    @Override
-    public void onBackPressed() {
-        if (!Objects.requireNonNull(editQuizName.getText()).toString().isEmpty() ||
-                !Objects.requireNonNull(editQuizDescription.getText()).toString().isEmpty() ||
-                (viewModel.getQuestionsList().getValue() != null && !viewModel.getQuestionsList().getValue().isEmpty())) {
-            // Show confirmation dialog
-            new AlertDialog.Builder(this)
-                    .setTitle("Discard Changes")
-                    .setMessage("Are you sure you want to discard your changes?")
-                    .setPositiveButton("Discard", (dialog, which) -> super.onBackPressed())
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        } else {
-            super.onBackPressed();
-        }
-    }
+
 }

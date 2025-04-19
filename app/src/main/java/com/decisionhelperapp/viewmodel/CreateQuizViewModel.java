@@ -16,49 +16,35 @@ import com.decisionhelperapp.models.QuizQuestions;
 import com.decisionhelperapp.repository.DecisionRepository;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CreateQuizViewModel extends AndroidViewModel {
-    private static final String TAG = "CreateQuizViewModel";
 
-    private MutableLiveData<String> quizStatus = new MutableLiveData<>("Ready");
-    private MutableLiveData<List<Question>> questionsList = new MutableLiveData<>(new ArrayList<>());
-    private MutableLiveData<Question> selectedQuestion = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> quizSaved = new MutableLiveData<>(false);
-    private MutableLiveData<Quiz> createdQuiz = new MutableLiveData<>();
-    private MutableLiveData<Integer> currentEditingQuestionPosition = new MutableLiveData<>(-1);
+    private final MutableLiveData<String> quizStatus = new MutableLiveData<>("Ready");
+    private final MutableLiveData<List<Question>> questionsList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> quizSaved = new MutableLiveData<>(false);
+    private final MutableLiveData<Quiz> createdQuiz = new MutableLiveData<>();
+    private final MutableLiveData<Integer> currentEditingQuestionPosition = new MutableLiveData<>(-1);
     
-    private DecisionRepository repository;
-    private StorageReference storageRef;
-    private FirebaseFirestore db;
+    private final DecisionRepository repository;
+    private final StorageReference storageRef;
 
     public CreateQuizViewModel(Application application) {
         super(application);
         repository = new DecisionRepository(application.getApplicationContext());
         FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-        db = FirebaseFirestore.getInstance();
     }
 
-    // LiveData getters
-    public LiveData<String> getQuizStatus() {
-        return quizStatus;
-    }
-    
     public LiveData<List<Question>> getQuestionsList() {
         return questionsList;
     }
-    
-    public LiveData<Question> getSelectedQuestion() {
-        return selectedQuestion;
-    }
-    
+
     public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
@@ -70,20 +56,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
     public LiveData<Boolean> getQuizSaved() {
         return quizSaved;
     }
-    
-    public LiveData<Quiz> getCreatedQuiz() {
-        return createdQuiz;
-    }
-    
-    public LiveData<Integer> getCurrentEditingQuestionPosition() {
-        return currentEditingQuestionPosition;
-    }
-    
-    // Set current editing question
-    public void setCurrentEditingQuestionPosition(int position) {
-        currentEditingQuestionPosition.setValue(position);
-    }
-    
+
     // Add a new question
     public void addNewQuestion() {
         Question newQuestion = new Question();
@@ -118,18 +91,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
             quizStatus.setValue("Question deleted");
         }
     }
-    
-    // Remove image from question
-    public void removeImageFromQuestion(int position) {
-        List<Question> currentList = questionsList.getValue();
-        if (currentList != null && position >= 0 && position < currentList.size()) {
-            Question question = currentList.get(position);
-            question.setDescription(question.getDescription().replace("has_image:true", ""));
-            questionsList.setValue(currentList);
-            quizStatus.setValue("Image removed");
-        }
-    }
-    
+
     // Upload image for question
     public void uploadImage(Uri imageUri) {
         isLoading.setValue(true);
@@ -138,38 +100,36 @@ public class CreateQuizViewModel extends AndroidViewModel {
         StorageReference imageRef = storageRef.child(imageName);
         
         imageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        Integer position = currentEditingQuestionPosition.getValue();
-                        if (position != null && position != -1) {
-                            List<Question> currentList = questionsList.getValue();
-                            if (currentList != null && position >= 0 && position < currentList.size()) {
-                                Question question = currentList.get(position);
-                                
-                                // Parse the current description to keep all the options/percentages information
-                                StringBuilder updatedDesc = new StringBuilder();
-                                
-                                // Add image info
-                                updatedDesc.append("has_image:true\n");
-                                updatedDesc.append("image_url:").append(uri.toString()).append("\n");
-                                
-                                // Preserve existing option and percentage data
-                                String currentDesc = question.getDescription();
-                                for (String line : currentDesc.split("\n")) {
-                                    if (line.startsWith("option:") || line.startsWith("percentage:") || 
-                                        line.startsWith("yes_full_score:")) {
-                                        updatedDesc.append(line).append("\n");
-                                    }
+                .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    Integer position = currentEditingQuestionPosition.getValue();
+                    if (position != null && position != -1) {
+                        List<Question> currentList = questionsList.getValue();
+                        if (currentList != null && position >= 0 && position < currentList.size()) {
+                            Question question = currentList.get(position);
+
+                            // Parse the current description to keep all the options/percentages information
+                            StringBuilder updatedDesc = new StringBuilder();
+
+                            // Add image info
+                            updatedDesc.append("has_image:true\n");
+                            updatedDesc.append("image_url:").append(uri.toString()).append("\n");
+
+                            // Preserve existing option and percentage data
+                            String currentDesc = question.getDescription();
+                            for (String line : currentDesc.split("\n")) {
+                                if (line.startsWith("option:") || line.startsWith("percentage:") ||
+                                    line.startsWith("yes_full_score:")) {
+                                    updatedDesc.append(line).append("\n");
                                 }
-                                
-                                question.setDescription(updatedDesc.toString().trim());
-                                questionsList.setValue(currentList);
-                                quizStatus.setValue("Image uploaded");
                             }
+
+                            question.setDescription(updatedDesc.toString().trim());
+                            questionsList.setValue(currentList);
+                            quizStatus.setValue("Image uploaded");
                         }
-                        isLoading.setValue(false);
-                    });
-                })
+                    }
+                    isLoading.setValue(false);
+                }))
                 .addOnFailureListener(e -> {
                     errorMessage.setValue("Failed to upload image: " + e.getMessage());
                     isLoading.setValue(false);
@@ -204,36 +164,41 @@ public class CreateQuizViewModel extends AndroidViewModel {
             
             if (question.getType().equals("multiple_choice")) {
                 // Check if the question has at least 2 answer options
-                String description = question.getDescription();
-                if (!description.contains("option:")) {
+                List<Question.Answer> answers = question.getAnswers();
+                List<String> answerTexts = new ArrayList<>();
+                if (answers.size() < 2) {
                     errorMessage.setValue("Multiple choice question " + (i + 1) + 
                             " needs at least 2 options");
                     return true;
                 }
                 
                 // Count options and check percentages
-                int optionCount = 0;
                 boolean hasPercentages = false;
                 int totalPercentage = 0;
                 
-                for (String part : description.split("\n")) {
-                    if (part.startsWith("option:")) {
-                        optionCount++;
-                    } else if (part.startsWith("percentage:")) {
+                for (Question.Answer answer : answers)
+                {
+                    if (answer.getPercentage() > 0)
+                    {
                         hasPercentages = true;
-                        try {
-                            totalPercentage += Integer.parseInt(part.substring("percentage:".length()));
-                        } catch (NumberFormatException e) {
-                            // Ignore parsing errors
-                        }
+                    }
+                    try {
+                        totalPercentage += answer.getPercentage();
+                    } catch (NumberFormatException e) {
+                        // Ignore parsing errors
+                    }
+                    if (!answerTexts.contains(answer.getText()))
+                    {
+                        answerTexts.add(answer.getText());
+                    }
+                    else
+                    {
+                        errorMessage.setValue("Question " + (i + 1) +
+                                " has duplicate options");
+                        return true;
                     }
                 }
-                
-                if (optionCount < 2) {
-                    errorMessage.setValue("Multiple choice question " + (i + 1) + 
-                            " needs at least 2 options");
-                    return true;
-                }
+
                 
                 // Check if percentages are defined properly
                 if (!hasPercentages) {
@@ -312,7 +277,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
                     savedCount[0]++;
                     if (savedCount[0] == questionCount) {
                         // All questions saved, now save quiz
-                        saveQuizAfterQuestions(quiz, questionIds, isPublic);
+                        saveQuizAfterQuestions(quiz, questionIds);
                     }
                 }
 
@@ -325,7 +290,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
         }
     }
     
-    private void saveQuizAfterQuestions(Quiz quiz, List<String> questionIds, boolean isPublic) {
+    private void saveQuizAfterQuestions(Quiz quiz, List<String> questionIds) {
         // Create QuizQuestions relationship
         QuizQuestions quizQuestions = new QuizQuestions(questionIds);
         

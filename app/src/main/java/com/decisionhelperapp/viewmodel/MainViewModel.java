@@ -2,6 +2,7 @@ package com.decisionhelperapp.viewmodel;
 
 import android.app.Application;
 import android.util.Log;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,16 +11,15 @@ import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.repository.DecisionRepository;
 
-// ViewModel for Main activity
 public class MainViewModel extends AndroidViewModel {
     private static final String TAG = "MainViewModel";
 
-    private MutableLiveData<User> currentUser = new MutableLiveData<>();
-    private MutableLiveData<String> currentUserName = new MutableLiveData<>("Guest");
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    
-    private DecisionRepository repository;
+    private final MutableLiveData<User> currentUser = new MutableLiveData<>();
+    private final MutableLiveData<String> currentUserName = new MutableLiveData<>("Guest");
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+
+    private final DecisionRepository repository;
 
     public MainViewModel(Application application) {
         super(application);
@@ -33,49 +33,52 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<String> getCurrentUser() {
         return currentUserName;
     }
-    
+
     public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
-    
-    public LiveData<Boolean> getIsLoading() {
+
+    public LiveData<Boolean> getLoading() {
         return isLoading;
     }
 
-    public void setCurrentUser(User user) {
-        currentUser.setValue(user);
-        if (user != null) {
-            currentUserName.setValue(user.getName());
-        } else {
-            currentUserName.setValue("Guest");
-        }
-    }
-
-    public void updateUser(String userName) {
-        currentUserName.setValue(userName);
-    }
-    
     public void loadUserData(String userId) {
+        Log.d(TAG, "🔄 Loading user data for ID: " + userId);
         isLoading.setValue(true);
+
         repository.getUserById(userId, new UserDAO.SingleUserCallback() {
             @Override
             public void onCallback(User user) {
                 if (user != null) {
-                    setCurrentUser(user);
+                    Log.d(TAG, "✅ User found: " + user.getEmail());
+                    currentUser.postValue(user);
+                    currentUserName.postValue(user.getName());
                 } else {
-                    Log.e(TAG, "User with ID " + userId + " not found in database");
-                    errorMessage.setValue("User not found");
-                    currentUser.setValue(null);
+                    Log.w(TAG, "❌ No user found for ID: " + userId);
+                    errorMessage.postValue("User not found");
+                    currentUser.postValue(null);
+                    currentUserName.postValue("Guest");
                 }
-                isLoading.setValue(false);
+                isLoading.postValue(false);
             }
-            
+
             @Override
             public void onFailure(Exception e) {
-                Log.e(TAG, "Failed to retrieve user data", e);
-                errorMessage.setValue("Failed to load user data: " + e.getMessage());
-                isLoading.setValue(false);
+                Log.e(TAG, "🔥 Error retrieving user", e);
+                errorMessage.postValue("Failed to load user data: " + e.getMessage());
+                currentUser.postValue(null);
+                currentUserName.postValue("Guest");
+                isLoading.postValue(false);
             }
         });
+    }
+
+    public void updateUser(String userName) {
+        currentUserName.postValue(userName);
+    }
+
+    public void setCurrentUser(User user) {
+        currentUser.postValue(user);
+        currentUserName.postValue(user != null ? user.getName() : "Guest");
     }
 }

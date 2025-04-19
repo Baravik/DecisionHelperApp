@@ -160,16 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:gravity="end"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_add_image"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_image"
-                android:textSize="12sp" />
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <!-- Image preview container -->
         <FrameLayout

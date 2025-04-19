@@ -1,7 +1,6 @@
 package com.decisionhelperapp.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -24,11 +23,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.models.Question;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,14 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
-    private Context context;
+    private final Context context;
     private List<Question> questions;
-    private QuestionAdapterListener listener;
+    private final QuestionAdapterListener listener;
 
     public interface QuestionAdapterListener {
         void onQuestionDeleted(int position);
-        void onImageRequested(int position);
-        void onImageRemoved(int position);
+
     }
 
     public QuestionAdapter(Context context, List<Question> questions, QuestionAdapterListener listener) {
@@ -74,7 +72,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         Question question = questions.get(position);
         
         // Set question number
-        holder.questionNumber.setText("Question " + (position + 1));
+        holder.questionNumber.setText(MessageFormat.format("Question {0}", position + 1));
         
         // Set existing question text if available
         if (question.getTitle() != null && !question.getTitle().isEmpty()) {
@@ -188,26 +186,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                     
                     // Set default Yes/No values
                     Question currentQuestion = questions.get(adapterPosition);
-                    StringBuilder descBuilder = new StringBuilder();
-                    
-                    // Preserve image information if it exists
-                    if (currentQuestion.getDescription().contains("has_image:true")) {
-                        String imageUrlLine = "";
-                        for (String line : currentQuestion.getDescription().split("\n")) {
-                            if (line.startsWith("image_url:")) {
-                                imageUrlLine = line;
-                                break;
-                            }
-                        }
-                        
-                        if (!imageUrlLine.isEmpty()) {
-                            descBuilder.append("has_image:true\n");
-                            descBuilder.append(imageUrlLine).append("\n");
-                        }
-                    }
-                    
-                    // Set Yes to 100% by default
-                    descBuilder.append("yes_full_score:true\n");
+                    StringBuilder descBuilder = getStringBuilder(currentQuestion);
                     currentQuestion.setDescription(descBuilder.toString().trim());
                     holder.radioYesFullScore.setChecked(true);
                 }
@@ -221,22 +200,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 Question currentQuestion = questions.get(adapterPosition);
                 StringBuilder descBuilder = new StringBuilder();
                 
-                // Preserve image information if it exists
-                if (currentQuestion.getDescription().contains("has_image:true")) {
-                    String imageUrlLine = "";
-                    for (String line : currentQuestion.getDescription().split("\n")) {
-                        if (line.startsWith("image_url:")) {
-                            imageUrlLine = line;
-                            break;
-                        }
-                    }
-                    
-                    if (!imageUrlLine.isEmpty()) {
-                        descBuilder.append("has_image:true\n");
-                        descBuilder.append(imageUrlLine).append("\n");
-                    }
-                }
-                
                 // Update the yes/no score setting
                 if (checkedId == R.id.radio_yes_full_score) {
                     descBuilder.append("yes_full_score:true\n");
@@ -249,9 +212,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         });
         
         // Set up Add Answer button
-        holder.btnAddAnswer.setOnClickListener(v -> {
-            holder.answerOptionsAdapter.addNewOption();
-        });
+        holder.btnAddAnswer.setOnClickListener(v -> holder.answerOptionsAdapter.addNewOption());
         
         // Set up Delete Question button
         holder.btnDeleteQuestion.setOnClickListener(v -> {
@@ -260,47 +221,16 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 listener.onQuestionDeleted(adapterPosition);
             }
         });
-        
-        // Set up Add Image button
-        holder.btnAddImage.setOnClickListener(v -> {
-            int adapterPosition = holder.getAdapterPosition();
-            if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                listener.onImageRequested(adapterPosition);
-            }
-        });
-        
-        // Check if the question has an image and show it if so
-        String description = question.getDescription();
-        if (description != null && description.contains("has_image:true")) {
-            holder.imageContainer.setVisibility(View.VISIBLE);
-            
-            String imageUrl = null;
-            for (String line : description.split("\n")) {
-                if (line.startsWith("image_url:")) {
-                    imageUrl = line.substring("image_url:".length());
-                    break;
-                }
-            }
-            
-            if (imageUrl != null) {
-                Glide.with(context)
-                        .load(Uri.parse(imageUrl))
-                        .centerCrop()
-                        .placeholder(R.drawable.default_profile)
-                        .into(holder.questionImage);
-            }
-            
-            // Set up remove image button
-            holder.btnRemoveImage.setOnClickListener(v -> {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                    holder.imageContainer.setVisibility(View.GONE);
-                    listener.onImageRemoved(adapterPosition);
-                }
-            });
-        } else {
-            holder.imageContainer.setVisibility(View.GONE);
-        }
+
+    }
+
+    @NonNull
+    private static StringBuilder getStringBuilder(Question currentQuestion) {
+        StringBuilder descBuilder = new StringBuilder();
+
+        // Set Yes to 100% by default
+        descBuilder.append("yes_full_score:true\n");
+        return descBuilder;
     }
 
     @Override
@@ -344,7 +274,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         RadioButton radioNoFullScore;
         RecyclerView recyclerAnswerOptions;
         Button btnAddAnswer;
-        Button btnAddImage;
         ImageButton btnDeleteQuestion;
         FrameLayout imageContainer;
         ImageView questionImage;
@@ -366,7 +295,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             radioNoFullScore = itemView.findViewById(R.id.radio_no_full_score);
             recyclerAnswerOptions = itemView.findViewById(R.id.recycler_answer_options);
             btnAddAnswer = itemView.findViewById(R.id.btn_add_answer);
-            btnAddImage = itemView.findViewById(R.id.btn_add_image);
+            //btnAddImage = itemView.findViewById(R.id.btn_add_image);
             btnDeleteQuestion = itemView.findViewById(R.id.btn_delete_question);
             imageContainer = itemView.findViewById(R.id.image_container);
             questionImage = itemView.findViewById(R.id.question_image);
@@ -421,8 +350,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
     // Nested adapter for answer options
     private static class AnswerOptionAdapter extends RecyclerView.Adapter<AnswerOptionAdapter.OptionViewHolder> {
-        private List<String> options;
-        private List<Integer> percentages;
+        private final List<String> options;
+        private final List<Integer> percentages;
         private AnswerChangeListener listener;
         private ItemTouchHelper touchHelper;
 
@@ -483,7 +412,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             notifyDataSetChanged();
         }
 
-        boolean onItemMove(int fromPosition, int toPosition) {
+        void onItemMove(int fromPosition, int toPosition) {
             if (fromPosition < toPosition) {
                 for (int i = fromPosition; i < toPosition; i++) {
                     Collections.swap(options, i, i + 1);
@@ -496,7 +425,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 }
             }
             notifyItemMoved(fromPosition, toPosition);
-            return true;
         }
 
         /**
@@ -522,8 +450,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                     // Formula: (n-1-i)/(n-1) * 100 where n is totalOptions and i is index
                     // This gives 100% for i=0, 0% for i=n-1, and evenly distributed values in between
                     
-                    int percent = (totalOptions > 1) ? 
-                        (int)(((float)(totalOptions - 1 - i) / (totalOptions - 1)) * 100) : 100;
+                    int percent = (int)((float)(totalOptions - 1 - i) / (totalOptions - 1) * 100);
                     
                     percentages.set(i, percent);
                 }
