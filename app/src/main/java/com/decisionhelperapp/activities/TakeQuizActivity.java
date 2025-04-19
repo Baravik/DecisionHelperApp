@@ -73,7 +73,7 @@ public class TakeQuizActivity extends BaseActivity {
         isPreview = getIntent().getBooleanExtra("IS_PREVIEW", false);
         
         if (isPreview) {
-            previewQuestions = getIntent().getParcelableArrayListExtra("QUESTIONS");
+            previewQuestions = getIntent().getParcelableArrayListExtra("QUESTIONS", Question.class);
         }
 
         // Initialize views
@@ -514,7 +514,7 @@ public class TakeQuizActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

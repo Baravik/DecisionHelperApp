@@ -13,7 +13,7 @@ import com.OpenU.decisionhelperapp.R;
 import java.util.List;
 
 public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresViewHolder> {
-    private List<Scores> scoresList;
+    private final List<Scores> scoresList;
 
     public ScoresAdapter(List<Scores> scoresList) {
         this.scoresList = scoresList;
@@ -36,12 +36,6 @@ public class ScoresAdapter extends RecyclerView.Adapter<ScoresAdapter.ScoresView
     @Override
     public int getItemCount() {
         return scoresList.size();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void updateData(List<Scores> newScores) {
-        this.scoresList = newScores;
-        notifyDataSetChanged();
     }
 
     public static class ScoresViewHolder extends RecyclerView.ViewHolder {
