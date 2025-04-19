@@ -98,9 +98,7 @@ public class MainActivity extends BaseActivity {
         });
 
         Button viewScoresButton = findViewById(R.id.btnViewScores);
-        viewScoresButton.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, ScoresActivity.class));
-        });
+        viewScoresButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ScoresActivity.class)));
 
         Button addQuestionsButton = findViewById(R.id.btnAddQuestions);
         addQuestionsButton.setOnClickListener(v -> {

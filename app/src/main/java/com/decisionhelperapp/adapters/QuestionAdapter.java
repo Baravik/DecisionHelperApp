@@ -1,7 +1,6 @@
 package com.decisionhelperapp.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -24,7 +23,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.models.Question;
 import com.google.android.material.textfield.TextInputEditText;
@@ -203,22 +201,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 Question currentQuestion = questions.get(adapterPosition);
                 StringBuilder descBuilder = new StringBuilder();
                 
-                // Preserve image information if it exists
-                if (currentQuestion.getDescription().contains("has_image:true")) {
-                    String imageUrlLine = "";
-                    for (String line : currentQuestion.getDescription().split("\n")) {
-                        if (line.startsWith("image_url:")) {
-                            imageUrlLine = line;
-                            break;
-                        }
-                    }
-                    
-                    if (!imageUrlLine.isEmpty()) {
-                        descBuilder.append("has_image:true\n");
-                        descBuilder.append(imageUrlLine).append("\n");
-                    }
-                }
-                
                 // Update the yes/no score setting
                 if (checkedId == R.id.radio_yes_full_score) {
                     descBuilder.append("yes_full_score:true\n");
@@ -240,68 +222,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 listener.onQuestionDeleted(adapterPosition);
             }
         });
-        
-        // Set up Add Image button
-        holder.btnAddImage.setOnClickListener(v -> {
-            int adapterPosition = holder.getAdapterPosition();
-            if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                listener.onImageRequested(adapterPosition);
-            }
-        });
-        
-        // Check if the question has an image and show it if so
-        String description = question.getDescription();
-        if (description != null && description.contains("has_image:true")) {
-            holder.imageContainer.setVisibility(View.VISIBLE);
-            
-            String imageUrl = null;
-            for (String line : description.split("\n")) {
-                if (line.startsWith("image_url:")) {
-                    imageUrl = line.substring("image_url:".length());
-                    break;
-                }
-            }
-            
-            if (imageUrl != null) {
-                Glide.with(context)
-                        .load(Uri.parse(imageUrl))
-                        .centerCrop()
-                        .placeholder(R.drawable.default_profile)
-                        .into(holder.questionImage);
-            }
-            
-            // Set up remove image button
-            holder.btnRemoveImage.setOnClickListener(v -> {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                    holder.imageContainer.setVisibility(View.GONE);
-                    listener.onImageRemoved(adapterPosition);
-                }
-            });
-        } else {
-            holder.imageContainer.setVisibility(View.GONE);
-        }
+
     }
 
     @NonNull
     private static StringBuilder getStringBuilder(Question currentQuestion) {
         StringBuilder descBuilder = new StringBuilder();
-
-        // Preserve image information if it exists
-        if (currentQuestion.getDescription().contains("has_image:true")) {
-            String imageUrlLine = "";
-            for (String line : currentQuestion.getDescription().split("\n")) {
-                if (line.startsWith("image_url:")) {
-                    imageUrlLine = line;
-                    break;
-                }
-            }
-
-            if (!imageUrlLine.isEmpty()) {
-                descBuilder.append("has_image:true\n");
-                descBuilder.append(imageUrlLine).append("\n");
-            }
-        }
 
         // Set Yes to 100% by default
         descBuilder.append("yes_full_score:true\n");
@@ -371,7 +297,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             radioNoFullScore = itemView.findViewById(R.id.radio_no_full_score);
             recyclerAnswerOptions = itemView.findViewById(R.id.recycler_answer_options);
             btnAddAnswer = itemView.findViewById(R.id.btn_add_answer);
-            btnAddImage = itemView.findViewById(R.id.btn_add_image);
+            //btnAddImage = itemView.findViewById(R.id.btn_add_image);
             btnDeleteQuestion = itemView.findViewById(R.id.btn_delete_question);
             imageContainer = itemView.findViewById(R.id.image_container);
             questionImage = itemView.findViewById(R.id.question_image);
