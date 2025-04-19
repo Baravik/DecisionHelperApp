@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuestionAdapter;
 import com.decisionhelperapp.models.Question;
-import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.viewmodel.CreateQuizViewModel;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -32,7 +29,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,9 +42,7 @@ public class CreateQuizActivity extends BaseActivity {
     private QuestionAdapter questionAdapter;
     private CircularProgressIndicator progressIndicator;
     private SwitchMaterial switchPublic;
-    private Spinner spinnerCategory;
-    
-    private final List<String> categories = Arrays.asList("General", "Business", "Education", "Health", "Technology", "Lifestyle");
+
     private FirebaseUser currentUser;
     private CreateQuizViewModel viewModel;
 
