@@ -161,17 +161,7 @@ public class CreateQuizActivity extends BaseActivity {
             public void onQuestionDeleted(int position) {
                 viewModel.deleteQuestion(position);
             }
-            
-            @Override
-            public void onImageRequested(int position) {
-                viewModel.setCurrentEditingQuestionPosition(position);
-                openGallery();
-            }
 
-            @Override
-            public void onImageRemoved(int position) {
-                viewModel.removeImageFromQuestion(position);
-            }
         });
         
         recyclerQuestions.setLayoutManager(new LinearLayoutManager(this));

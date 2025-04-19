@@ -9,6 +9,7 @@ import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
@@ -42,8 +43,10 @@ public class UserActivity extends BaseActivity {
         googleSignInHelper = new GoogleSignInHelper(this);
 
         // Setup action bar title
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("User Profile");
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("User Profile");
         }
 
         // Initialize views

@@ -41,8 +41,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
     public interface QuestionAdapterListener {
         void onQuestionDeleted(int position);
-        void onImageRequested(int position);
-        void onImageRemoved(int position);
+
     }
 
     public QuestionAdapter(Context context, List<Question> questions, QuestionAdapterListener listener) {
@@ -275,7 +274,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         RadioButton radioNoFullScore;
         RecyclerView recyclerAnswerOptions;
         Button btnAddAnswer;
-        Button btnAddImage;
         ImageButton btnDeleteQuestion;
         FrameLayout imageContainer;
         ImageView questionImage;
