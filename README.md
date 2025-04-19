@@ -1,6 +1,6 @@
 # DecisionHelperApp
 
-DecisionHelperApp is an Android application designed to help users make informed decisions through customizable questionnaires. Users can answer questions, rate their importance, and receive tailored recommendations based on their input.
+DecisionHelperApp is an Android application designed to help users make informed decisions through customizable questionnaires. Users can answer questions, rate their importance, and receive tailored recommendations based on their input. Built with a modern MVVM architecture and Firebase integration, the app provides a robust platform for creating, sharing, and analyzing decision-making tools.
 
 ---
 
@@ -51,22 +51,30 @@ The **Model** layer represents the data structures and business logic of the app
 
 Files in this layer:
 - **Data Models**:
-  - `Quiz.java`: Represents a quiz with metadata such as title, description, category.
-  - `Question.java`: Represents quiz questions, supporting multiple choice and yes/no types.
-  - `User.java`: Represents a user with authentication and profile information.
-  - `QuizQuestions.java`: Manages relationships between quizzes and their questions.
-  - `QuizUser.java`: Tracks user interactions with quizzes including completion status.
-  - `Scores.java`: Stores score ranges and their interpretations.
-  - `Answer.java`: Represents answer options with associated percentages.
+  - `Quiz.java`: Represents a quiz with metadata such as title, description, category, and visibility settings.
+  - `Question.java`: Represents quiz questions, supporting multiple choice and yes/no types with weighted answers.
+  - `User.java`: Represents a user with authentication data, profile information, and preferences.
+  - `QuizQuestions.java`: Manages relationships between quizzes and their questions including ordering.
+  - `QuizUser.java`: Tracks user interactions with quizzes including completion status, responses, and results.
+  - `Scores.java`: Stores score ranges, interpretations, and feedback for results analysis.
+  - `Answer.java`: Represents answer options with associated percentages and position-based weighting.
 
 - **Data Access**:
-  - `DatabaseHelper.java`: Manages SQLite database operations for offline functionality.
-  - Various DAO classes: Implement Firebase Firestore operations for each entity type.
-    - `QuizDAO.java`, `QuestionDAO.java`, `UserDAO.java`, `ScoresDAO.java`
-    - `QuizUserDAO.java`, `QuizQuestionsDAO.java`
+  - `DatabaseHelper.java`: Manages SQLite database operations for offline functionality with predefined tables for all entities.
+  - Various DAO classes: Implement Firebase Firestore operations with callback interfaces for asynchronous data handling:
+    - `QuestionDAO.java`: Manages CRUD operations for questions with batch updating capabilities
+    - `QuizDAO.java`: Handles quiz creation, retrieval, and management
+    - `UserDAO.java`: Manages user profiles and authentication state
+    - `ScoresDAO.java`: Processes and stores quiz result data
+    - `QuizUserDAO.java`: Tracks relationships between users and quizzes
+    - `QuizQuestionsDAO.java`: Manages question collections within quizzes
 
 - **Repository**:
-  - `DecisionRepository.java`: Centralizes data operations and abstracts data sources from the rest of the app.
+  - `DecisionRepository.java`: Centralizes data operations and abstracts data sources from the rest of the app:
+    - Initializes and orchestrates all DAO instances
+    - Provides a unified API for ViewModels to access data
+    - Implements callback handling for asynchronous Firebase operations
+    - Manages data consistency across different collections
 
 ### **View**  
 The **View** layer handles UI rendering and user interaction.
@@ -89,42 +97,52 @@ Components in this layer:
   - Various XML layouts defining the UI structure of each screen.
 
 ### **ViewModel**  
-The **ViewModel** layer processes data for the UI and manages UI-related data in a lifecycle-conscious way.
+The **ViewModel** layer processes data for the UI and manages UI-related data in a lifecycle-conscious way using LiveData objects.
 
 Key ViewModels:
-- `MainViewModel.java`: Manages main screen state and user data.
-- `LoginViewModel.java`: Handles authentication logic and user session state.
-- `CreateQuizViewModel.java`: Manages quiz creation workflow, including question management and image uploads.
-- `QuizViewModel.java`: Controls quiz interaction flow and question navigation.
-- `ScoresViewModel.java`: Processes and formats score data for display.
+- `MainViewModel.java`: Manages main screen state, user data, and profile operations with error handling.
+- `AuthUseCase.java`: Implements authentication logic including email/password and Google Sign-In integration.
+- `CreateQuizViewModel.java`: Manages quiz creation workflow, question management, image uploads, and Firebase storage operations.
+- `QuizViewModel.java`: Controls quiz interaction flow, question navigation, status tracking, and result calculation.
+- `ScoresViewModel.java`: Processes and formats score data for display with filtering and sorting capabilities.
 
 ---
 
 ## **Key Functionality**
 
 ### **User Authentication**
-- Email/password registration and login
-- Google authentication integration
-- User profile management
-- Session persistence
+- Email/password registration and login with validation
+- Google authentication integration using Firebase Auth
+- User profile management with real-time updates
+- Session persistence across app restarts
+- Secure password handling with cryptographic hashing
+- Authentication state monitoring across the application
 
 ### **Quiz Creation and Management**
-- Multi-step quiz creation process
-- Support for multiple choice and yes/no question types
-- Image upload capability for questions
-- Input validation for quiz content
-- Public/private visibility options
+- Multi-step quiz creation process with progress tracking
+- Support for multiple choice and yes/no question types with customizable weightings
+- Drag-and-drop reordering of answer options with automatic percentage adjustment
+- Image upload capability for questions with Firebase Storage integration
+- Comprehensive input validation for quiz content
+- Public/private visibility options for sharing control
+- Real-time preview of quiz appearance during creation
 
 ### **Quiz Taking**
-- Sequential or random question presentation
-- Progress tracking during quiz sessions
-- Score calculation based on answer weights
-- Result storage and historical comparison
+- Sequential or random question presentation with smooth navigation
+- Interactive progress tracking during quiz sessions
+- Dynamic score calculation based on position-weighted answer selections
+- Persistent state management to resume interrupted sessions
+- Immediate feedback options based on answer selection
+- Result storage with Firebase Firestore for historical comparison
+- Cross-device access to previously taken quizzes
 
 ### **Scoring System**
-- Customizable scoring ranges
-- Interpretive feedback based on score brackets
-- Performance metrics visualization
+- Customizable scoring ranges with percentage-based weighting
+- Sophisticated algorithm for calculating decision recommendations
+- Interpretive feedback based on configurable score brackets
+- Performance metrics visualization with comparative analysis
+- Historical tracking of score progression over time
+- Exportable score reports for sharing results
 
 ### **Cloud Integration**
 - Data synchronization between devices
