@@ -31,8 +31,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
     private final Context context;
@@ -74,10 +76,9 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         // Set question number
         holder.questionNumber.setText(MessageFormat.format("Question {0}", position + 1));
         
-        // Set existing question text if available
-        if (question.getTitle() != null && !question.getTitle().isEmpty()) {
-            holder.questionText.setText(question.getTitle());
-        }
+        // FIXED: Always set the question text from the model, even if empty
+        // This ensures recycled views don't show previous question titles
+        holder.questionText.setText(question.getTitle());
         
         // Set up question type
         if ("yes_no_question".equals(question.getType())) {
@@ -462,15 +463,28 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
         private void notifyOptionsChanged() {
             if (listener != null) {
-                // Filter out empty options and create map with percentages
+                // Filter out empty options and check for duplicates
                 Map<String, Integer> optionsWithPercentages = new HashMap<>();
+                Set<String> uniqueOptions = new HashSet<>();
+                boolean hasDuplicates = false;
+                
                 for (int i = 0; i < options.size(); i++) {
                     String option = options.get(i).trim();
                     if (!option.isEmpty()) {
+                        // Check if this is a duplicate
+                        if (!uniqueOptions.add(option)) {
+                            hasDuplicates = true;
+                            // We don't return early as we want to check all options
+                            // and highlight all duplicates through the UI
+                        }
                         optionsWithPercentages.put(option, percentages.get(i));
                     }
                 }
-                listener.onOptionsChanged(optionsWithPercentages);
+                
+                // Only update the model if there are no duplicates
+                if (!hasDuplicates) {
+                    listener.onOptionsChanged(optionsWithPercentages);
+                }
             }
         }
 
@@ -487,6 +501,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             holder.optionText.setText(options.get(position));
             holder.percentText.setText(String.valueOf(percentages.get(position)));
             
+            // Reset any previous error state
+            holder.optionText.setError(null);
+            
+            // Check for duplicates at bind time and show error if found
+            checkForDuplicatesAndShowError(holder, position);
+            
             holder.optionText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -500,35 +520,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 public void afterTextChanged(Editable s) {
                     int adapterPosition = holder.getAdapterPosition();
                     if (adapterPosition != RecyclerView.NO_POSITION) {
-                        options.set(adapterPosition, s.toString());
+                        String newValue = s.toString().trim();
+                        options.set(adapterPosition, newValue);
+                        
+                        // Check for duplicates and set error if found
+                        checkForDuplicatesAndShowError(holder, adapterPosition);
+                        
                         notifyOptionsChanged();
-                    }
-                }
-            });
-            
-            holder.percentText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    int adapterPosition = holder.getAdapterPosition();
-                    if (adapterPosition != RecyclerView.NO_POSITION) {
-                        try {
-                            int percent = s.toString().isEmpty() ? 0 : Integer.parseInt(s.toString());
-                            // Limit percentage to 0-100
-                            percent = Math.max(0, Math.min(100, percent));
-                            percentages.set(adapterPosition, percent);
-                            notifyOptionsChanged();
-                        } catch (NumberFormatException e) {
-                            // If not a valid number, set to 0
-                            percentages.set(adapterPosition, 0);
-                        }
                     }
                 }
             });
@@ -559,6 +557,41 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                     }
                 }
             });
+        }
+        
+        /**
+         * Checks if the answer text at the given position is a duplicate of any other answer
+         * and shows an error if it is.
+         * @param holder The ViewHolder containing the answer text field
+         * @param position The position of the answer to check
+         * @return true if there is a duplicate, false otherwise
+         */
+        private boolean checkForDuplicatesAndShowError(OptionViewHolder holder, int position) {
+            String currentText = options.get(position).trim();
+            
+            // Don't consider empty text as duplicate
+            if (currentText.isEmpty()) {
+                holder.optionText.setError(null);
+                return false;
+            }
+            
+            // Check for duplicates
+            boolean hasDuplicate = false;
+            for (int i = 0; i < options.size(); i++) {
+                if (i != position && options.get(i).trim().equals(currentText)) {
+                    hasDuplicate = true;
+                    break;
+                }
+            }
+            
+            // Show error if duplicate found
+            if (hasDuplicate) {
+                holder.optionText.setError("Duplicate answer text");
+                return true;
+            } else {
+                holder.optionText.setError(null);
+                return false;
+            }
         }
 
         @Override

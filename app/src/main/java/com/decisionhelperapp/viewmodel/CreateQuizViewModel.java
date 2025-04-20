@@ -18,7 +18,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class CreateQuizViewModel extends AndroidViewModel {
@@ -61,7 +63,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
     public void addNewQuestion() {
         Question newQuestion = new Question();
         newQuestion.setId(UUID.randomUUID().toString());
-        newQuestion.setTitle("");  // Will be filled in by user
+        newQuestion.setTitle("");  // Explicitly set to empty string
         newQuestion.setType("multiple_choice");  // Default type
         
         // Add default options with equal percentages
@@ -165,7 +167,7 @@ public class CreateQuizViewModel extends AndroidViewModel {
             if (question.getType().equals("multiple_choice")) {
                 // Check if the question has at least 2 answer options
                 List<Question.Answer> answers = question.getAnswers();
-                List<String> answerTexts = new ArrayList<>();
+                Set<String> answerTexts = new HashSet<>();
                 if (answers.size() < 2) {
                     errorMessage.setValue("Multiple choice question " + (i + 1) + 
                             " needs at least 2 options");
@@ -187,18 +189,20 @@ public class CreateQuizViewModel extends AndroidViewModel {
                     } catch (NumberFormatException e) {
                         // Ignore parsing errors
                     }
-                    if (!answerTexts.contains(answer.getText()))
-                    {
-                        answerTexts.add(answer.getText());
+                    // Check for duplicate answer text - more robust with trim()
+                    String answerText = answer.getText().trim();
+                    if (answerText.isEmpty()) {
+                        errorMessage.setValue("Question " + (i + 1) +
+                                " has an empty answer text");
+                        return true;
                     }
-                    else
+                    if (!answerTexts.add(answerText))
                     {
                         errorMessage.setValue("Question " + (i + 1) +
-                                " has duplicate options");
+                                " has duplicate options: \"" + answerText + "\"");
                         return true;
                     }
                 }
-
                 
                 // Check if percentages are defined properly
                 if (!hasPercentages) {
