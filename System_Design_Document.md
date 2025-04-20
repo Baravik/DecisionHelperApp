@@ -43,9 +43,10 @@ The Model layer represents domain data and business logic.
   - `title`: String - Question text
   - `type`: String - Question type (multiple_choice, yes_no_question)
   - `description`: String - Storage for answer options encoded as text
-  - `imageUrl`: String - Optional image URL
   - `answers`: List<Answer> - Collection of answer options
+  - `score`: int - Score value (if applicable)
 
+// להמשיך מכאן
 #### 1.1.4 QuizQuestions.java
 - **Responsibility**: Maps relationship between quizzes and questions
 - **Properties**:
