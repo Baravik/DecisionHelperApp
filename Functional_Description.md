@@ -38,12 +38,9 @@ Users can create customized decision-making quizzes through:
    - Adding multiple-choice or yes/no questions relevant to the decision
    - Customizing answer options with percentage-based importance weighting
    - Reordering questions and answer options via drag-and-drop
-   - Adding images to questions for better context and visualization
-   - Real-time preview of how questions will appear
 
 3. **Scoring Configuration**:
    - Setting up scoring ranges for results interpretation
-   - Creating feedback texts for different score brackets
 
 ### Taking Quizzes
 
@@ -52,40 +49,31 @@ Users can access and complete quizzes through:
 1. **Quiz Selection**:
    - Browsing available public quizzes
    - Accessing previously created personal quizzes
-   - Viewing quizzes shared specifically with them
+   - Option to delete quizzes marked as personal
 
 2. **Quiz Completion Process**:
    - Sequential navigation through quiz questions
    - Selection of most appropriate answers
    - Progress tracking during quiz completion
-   - Option to save progress and resume later
-
-3. **Results and Recommendations**:
-   - Receiving calculated scores based on answer weights
-   - Viewing personalized recommendations based on score ranges
-   - Option to save results for future reference
+   - Ability to navigate back to previous questions and review selected answers
+   - Option to change previously submitted answers before final submission
 
 ### Score Management
 
-Users can track and analyze their decision-making patterns through:
+Users can track their decision-making patterns through:
 
-1. **Results History**:
-   - Viewing historical quiz results organized chronologically
-   - Filtering results by quiz type or date range
-   - Comparing results across multiple quizzes
-
-2. **Performance Analysis**:
-   - Visualizing decision patterns over time
-   - Identifying consistent preferences or changes in approach
-
+ **Results**:
+   - Receiving calculated scores based on answer weights
+   - Option to save results for future reference
+   - Option to delete quiz scores
+     
 ### User Profile Management
 
 Users can manage their account settings through:
 
 1. **Profile Information**:
-   - Updating personal information (name, email)
    - Changing profile picture
-   - Viewing account statistics (quizzes created, quizzes taken)
+   - Viewing account details
 
 2. **Account Settings**:
    - Password management (for email users)
@@ -110,9 +98,8 @@ After completion, the app calculates which job offer best aligns with the user's
 A user deciding between different product options could:
 
 - Create a quiz with specific feature comparisons
-- Add images of products being considered
 - Set higher weights for must-have features
-- Share the quiz with family members for additional input
+- Share the quiz for additional input
 
 The final score helps identify which product best matches their needs based on their personal criteria weighting.
 
@@ -125,11 +112,3 @@ For significant life decisions (relocating, education choices), users can:
 - Review historical responses to similar decisions
 - Track how their priorities have changed over time
 
-## Benefits
-
-- **Structured Approach**: Transforms complex decisions into manageable components
-- **Personalization**: Adjusts to individual priorities through weighted scoring
-- **Visualization**: Provides clear visual representation of options and outcomes
-- **History Tracking**: Enables review of past decisions and their reasoning
-- **Collaboration**: Allows sharing decision frameworks with others for input
-- **Cross-Device Access**: Syncs decision data across user devices
