@@ -44,10 +44,6 @@ public class Quiz {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public int getScore() {
         return score;
     }
