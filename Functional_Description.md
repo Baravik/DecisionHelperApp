@@ -91,6 +91,7 @@ Users can manage their account settings through:
    - Password management (for email users)
    - Account deletion options
    - Authentication method management
+   - Connecting additional sign-in methods (e.g., linking Google account)
 
 ## Example Use Cases
 

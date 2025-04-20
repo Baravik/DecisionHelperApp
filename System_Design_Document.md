@@ -24,13 +24,7 @@ The Model layer represents domain data and business logic.
   - `id`: String - Unique identifier (Firebase UID)
   - `email`: String - User's email address
   - `name`: String - User's display name
-  - `username`: String - Optional username
-  - `passwordHash`: String - Hashed password (for email authentication)
   - `profilePictureUrl`: String - URL to profile image
-  - `viaGmail`: boolean - Whether user authenticated via Google
-  - `creationDate`: Date - Account creation timestamp
-  - `lastLoginDate`: Date - Most recent login timestamp
-  - `lastUpdated`: Date - Profile last update timestamp
 
 #### 1.1.2 Quiz.java
 - **Responsibility**: Represents a decision quiz/questionnaire
@@ -40,7 +34,6 @@ The Model layer represents domain data and business logic.
   - `description`: String - Quiz description
   - `userId`: String - Creator's user ID
   - `score`: int - Score value (if applicable)
-  - `completedAt`: String - Completion timestamp
   - `isPublic`: boolean - Public availability flag
 
 #### 1.1.3 Question.java
@@ -52,106 +45,87 @@ The Model layer represents domain data and business logic.
   - `description`: String - Storage for answer options encoded as text
   - `imageUrl`: String - Optional image URL
   - `answers`: List<Answer> - Collection of answer options
-- **Inner Classes**:
-  - `Answer`: Represents a possible answer with text and percentage weight
 
 #### 1.1.4 QuizQuestions.java
 - **Responsibility**: Maps relationship between quizzes and questions
 - **Properties**:
   - `id`: String - Unique identifier
   - `quizId`: String - Associated quiz ID
-  - `questionId`: String - Associated question ID
-  - `order`: int - Question sequence number
+  - `questionsId`: List<String> - List of question IDs
 
-#### 1.1.5 QuizUser.java
-- **Responsibility**: Tracks users' interactions with quizzes
-- **Properties**:
-  - `id`: String - Unique identifier
-  - `quizId`: String - Associated quiz ID
-  - `userId`: String - User ID
-  - `completed`: boolean - Completion status
-  - `score`: int - User's score
-  - `takenAt`: Date - Timestamp
-
-#### 1.1.6 Scores.java
+#### 1.1.5 Scores.java
 - **Responsibility**: Records quiz scores and interpretations
 - **Properties**:
   - `id`: String - Unique identifier
   - `quizId`: String - Associated quiz ID
   - `userId`: String - User ID
   - `score`: int - Numeric score
-  - `interpretation`: String - Result interpretation based on score range
 
 ### 1.2 Data Access Objects (DAOs)
 
 #### 1.2.1 UserDAO.java
 - **Responsibility**: Manages user data in Firebase Firestore
 - **Key Methods**:
-  - `getAllUsers(UserCallback)`: Retrieves all users
-  - `getUserById(String, SingleUserCallback)`: Fetches user by ID
-  - `getUserByEmail(String, SingleUserCallback)`: Fetches user by email
-  - `addUser(User, ActionCallback)`: Creates new user record
-  - `updateUser(User, ActionCallback)`: Updates existing user
-  - `deleteUser(String, ActionCallback)`: Removes user record
+  - `getUserById(String id, SingleUserCallback callback)`: Fetches user by ID
+  - `addUser(User user, ActionCallback callback)`: Creates new user record
+  - `updateUser(User user, ActionCallback callback)`: Updates existing user
 
 #### 1.2.2 QuizDAO.java
 - **Responsibility**: Manages quiz data in Firebase Firestore
 - **Key Methods**:
-  - `getAllQuizzes(QuizCallback)`: Retrieves all quizzes
-  - `getQuizById(String, SingleQuizCallback)`: Fetches quiz by ID
-  - `addQuiz(Quiz, ActionCallback)`: Creates new quiz
-  - `updateQuiz(Quiz, ActionCallback)`: Updates existing quiz
-  - `deleteQuiz(String, ActionCallback)`: Removes quiz
+  - `getAllQuizzes(QuizCallback callback)`: Retrieves all quizzes
+  - `getQuizById(String quizId, SingleQuizCallback callback)`: Fetches quiz by ID
+  - `addQuiz(Quiz quiz, ActionCallback callback)`: Creates new quiz
+  - `deleteQuiz(String quizId, ActionCallback callback)`: Removes quiz
 
 #### 1.2.3 QuestionDAO.java
 - **Responsibility**: Manages question data in Firebase Firestore
 - **Key Methods**:
-  - `getAllQuestions(QuestionCallback)`: Retrieves all questions
-  - `getQuestionById(String, SingleQuestionCallback)`: Fetches question by ID
-  - `addQuestion(Question, ActionCallback)`: Creates new question
-  - `updateQuestion(Question, ActionCallback)`: Updates existing question
-  - `deleteQuestion(String, ActionCallback)`: Removes question
+  - `addQuestion(Question question, ActionCallback callback)`: Creates new question
+  - `deleteQuestion(String id, QuizDAO.ActionCallback callback)`: Removes question
 
 #### 1.2.4 QuizQuestionsDAO.java
 - **Responsibility**: Manages quiz-question relationships
 - **Key Methods**:
-  - `getQuestionsForQuiz(String, QuestionsCallback)`: Gets questions for specific quiz
-  - `addQuizQuestion(QuizQuestions, String, ActionCallback)`: Links question to quiz
+  - `getQuestionsForQuiz(String quizId, QuestionsCallback callback)`: Gets questions for specific quiz
+  - `addQuizQuestion(QuizQuestions quizQuestion, String quizID, ActionCallback callback)`: Links question to quiz
+  - `deleteQuizQuestions(String quizId, ActionCallback callback)`: Removes quiz-question associations
 
-#### 1.2.5 QuizUserDAO.java
-- **Responsibility**: Manages user-quiz interaction records
-- **Key Methods**:
-  - `getAllQuizUsers(QuizUserCallback)`: Gets all quiz-user records
-  - `getQuizUsersByQuizId(String, QuizUserCallback)`: Gets users for specific quiz
-  - `getQuizUsersByUserId(String, QuizUserCallback)`: Gets quizzes for specific user
-  - `getQuizzesForUser(String, QuizCallback)`: Gets quiz objects for user
-  - `addQuizUser(QuizUser, ActionCallback)`: Creates new quiz-user record
-  - `updateQuizUser(QuizUser, ActionCallback)`: Updates existing record
-  - `deleteQuizUser(String, ActionCallback)`: Removes record
-
-#### 1.2.6 ScoresDAO.java
+#### 1.2.5 ScoresDAO.java
 - **Responsibility**: Manages score data
 - **Key Methods**:
-  - `getAllScores(ScoresCallback)`: Retrieves all scores
-  - `getScoresByQuizId(String, ScoresCallback)`: Gets scores for specific quiz
-  - `getScoresByUserId(String, ScoresCallback)`: Gets scores for specific user
-  - `addScore(Scores, ActionCallback)`: Creates new score record
-  - `updateScore(Scores, ActionCallback)`: Updates existing score
-  - `deleteScore(String, ActionCallback)`: Removes score
+  - `getAllScores(ScoresCallback callback)`: Retrieves all scores
+  - `deleteScore(String scoreId, ActionCallback callback)`: Removes score
 
 ### 1.3 Repository
 
 #### 1.3.1 DecisionRepository.java
 - **Responsibility**: Centralizes data operations from all DAOs
 - **Properties**:
-  - Instances of all DAO classes
-- **Methods**:
-  - Delegate methods for each DAO operation
-  - Coordinates cross-entity operations
-- **Implementation Details**:
-  - Initializes Firebase connections
-  - Manages asynchronous callbacks
-  - Serves as single access point for all data operations
+  - `questionDAO`: QuestionDAO
+  - `quizDAO`: QuizDAO
+  - `userDAO`: UserDAO
+  - `scoresDAO`: ScoresDAO
+  - `quizQuestionsDAO`: QuizQuestionsDAO
+- **Key Methods**:
+  - User related methods:
+    - `getUserById(String userId, UserDAO.SingleUserCallback callback)`
+    - `addUser(User user, UserDAO.ActionCallback callback)`
+    - `updateUser(User user, UserDAO.ActionCallback callback)`
+  - Quiz related methods:
+    - `getAllQuizzes(QuizDAO.QuizCallback callback)`
+    - `getQuizById(String quizId, QuizDAO.SingleQuizCallback callback)`
+    - `addQuiz(Quiz quiz, QuizDAO.ActionCallback callback)`
+    - `deleteQuiz(String quizId, QuizDAO.ActionCallback callback)`
+  - Question related methods:
+    - `addQuestion(Question question, QuestionDAO.ActionCallback callback)`
+    - `deleteQuestion(String id, QuizDAO.ActionCallback callback)`
+  - QuizQuestions related methods:
+    - `getQuestionsForQuiz(String quizId, QuizQuestionsDAO.QuestionsCallback callback)`
+    - `addQuizQuestion(QuizQuestions quizQuestion, String quizID, QuizQuestionsDAO.ActionCallback callback)`
+    - `deleteQuizQuestions(String quizId, QuizQuestionsDAO.ActionCallback callback)`
+  - Scores related methods:
+    - `getAllScores(ScoresDAO.ScoresCallback callback)`
 
 ## 2. View Layer
 
@@ -162,21 +136,19 @@ The View layer contains UI components and user interaction handlers.
 #### 2.1.1 BaseActivity.java
 - **Responsibility**: Parent class for common activity functionality
 - **Key Methods**:
-  - `onCreate()`: Sets up common components like toolbar
-  - `onCreateOptionsMenu()`: Sets up menu options
-  - `onOptionsItemSelected()`: Handles menu interactions
+  - Basic activity setup and shared behavior
 
 #### 2.1.2 SplashActivity.java
 - **Responsibility**: Application entry point and authentication check
 - **Key Methods**:
-  - `onCreate()`: Checks authentication state and redirects accordingly
+  - Authentication state verification and redirection
 
 #### 2.1.3 LoginActivity.java
 - **Responsibility**: Handles user authentication
 - **Key Methods**:
-  - `onCreate()`: Sets up login UI and click listeners
-  - `observeViewModel()`: Observes authentication state changes
-  - `showRegistrationDialog()`: Displays registration form dialog
+  - Email/password login
+  - Google Sign-In integration
+  - Registration form handling
 
 #### 2.1.4 MainActivity.java
 - **Responsibility**: Primary navigation hub
@@ -184,6 +156,7 @@ The View layer contains UI components and user interaction handlers.
   - `onCreate()`: Sets up main UI and navigation buttons
   - `navigateToLogin()`: Handles redirection to login
   - `updateUIWithUser()`: Updates UI with user information
+  - Navigation to various app sections
 
 #### 2.1.5 CreateQuizActivity.java
 - **Responsibility**: Quiz creation interface
@@ -197,6 +170,8 @@ The View layer contains UI components and user interaction handlers.
 - **Key Methods**:
   - Display available quizzes
   - Quiz filtering and sorting
+  - Quiz deletion
+  - Quiz selection for taking
 
 #### 2.1.7 TakeQuizActivity.java
 - **Responsibility**: Quiz answering interface
@@ -204,6 +179,7 @@ The View layer contains UI components and user interaction handlers.
   - Question display and navigation
   - Answer selection handling
   - Progress tracking
+  - Results calculation
 
 #### 2.1.8 ScoresActivity.java
 - **Responsibility**: Displays quiz results and scores
@@ -214,33 +190,32 @@ The View layer contains UI components and user interaction handlers.
 #### 2.1.9 UserActivity.java
 - **Responsibility**: User profile management
 - **Key Methods**:
-  - Profile information display and editing
-  - Authentication settings
+  - `loadUserData()`: Fetches and displays user info
+  - `logoutUser()`: Signs out the user
+  - `connectWithGmail()`: Links Google account
+  - `firebaseAuthWithGoogle()`: Handles Google authentication
+  - `redirectToLogin()`: Redirects to login screen
 
 ### 2.2 Adapters
 
 #### 2.2.1 QuizAdapter.java
 - **Responsibility**: Binds quiz data to RecyclerView
 - **Key Methods**:
-  - `onCreateViewHolder()`: Inflates quiz item views
-  - `onBindViewHolder()`: Populates views with quiz data
+  - Quiz item display
+  - Click handling for quiz selection
+  - Delete button handling
 
 #### 2.2.2 QuestionAdapter.java
 - **Responsibility**: Manages question display in lists
 - **Key Methods**:
-  - `onCreateViewHolder()`: Inflates question item views
-  - `onBindViewHolder()`: Populates views with question data
-  - `extractAnswerOptions()`: Parses answer options from description
-- **Inner Classes**:
-  - `QuestionViewHolder`: Holds question view references
-  - `AnswerOptionAdapter`: Nested adapter for answer options
-  - `AnswerItemTouchHelperCallback`: Handles drag-and-drop reordering
+  - Question item display
+  - Edit/delete operations for questions
 
 #### 2.2.3 ScoresAdapter.java
 - **Responsibility**: Handles score data visualization
 - **Key Methods**:
-  - `onCreateViewHolder()`: Inflates score item views
-  - `onBindViewHolder()`: Populates views with score data
+  - Score item display
+  - Formatting and presentation of score data
 
 ## 3. ViewModel Layer
 
@@ -250,92 +225,91 @@ The ViewModel layer processes data for UI and manages UI-related state.
 - **Responsibility**: Manages authentication logic
 - **Properties**:
   - `authUseCase`: Handles authentication operations
-  - `user`: LiveData<User> - Current authenticated user
-  - `error`: LiveData<String> - Authentication errors
-  - `loading`: LiveData<Boolean> - Loading state
 - **Key Methods**:
-  - `login(String, String)`: Email/password authentication
-  - `register(String, String, String)`: User registration
-  - `loginWithGoogle(GoogleSignInAccount)`: Google authentication
+  - `login(String email, String password)`: Email/password authentication
+  - `register(String name, String email, String password)`: User registration
+  - `loginWithGoogle(GoogleSignInAccount account)`: Google authentication
+  - LiveData getters for user, error, and loading states
 
 ### 3.2 MainViewModel.java
 - **Responsibility**: Manages main screen state
 - **Properties**:
-  - `currentUser`: MutableLiveData<User> - Current user object
-  - `currentUserName`: MutableLiveData<String> - User's name
-  - `errorMessage`: MutableLiveData<String> - Error messages
-  - `isLoading`: MutableLiveData<Boolean> - Loading state
+  - `currentUser`: MutableLiveData<User>
+  - `currentUserName`: MutableLiveData<String>
+  - `errorMessage`: MutableLiveData<String>
+  - `isLoading`: MutableLiveData<Boolean>
 - **Key Methods**:
-  - `loadUserData(String)`: Loads user data by ID
-  - `updateUser(String)`: Updates user information
-  - `setCurrentUser(User)`: Updates current user object
+  - `loadUserData(String userId)`: Loads user data by ID
+  - LiveData getters for user, error, and loading states
 
 ### 3.3 CreateQuizViewModel.java
 - **Responsibility**: Manages quiz creation workflow
 - **Properties**:
-  - `questionsList`: LiveData<List<Question>> - Questions in current quiz
-  - `errorMessage`: LiveData<String> - Error messages
-  - `isLoading`: LiveData<Boolean> - Loading state
-  - `quizSaved`: LiveData<Boolean> - Save completion flag
+  - `questionsList`: MutableLiveData<List<Question>>
+  - `errorMessage`: MutableLiveData<String>
+  - `isLoading`: MutableLiveData<Boolean>
+  - `quizSaved`: MutableLiveData<Boolean>
 - **Key Methods**:
-  - `addQuestion(Question)`: Adds question to list
-  - `removeQuestion(int)`: Removes question from list
-  - `saveQuiz(String, String, String)`: Saves quiz to database
+  - `addQuestion()`: Adds question to list
+  - `deleteQuestion()`: Removes question from list
   - `uploadImage(Uri)`: Uploads question image to Firebase Storage
+  - `saveQuiz(String description, String name, String userId, boolean isPublic)`: Saves quiz to database
   - `validateQuiz(String, String)`: Validates quiz input before saving
+  - LiveData getters for questions, errors, loading, and save states
 
 ### 3.4 QuizViewModel.java
 - **Responsibility**: Controls quiz interaction flow
+- **Properties**:
+  - `quizStatus`: MutableLiveData<String>
+  - `currentQuiz`: MutableLiveData<Quiz>
+  - `quizList`: MutableLiveData<List<Quiz>>
+  - `questionsList`: MutableLiveData<List<Question>>
+  - `currentQuestion`: MutableLiveData<Question>
+  - `currentQuestionIndex`: MutableLiveData<Integer>
+  - `errorMessage`: MutableLiveData<String>
+  - `isLoading`: MutableLiveData<Boolean>
 - **Key Methods**:
-  - `loadQuizData(String)`: Loads quiz by ID
-  - `nextQuestion()`: Navigates to next question
-  - `previousQuestion()`: Navigates to previous question
-  - `selectAnswer(int)`: Processes answer selection
-  - `calculateScore()`: Calculates final quiz score
+  - `loadAllQuizzes()`: Loads quiz list
+  - `loadQuizById(String quizId)`: Loads specific quiz
+  - `loadQuestionsForQuiz(String quizId)`: Loads questions for quiz
+  - `deleteQuiz(String quizId)`: Deletes quiz and related data
+  - LiveData getters for quiz status, current quiz, quiz list, error messages, and loading state
 
 ### 3.5 ScoresViewModel.java
 - **Responsibility**: Processes score data
 - **Key Methods**:
-  - `getScoresByUser(String)`: Retrieves user scores
-  - `filterByDate(Date, Date)`: Filters scores by date range
-  - `sortByScore()`: Sorts scores by value
-  - `prepareChartData()`: Formats data for visualization
+  - Score data loading
+  - Score processing and formatting
+  - Data visualization preparation
 
 ## 4. Authentication and Security
 
 ### 4.1 AuthUseCase.java
 - **Responsibility**: Implements authentication logic
 - **Properties**:
-  - `repository`: DecisionRepository - Data access
-  - `mAuth`: FirebaseAuth - Firebase authentication
-  - `loggedInUser`: LiveData<User> - Current user
-  - `errorMessage`: LiveData<String> - Error messages
-  - `isLoading`: LiveData<Boolean> - Loading state
+  - `repository`: DecisionRepository
+  - `mAuth`: FirebaseAuth
+  - `loggedInUser`: MutableLiveData<User>
+  - `errorMessage`: MutableLiveData<String>
+  - `isLoading`: MutableLiveData<Boolean>
 - **Key Methods**:
-  - `login(String, String)`: Email authentication
-  - `register(String, String, String)`: User registration
-  - `loginWithGoogle(GoogleSignInAccount)`: Google authentication
-  - `fetchUser(String)`: Retrieves user data after authentication
+  - `login(String email, String password)`: Email authentication
+  - `register(String name, String email, String password)`: User registration
+  - `loginWithGoogle(GoogleSignInAccount account)`: Google authentication
 
 ### 4.2 GoogleSignInHelper.java
 - **Responsibility**: Facilitates Google authentication
-- **Properties**:
-  - `googleSignInClient`: GoogleSignInClient - Google client instance
 - **Key Methods**:
-  - `launchSignIn(ActivityResultLauncher<Intent>)`: Initiates sign-in
-  - `handleSignInResult(Intent, SignInCallback)`: Processes authentication result
+  - `launchSignIn()`: Initiates sign-in
+  - Google authentication result handling
 
 ## 5. Utility Classes
 
-### 5.1 Utils.java
-- **Responsibility**: General utility functions
-- **Key Methods**:
-  - Security utilities (hashing, etc.)
-
-### 5.2 MenuHelper.java
+### 5.1 MenuHelper.java
 - **Responsibility**: Menu management utilities
 - **Key Methods**:
-  - Menu display customization based on user state
+  - Menu creation and display
+  - Menu item handling
 
 ## 6. Database Schema
 
@@ -347,10 +321,7 @@ Users
 │   ├── email: String
 │   ├── name: String
 │   ├── profilePictureUrl: String (optional)
-│   ├── viaGmail: Boolean
-│   ├── creationDate: Timestamp
-│   ├── lastLoginDate: Timestamp
-│   └── lastUpdated: Timestamp
+│   └── id: String
 
 Quizzes
 ├── quiz_id (document)
@@ -358,34 +329,25 @@ Quizzes
 │   ├── description: String
 │   ├── userId: String (ref to Users)
 │   ├── isPublic: Boolean
-│   └── completedAt: String (optional)
+│   └── score: Number
 
 Questions
 ├── question_id (document)
-│   ├── text: String
+│   ├── title: String
+│   ├── type: String
 │   ├── description: String (contains serialized answer options)
 │   └── imageUrl: String (optional)
 
 QuizQuestions
 ├── quizquestion_id (document)
 │   ├── quizId: String (ref to Quizzes)
-│   ├── questionId: String (ref to Questions)
-│   └── order: Number
-
-QuizUser
-├── quizuser_id (document)
-│   ├── quizId: String (ref to Quizzes)
-│   ├── userId: String (ref to Users)
-│   ├── completed: Boolean
-│   ├── score: Number (optional)
-│   └── takenAt: Timestamp
+│   └── questionsId: Array<String> (ref to Questions)
 
 Scores
 ├── score_id (document)
     ├── quizId: String (ref to Quizzes)
     ├── userId: String (ref to Users)
-    ├── score: Number
-    └── interpretation: String
+    └── score: Number
 ```
 
 ### 6.2 Local SQLite Database
@@ -413,11 +375,10 @@ results
 ```mermaid
 erDiagram
     User ||--o{ Quiz : creates
-    User ||--o{ QuizUser : completes
     Quiz ||--o{ QuizQuestions : contains
-    Quiz ||--o{ QuizUser : taken_by
     Question ||--o{ QuizQuestions : used_in
-    QuizUser ||--o{ Scores : generates
+    User ||--o{ Scores : has
+    Quiz ||--o{ Scores : generates
 ```
 
 ## 8. System Interactions
@@ -442,7 +403,6 @@ erDiagram
 3. User navigates through questions and submits answers
 4. Score is calculated based on answer weights
 5. Result is saved to Scores collection
-6. QuizUser record is updated to reflect completion
 
 ## 9. Dependencies
 
