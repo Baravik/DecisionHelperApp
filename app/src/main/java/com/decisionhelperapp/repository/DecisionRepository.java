@@ -92,4 +92,5 @@ public class DecisionRepository {
     public void deleteScore(String scoreId, ScoresDAO.ActionCallback scoreDeletedSuccessfully) {
         scoresDAO.deleteScore(scoreId, scoreDeletedSuccessfully);
     }
+
 }

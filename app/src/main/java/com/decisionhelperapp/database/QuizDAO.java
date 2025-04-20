@@ -88,6 +88,7 @@ public class QuizDAO {
             .addOnFailureListener(quizDeletedSuccessfully::onFailure);
     }
 
+
     public interface QuizCallback {
         void onCallback(List<Quiz> quizList);
         void onFailure(Exception e);

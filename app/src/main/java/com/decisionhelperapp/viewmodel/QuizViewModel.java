@@ -266,4 +266,5 @@ public class QuizViewModel extends AndroidViewModel {
             currentQuestion.setValue(questions.get(prevIndex));
         }
     }
+
 }

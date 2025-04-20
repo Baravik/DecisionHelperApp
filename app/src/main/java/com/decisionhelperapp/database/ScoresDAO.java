@@ -58,6 +58,7 @@ public class ScoresDAO {
                 });
     }
 
+
     public interface ScoresCallback {
         void onCallback(List<Scores> scoresList);
         void onFailure(Exception e);
@@ -67,4 +68,5 @@ public class ScoresDAO {
         void onSuccess();
         void onFailure(Exception e);
     }
+
 }
