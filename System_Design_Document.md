@@ -47,10 +47,13 @@ The Model layer represents domain data and business logic.
 - **Responsibility**: Represents individual questions within quizzes
 - **Properties**:
   - `id`: String - Unique identifier
-  - `text`: String - Question text
+  - `title`: String - Question text
+  - `type`: String - Question type (multiple_choice, yes_no_question)
   - `description`: String - Storage for answer options encoded as text
   - `imageUrl`: String - Optional image URL
-  - Methods for answer option serialization/deserialization
+  - `answers`: List<Answer> - Collection of answer options
+- **Inner Classes**:
+  - `Answer`: Represents a possible answer with text and percentage weight
 
 #### 1.1.4 QuizQuestions.java
 - **Responsibility**: Maps relationship between quizzes and questions
@@ -275,24 +278,28 @@ The ViewModel layer processes data for UI and manages UI-related state.
   - `isLoading`: LiveData<Boolean> - Loading state
   - `quizSaved`: LiveData<Boolean> - Save completion flag
 - **Key Methods**:
-  - Question addition/removal
-  - Quiz saving
-  - Image upload handling
+  - `addQuestion(Question)`: Adds question to list
+  - `removeQuestion(int)`: Removes question from list
+  - `saveQuiz(String, String, String)`: Saves quiz to database
+  - `uploadImage(Uri)`: Uploads question image to Firebase Storage
+  - `validateQuiz(String, String)`: Validates quiz input before saving
 
 ### 3.4 QuizViewModel.java
 - **Responsibility**: Controls quiz interaction flow
 - **Key Methods**:
-  - Quiz data loading
-  - Question navigation
-  - Answer processing
-  - Score calculation
+  - `loadQuizData(String)`: Loads quiz by ID
+  - `nextQuestion()`: Navigates to next question
+  - `previousQuestion()`: Navigates to previous question
+  - `selectAnswer(int)`: Processes answer selection
+  - `calculateScore()`: Calculates final quiz score
 
 ### 3.5 ScoresViewModel.java
 - **Responsibility**: Processes score data
 - **Key Methods**:
-  - Score retrieval and formatting
-  - Filtering and sorting
-  - Data visualization preparation
+  - `getScoresByUser(String)`: Retrieves user scores
+  - `filterByDate(Date, Date)`: Filters scores by date range
+  - `sortByScore()`: Sorts scores by value
+  - `prepareChartData()`: Formats data for visualization
 
 ## 4. Authentication and Security
 

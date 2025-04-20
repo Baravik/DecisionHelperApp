@@ -20,7 +20,10 @@ After successful authentication, users are presented with the main dashboard tha
 
 - Personalized welcome with user name and profile picture (if available)
 - Navigation to user profile for account management
-- Primary action buttons for key app functions
+- Primary action buttons for key app functions:
+  - Start or browse quizzes
+  - View personal score history
+  - Create new quizzes
 
 ### Creating Decision Quizzes
 
