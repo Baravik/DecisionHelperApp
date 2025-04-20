@@ -1,6 +1,6 @@
 # DecisionHelperApp
 
-DecisionHelperApp is an Android application designed to help users make informed decisions through customizable questionnaires. Users can answer questions, rate their importance, and receive tailored recommendations based on their input. Built with a modern MVVM architecture and Firebase integration, the app provides a robust platform for creating, sharing, and analyzing decision-making tools.
+DecisionHelperApp is an Android application designed to help users evaluate decisions using customizable questionnaires. Users answer questions, rate their importance, and receive a decision score based on their input. Built with a modern MVVM architecture and Firebase integration, the app offers a flexible platform for creating, sharing, and analyzing decision-making tools.
 
 ---
 
