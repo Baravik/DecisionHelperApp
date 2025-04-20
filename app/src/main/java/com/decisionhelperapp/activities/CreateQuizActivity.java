@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -48,8 +45,6 @@ public class CreateQuizActivity extends BaseActivity {
     private FirebaseUser currentUser;
     private CreateQuizViewModel viewModel;
 
-    private ActivityResultLauncher<Intent> galleryLauncher;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,21 +79,6 @@ public class CreateQuizActivity extends BaseActivity {
         // Set up button listeners
         findViewById(R.id.btn_add_question).setOnClickListener(v -> viewModel.addNewQuestion());
         findViewById(R.id.btn_save).setOnClickListener(v -> saveQuiz());
-
-        // Set up image picker
-        galleryLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Uri selectedImage = result.getData().getData();
-                        // Continue your image handling logic
-                        if (selectedImage != null) {
-                            viewModel.uploadImage(selectedImage);
-                        }
-
-                    }
-                }
-        );
 
         // Handle back button press
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -156,13 +136,7 @@ public class CreateQuizActivity extends BaseActivity {
             questions = new ArrayList<>();
         }
         
-        questionAdapter = new QuestionAdapter(this, questions, new QuestionAdapter.QuestionAdapterListener() {
-            @Override
-            public void onQuestionDeleted(int position) {
-                viewModel.deleteQuestion(position);
-            }
-
-        });
+        questionAdapter = new QuestionAdapter(this, questions, position -> viewModel.deleteQuestion(position));
         
         recyclerQuestions.setLayoutManager(new LinearLayoutManager(this));
         recyclerQuestions.setAdapter(questionAdapter);
@@ -181,11 +155,6 @@ public class CreateQuizActivity extends BaseActivity {
             currentUser.getUid(),
             isPublic
         );
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryLauncher.launch(intent);
     }
 
     @Override
