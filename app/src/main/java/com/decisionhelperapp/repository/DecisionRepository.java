@@ -59,9 +59,7 @@ public class DecisionRepository {
     public void addQuiz(Quiz quiz, QuizDAO.ActionCallback callback) {
         quizDAO.addQuiz(quiz, callback);
     }
-    public void updateQuiz(Quiz quiz, QuizDAO.ActionCallback callback) {
-        quizDAO.updateQuiz(quiz, callback);
-    }
+
     public void addQuestion(Question question, QuestionDAO.ActionCallback callback) {
         questionDAO.addQuestion(question, callback);
     }

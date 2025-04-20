@@ -40,7 +40,6 @@ public class ScoresDAO {
     }
 
     public void deleteScore(String scoreId, final ActionCallback scoreDeletedSuccessfully) {
-        String currentUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Log the score ID for debugging
         System.out.println("Attempting to delete score with ID: " + scoreId);

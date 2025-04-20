@@ -69,18 +69,6 @@ public class QuizDAO {
             });
     }
 
-    public void updateQuiz(Quiz quiz, final ActionCallback callback){
-        db.collection(Table_Quizzes).document(quiz.getId())
-            .set(quiz)
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    callback.onSuccess();
-                } else {
-                    callback.onFailure(task.getException());
-                }
-            });
-    }
-
     public void deleteQuiz(String quizId, final ActionCallback quizDeletedSuccessfully) {
         db.collection(Table_Quizzes).document(quizId)
             .delete()
