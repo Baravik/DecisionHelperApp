@@ -7,7 +7,6 @@ DecisionHelperApp is an Android application designed to help users evaluate deci
 ## **Features**
 - Create and answer quizzes to evaluate decisions
 - Multiple question types (multiple choice, yes/no) with customizable options
-- Upload images to enhance quiz questions
 - User authentication with email/password or Google Sign-In
 - Save quiz results and track progress over time
 - Public and private quiz sharing options
@@ -33,10 +32,7 @@ DecisionHelperApp is an Android application designed to help users evaluate deci
 5. **Firebase Storage**:  
    Cloud storage solution for user-generated content such as question images.
 
-6. **SQLite (Local Cache)**:  
-   A lightweight local database used for offline access and caching.
-
-7. **Android Architecture Components**:  
+6. **Android Architecture Components**:  
    - LiveData: For observable data holder classes
    - ViewModel: For UI-related data handling that survives configuration changes
 
@@ -57,7 +53,6 @@ Files in this layer:
   - `QuizQuestions.java`: Manages relationships between quizzes and their questions including ordering.
   - `QuizUser.java`: Tracks user interactions with quizzes including completion status, responses, and results.
   - `Scores.java`: Stores score ranges, interpretations, and feedback for results analysis.
-  - `Answer.java`: Represents answer options with associated percentages and position-based weighting.
 
 - **Data Access**:
   - `DatabaseHelper.java`: Manages SQLite database operations for offline functionality with predefined tables for all entities.
@@ -66,7 +61,6 @@ Files in this layer:
     - `QuizDAO.java`: Handles quiz creation, retrieval, and management
     - `UserDAO.java`: Manages user profiles and authentication state
     - `ScoresDAO.java`: Processes and stores quiz result data
-    - `QuizUserDAO.java`: Tracks relationships between users and quizzes
     - `QuizQuestionsDAO.java`: Manages question collections within quizzes
 
 - **Repository**:
@@ -87,6 +81,8 @@ Components in this layer:
   - `CreateQuizActivity.java`: Interface for creating and editing quizzes.
   - `QuizActivity.java`: Displays and processes quiz questions.
   - `ScoresActivity.java`: Shows user performance metrics.
+  - `TakeQuizActivity.java`: Allows users to take quizzes by answering questions, calculate the score, and submit their responses.
+  - `SplashActivity.java`: Entry point of the app that checks for a stored user session and redirects to either `MainActivity` or `LoginActivity`.
 
 - **Adapters**:
   - `QuizAdapter.java`: Binds quiz data to RecyclerView items.
@@ -101,7 +97,7 @@ The **ViewModel** layer processes data for the UI and manages UI-related data in
 
 Key ViewModels:
 - `MainViewModel.java`: Manages main screen state, user data, and profile operations with error handling.
-- `AuthUseCase.java`: Implements authentication logic including email/password and Google Sign-In integration.
+- `LoginViewModel.java`: Implements authentication logic including email/password and Google Sign-In integration.
 - `CreateQuizViewModel.java`: Manages quiz creation workflow, question management, image uploads, and Firebase storage operations.
 - `QuizViewModel.java`: Controls quiz interaction flow, question navigation, status tracking, and result calculation.
 - `ScoresViewModel.java`: Processes and formats score data for display with filtering and sorting capabilities.
@@ -122,7 +118,6 @@ Key ViewModels:
 - Multi-step quiz creation process with progress tracking
 - Support for multiple choice and yes/no question types with customizable weightings
 - Drag-and-drop reordering of answer options with automatic percentage adjustment
-- Image upload capability for questions with Firebase Storage integration
 - Comprehensive input validation for quiz content
 - Public/private visibility options for sharing control
 - Real-time preview of quiz appearance during creation
@@ -135,14 +130,14 @@ Key ViewModels:
 - Immediate feedback options based on answer selection
 - Result storage with Firebase Firestore for historical comparison
 - Cross-device access to previously taken quizzes
+- Sophisticated algorithm for calculating decision recommendations
+
 
 ### **Scoring System**
 - Customizable scoring ranges with percentage-based weighting
 - Sophisticated algorithm for calculating decision recommendations
 - Interpretive feedback based on configurable score brackets
-- Performance metrics visualization with comparative analysis
-- Historical tracking of score progression over time
-- Exportable score reports for sharing results
+- Scoring based on relevant questionnaires
 
 ### **Cloud Integration**
 - Data synchronization between devices
