@@ -46,7 +46,6 @@ The Model layer represents domain data and business logic.
   - `answers`: List<Answer> - Collection of answer options
   - `score`: int - Score value (if applicable)
 
-// להמשיך מכאן
 #### 1.1.4 QuizQuestions.java
 - **Responsibility**: Maps relationship between quizzes and questions
 - **Properties**:
@@ -330,86 +329,54 @@ Quizzes
 │   ├── description: String
 │   ├── userId: String (ref to Users)
 │   ├── isPublic: Boolean
+│   ├── id: String 
 │   └── score: Number
 
 Questions
 ├── question_id (document)
 │   ├── title: String
 │   ├── type: String
-│   ├── description: String (contains serialized answer options)
-│   └── imageUrl: String (optional)
+│   ├── description: String 
 
 QuizQuestions
 ├── quizquestion_id (document)
 │   ├── quizId: String (ref to Quizzes)
 │   └── questionsId: Array<String> (ref to Questions)
 
-Scores
+userQuizScores
 ├── score_id (document)
     ├── quizId: String (ref to Quizzes)
     ├── userId: String (ref to Users)
     └── score: Number
 ```
 
-### 6.2 Local SQLite Database
+## 7. System Interactions
 
-The application also maintains a local SQLite database for offline caching with the following tables:
-
-```
-questions
-├── id: INTEGER PRIMARY KEY AUTOINCREMENT
-├── question_text: TEXT
-└── quiz_name: TEXT
-
-quizzes
-├── id: INTEGER PRIMARY KEY AUTOINCREMENT
-└── quiz_name: TEXT
-
-results
-├── id: INTEGER PRIMARY KEY AUTOINCREMENT
-├── quiz_name: TEXT
-└── score: INTEGER
-```
-
-## 7. Entity Relationships
-
-```mermaid
-erDiagram
-    User ||--o{ Quiz : creates
-    Quiz ||--o{ QuizQuestions : contains
-    Question ||--o{ QuizQuestions : used_in
-    User ||--o{ Scores : has
-    Quiz ||--o{ Scores : generates
-```
-
-## 8. System Interactions
-
-### 8.1 Authentication Flow
+### 7.1 Authentication Flow
 1. User enters credentials (email/password or Google)
 2. AuthUseCase validates credentials with Firebase Auth
 3. On success, user data is fetched from Firestore
 4. User state is propagated to UI via LiveData
 5. Navigation redirects to MainActivity
 
-### 8.2 Quiz Creation Flow
+### 7.2 Quiz Creation Flow
 1. User enters quiz details in CreateQuizActivity
 2. Data is validated by CreateQuizViewModel
 3. Quiz is saved to Firestore via Repository
 4. Questions are created and linked to quiz via QuizQuestionsDAO
 5. Success/failure state is propagated to UI
 
-### 8.3 Quiz Taking Flow
+### 7.3 Quiz Taking Flow
 1. User selects quiz from list
 2. QuizViewModel loads questions via Repository
 3. User navigates through questions and submits answers
 4. Score is calculated based on answer weights
 5. Result is saved to Scores collection
 
-## 9. Dependencies
+## 8. Dependencies
 
 - Firebase Authentication: User authentication
 - Cloud Firestore: Database storage
 - Firebase Storage: Image storage
 - Android Architecture Components (LiveData, ViewModel): UI state management
 - Glide: Image loading and caching
-- SQLite: Local data caching
