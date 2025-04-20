@@ -88,7 +88,7 @@ Users can manage their account settings through:
 A user facing multiple job offers could create a decision quiz with questions like:
 
 - "How important is salary in your decision?" (with weighted options)
-- "How would you rate the company culture?" (with image attachments of offices)
+- "How would you rate the company culture?" (with weighted options)
 - "What commute time would you prefer?" (with different time range options)
 
 After completion, the app calculates which job offer best aligns with the user's weighted preferences.
