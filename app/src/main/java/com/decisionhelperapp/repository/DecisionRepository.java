@@ -6,7 +6,6 @@ import com.decisionhelperapp.database.DatabaseHelper;
 import com.decisionhelperapp.database.QuestionDAO;
 import com.decisionhelperapp.database.QuizDAO;
 import com.decisionhelperapp.database.QuizQuestionsDAO;
-import com.decisionhelperapp.database.QuizUserDAO;
 import com.decisionhelperapp.database.ScoresDAO;
 import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.Question;
@@ -35,7 +34,6 @@ public class DecisionRepository {
         userDAO = new UserDAO();
         scoresDAO = new ScoresDAO();
         quizQuestionsDAO = new QuizQuestionsDAO();
-        new QuizUserDAO();
     }
 
     // User related methods

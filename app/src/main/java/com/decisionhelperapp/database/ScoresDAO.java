@@ -38,21 +38,9 @@ public class ScoresDAO {
                 });
     }
 
-    public void deleteScore(String id, final ActionCallback callback) {
-        db.collection(COLLECTION_NAME)
-            .document(id)
-            .delete()
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(callback::onFailure);
-    }
-
     public interface ScoresCallback {
         void onCallback(List<Scores> scoresList);
         void onFailure(Exception e);
     }
 
-    public interface ActionCallback {
-        void onSuccess();
-        void onFailure(Exception e);
-    }
 }
