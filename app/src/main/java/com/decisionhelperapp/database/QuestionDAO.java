@@ -31,6 +31,19 @@ public class QuestionDAO {
             });
     }
 
+    public void deleteQuestion(String id, final QuizDAO.ActionCallback callback) {
+        db.collection(Table_Question).document(id)
+            .delete()
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure(task.getException());
+                }
+            });
+    }
+
+
     public interface ActionCallback {
         void onSuccess();
         void onFailure(Exception e);

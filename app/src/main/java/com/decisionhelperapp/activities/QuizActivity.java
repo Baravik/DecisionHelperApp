@@ -14,6 +14,7 @@ import com.OpenU.decisionhelperapp.R;
 import com.decisionhelperapp.adapters.QuizAdapter;
 import com.decisionhelperapp.models.Quiz;
 import com.decisionhelperapp.viewmodel.QuizViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,21 +36,25 @@ public class QuizActivity extends BaseActivity {
         recyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
         emptyView = findViewById(R.id.emptyView);
-        userId = getIntent().getStringExtra("USER_ID");
+
+        // Get current user ID
+        userId = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getUid() :
+                getIntent().getStringExtra("USER_ID");
 
         // Set up recycler view
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize ViewModel
         quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
-        
+
         // Set up observers
         setupObservers();
-        
+
         // Load quizzes
         quizViewModel.loadAllQuizzes();
     }
-    
+
     private void setupObservers() {
         // Observe quiz list
         quizViewModel.getQuizList().observe(this, quizzes -> {
@@ -57,7 +62,7 @@ public class QuizActivity extends BaseActivity {
                 // Filter quizzes: public or created by current user
                 List<Quiz> filteredQuizzes = new ArrayList<>();
                 for (Quiz quiz : quizzes) {
-                    if (quiz.getIsPublic() || quiz.getUserId().equals(userId)) {
+                    if (quiz.getIsPublic() || (quiz.getUserId() != null && quiz.getUserId().equals(userId))) {
                         filteredQuizzes.add(quiz);
                     }
                 }
@@ -71,6 +76,14 @@ public class QuizActivity extends BaseActivity {
                             Toast.makeText(this, "Invalid quiz ID", Toast.LENGTH_SHORT).show();
                         }
                     });
+
+                    // Set up the delete listener for non-public quizzes
+                    quizAdapter.setOnQuizDeleteListener(quiz -> {
+                        // Delete quiz and its associated questions
+                        quizViewModel.deleteQuiz(quiz.getId());
+                        Toast.makeText(this, "Deleting quiz: " + quiz.getCustomTitle(), Toast.LENGTH_SHORT).show();
+                    });
+
                     recyclerView.setAdapter(quizAdapter);
                     recyclerView.setVisibility(View.VISIBLE);
                     emptyView.setVisibility(View.GONE);
@@ -83,22 +96,24 @@ public class QuizActivity extends BaseActivity {
                 emptyView.setVisibility(View.VISIBLE);
             }
         });
-        
+
         // Observe loading state
         quizViewModel.getIsLoading().observe(this, isLoading -> progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE));
-        
+
         // Observe errors
         quizViewModel.getErrorMessage().observe(this, errorMsg -> {
             if (errorMsg != null && !errorMsg.isEmpty()) {
                 Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         // Observe quiz status
         quizViewModel.getQuizStatus().observe(this, status -> {
-            // Could update a status text view here if needed
+            if (status != null && status.contains("deleted")) {
+                Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+            }
         });
-        
+
         // Observe current quiz
         quizViewModel.getCurrentQuiz().observe(this, quiz -> {
             if (quiz != null) {
@@ -114,7 +129,7 @@ public class QuizActivity extends BaseActivity {
                 // Start the TakeQuizActivity
                 startActivity(intent);
             } else {
-               // Handle case where quiz is null (optional)
+                // Handle case where quiz is null (optional)
                 Toast.makeText(this, "No quiz selected", Toast.LENGTH_SHORT).show();
             }
         });

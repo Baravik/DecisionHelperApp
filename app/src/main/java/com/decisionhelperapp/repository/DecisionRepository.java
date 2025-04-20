@@ -59,6 +59,9 @@ public class DecisionRepository {
     public void addQuiz(Quiz quiz, QuizDAO.ActionCallback callback) {
         quizDAO.addQuiz(quiz, callback);
     }
+    public void updateQuiz(Quiz quiz, QuizDAO.ActionCallback callback) {
+        quizDAO.updateQuiz(quiz, callback);
+    }
     public void addQuestion(Question question, QuestionDAO.ActionCallback callback) {
         questionDAO.addQuestion(question, callback);
     }
@@ -73,4 +76,21 @@ public class DecisionRepository {
     public void addQuizQuestion(QuizQuestions quizQuestion, String quizID,QuizQuestionsDAO.ActionCallback callback) {
         quizQuestionsDAO.addQuizQuestion(quizQuestion, quizID, callback);
     }
+
+    public void deleteQuestion(String id, QuizDAO.ActionCallback actionCallback) {
+        questionDAO.deleteQuestion(id, actionCallback);
+    }
+
+    public void deleteQuizQuestions(String quizId, QuizQuestionsDAO.ActionCallback quizDeletedSuccessfully) {
+        quizQuestionsDAO.deleteQuizQuestions(quizId, quizDeletedSuccessfully);
+    }
+
+    public void deleteQuiz(String quizId, QuizDAO.ActionCallback quizDeletedSuccessfully) {
+        quizDAO.deleteQuiz(quizId, quizDeletedSuccessfully);
+    }
+
+    public void deleteScore(String scoreId, ScoresDAO.ActionCallback scoreDeletedSuccessfully) {
+        scoresDAO.deleteScore(scoreId, scoreDeletedSuccessfully);
+    }
+
 }
