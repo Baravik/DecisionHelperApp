@@ -17,22 +17,6 @@ public class QuizQuestionsDAO {
         db = FirebaseFirestore.getInstance();
     }
 
-    public void getAllQuizQuestions(final QuizQuestionsCallback callback) {
-        db.collection(Table_QuizQuestions).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                List<QuizQuestions> quizQuestionsList = new ArrayList<>();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    QuizQuestions quizQuestions = document.toObject(QuizQuestions.class);
-                    // No need to set ID as we've removed this field
-                    quizQuestionsList.add(quizQuestions);
-                }
-                callback.onCallback(quizQuestionsList);
-            } else {
-                callback.onFailure(task.getException());
-            }
-        });
-    }
-
     // Get questions for a specific quiz - simplified to use document ID
     public void getQuestionsByQuizId(String quizId, final QuizQuestionsCallback callback) {
         // Since we're now using quizId as the document ID, we can get it directly
@@ -49,22 +33,6 @@ public class QuizQuestionsDAO {
                 }
                 callback.onCallback(quizQuestionsList);
             })
-            .addOnFailureListener(e -> callback.onFailure(e));
-    }
-
-    // Get a specific quiz question relationship (renamed to better reflect that quizId is the document ID)
-    public void getQuizQuestionsById(String quizId, final SingleQuizQuestionsCallback callback) {
-        db.collection(Table_QuizQuestions)
-            .document(quizId)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    QuizQuestions quizQuestions = documentSnapshot.toObject(QuizQuestions.class);
-                    callback.onCallback(quizQuestions);
-                } else {
-                    callback.onCallback(null);
-                }
-            })
             .addOnFailureListener(callback::onFailure);
     }
 
@@ -79,29 +47,6 @@ public class QuizQuestionsDAO {
         db.collection(Table_QuizQuestions)
             .document(quizId)
             .set(quizQuestions)
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(callback::onFailure);
-    }
-
-    // Update a quiz-questions relationship
-    public void updateQuizQuestions(QuizQuestions quizQuestions, String quizId, final ActionCallback callback) {
-        if (quizId == null || quizId.isEmpty()) {
-            callback.onFailure(new IllegalArgumentException("QuizId cannot be null or empty for update operation"));
-            return;
-        }
-
-        db.collection(Table_QuizQuestions)
-            .document(quizId)
-            .set(quizQuestions)
-            .addOnSuccessListener(aVoid -> callback.onSuccess())
-            .addOnFailureListener(callback::onFailure);
-    }
-
-    // Delete a quiz-questions relationship
-    public void deleteQuizQuestions(String id, final ActionCallback callback) {
-        db.collection(Table_QuizQuestions)
-            .document(id)
-            .delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess())
             .addOnFailureListener(callback::onFailure);
     }
@@ -161,11 +106,6 @@ public class QuizQuestionsDAO {
 
     public interface QuizQuestionsCallback {
         void onCallback(List<QuizQuestions> quizQuestionsList);
-        void onFailure(Exception e);
-    }
-
-    public interface SingleQuizQuestionsCallback {
-        void onCallback(QuizQuestions quizQuestions);
         void onFailure(Exception e);
     }
 

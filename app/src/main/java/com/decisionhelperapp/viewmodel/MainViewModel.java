@@ -30,10 +30,6 @@ public class MainViewModel extends AndroidViewModel {
         return currentUser;
     }
 
-    public LiveData<String> getCurrentUser() {
-        return currentUserName;
-    }
-
     public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
@@ -71,14 +67,5 @@ public class MainViewModel extends AndroidViewModel {
                 isLoading.postValue(false);
             }
         });
-    }
-
-    public void updateUser(String userName) {
-        currentUserName.postValue(userName);
-    }
-
-    public void setCurrentUser(User user) {
-        currentUser.postValue(user);
-        currentUserName.postValue(user != null ? user.getName() : "Guest");
     }
 }

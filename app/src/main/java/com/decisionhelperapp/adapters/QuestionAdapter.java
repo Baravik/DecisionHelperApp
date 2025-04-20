@@ -186,7 +186,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                     
                     // Set default Yes/No values
                     Question currentQuestion = questions.get(adapterPosition);
-                    StringBuilder descBuilder = getStringBuilder(currentQuestion);
+                    StringBuilder descBuilder = getStringBuilder();
                     currentQuestion.setDescription(descBuilder.toString().trim());
                     holder.radioYesFullScore.setChecked(true);
                 }
@@ -225,7 +225,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     }
 
     @NonNull
-    private static StringBuilder getStringBuilder(Question currentQuestion) {
+    private static StringBuilder getStringBuilder() {
         StringBuilder descBuilder = new StringBuilder();
 
         // Set Yes to 100% by default

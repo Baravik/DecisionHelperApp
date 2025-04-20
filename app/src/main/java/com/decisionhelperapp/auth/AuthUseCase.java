@@ -8,12 +8,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.decisionhelperapp.database.UserDAO;
 import com.decisionhelperapp.models.User;
 import com.decisionhelperapp.repository.DecisionRepository;
-import com.decisionhelperapp.utils.Utils;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.*;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.Objects;
 
 public class AuthUseCase {
@@ -66,7 +64,6 @@ public class AuthUseCase {
             public void onCallback(User user) {
                 if (user != null) {
                     Log.d("AuthUseCase", "✅ user found in Firestore: " + user.getEmail());
-                    user.setLastLoginDate(new Date());
                     repository.updateUser(user, new UserDAO.ActionCallback() {
                         public void onSuccess() {
                             Log.d("AuthUseCase", "📤 user updated");
@@ -88,8 +85,7 @@ public class AuthUseCase {
                         User fallbackUser = new User(
                                 firebaseUser.getEmail(),
                                 firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "User",
-                                firebaseUser.getUid(),
-                                "" // password hash or empty
+                                firebaseUser.getUid()
                         );
 
                         repository.addUser(fallbackUser, new UserDAO.ActionCallback() {
@@ -131,8 +127,7 @@ public class AuthUseCase {
                     if (task.isSuccessful()) {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
-                            String hashedPassword = Utils.hashPassword(password);
-                            User newUser = new User(email, name, firebaseUser.getUid(), hashedPassword);
+                            User newUser = new User(email, name, firebaseUser.getUid());
 
                             repository.addUser(newUser, new UserDAO.ActionCallback() {
                                 public void onSuccess() {
@@ -169,7 +164,7 @@ public class AuthUseCase {
                             String uid = firebaseUser.getUid();
                             String profileUrl = account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "";
 
-                            User user = new User(email, name, uid, profileUrl, true);
+                            User user = new User(email, name, uid, profileUrl);
                             repository.addUser(user, new UserDAO.ActionCallback() {
                                 public void onSuccess() {
                                     _loggedInUser.postValue(user);

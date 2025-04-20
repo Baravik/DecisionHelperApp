@@ -4,10 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
-import androidx.appcompat.view.menu.ActionMenuItemView;
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.NonNull;
 
 import com.OpenU.decisionhelperapp.R;
 import com.bumptech.glide.Glide;
@@ -16,8 +14,6 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Objects;
 
 public class MenuHelper {
 
@@ -38,7 +34,7 @@ public class MenuHelper {
                     .apply(RequestOptions.circleCropTransform())
                     .into(new CustomTarget<Drawable>() {
                         @Override
-                        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
                             userMenuItem.setIcon(resource);
                         }
 
