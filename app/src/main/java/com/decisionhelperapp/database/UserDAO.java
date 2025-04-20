@@ -4,10 +4,6 @@ import android.util.Log;
 
 import com.decisionhelperapp.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserDAO {
     private static final String TAG = "UserDAO";
@@ -16,25 +12,6 @@ public class UserDAO {
 
     public UserDAO() {
         db = FirebaseFirestore.getInstance();
-    }
-
-    // Retrieve all users in the collection
-    public void getAllUsers(final UserCallback callback) {
-        db.collection(COLLECTION_NAME)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<User> userList = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            User user = document.toObject(User.class);
-                            userList.add(user);
-                        }
-                        callback.onCallback(userList);
-                    } else {
-                        Log.e(TAG, "❌ Failed to get all users", task.getException());
-                        callback.onFailure(task.getException());
-                    }
-                });
     }
 
     // Retrieve a single user by Firestore document ID (must match Firebase UID)
@@ -55,28 +32,6 @@ public class UserDAO {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "❌ Failed to fetch user by ID", e);
                     callback.onFailure(e);
-                });
-    }
-
-    // Retrieve user by email (e.g. for Google Sign-In fallback)
-    public void getUserByEmail(String email, final SingleUserCallback callback) {
-        Log.d(TAG, "🔍 Fetching user by email: " + email);
-        db.collection(COLLECTION_NAME)
-                .whereEqualTo("email", email)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        User user = task.getResult().getDocuments().get(0).toObject(User.class);
-                        assert user != null;
-                        Log.d(TAG, "✅ User found by email: " + user.getEmail());
-                        callback.onCallback(user);
-                    } else if (task.isSuccessful()) {
-                        Log.w(TAG, "⚠️ No user found with email: " + email);
-                        callback.onCallback(null);
-                    } else {
-                        Log.e(TAG, "❌ Failed to fetch user by email", task.getException());
-                        callback.onFailure(task.getException());
-                    }
                 });
     }
 
@@ -122,28 +77,6 @@ public class UserDAO {
                     Log.e(TAG, "❌ Failed to update user", e);
                     callback.onFailure(e);
                 });
-    }
-
-    // Delete user by ID
-    public void deleteUser(String id, final ActionCallback callback) {
-        Log.d(TAG, "🗑️ Deleting user with ID: " + id);
-        db.collection(COLLECTION_NAME)
-                .document(id)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "✅ User deleted");
-                    callback.onSuccess();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "❌ Failed to delete user", e);
-                    callback.onFailure(e);
-                });
-    }
-
-    // Callback interfaces
-    public interface UserCallback {
-        void onCallback(List<User> userList);
-        void onFailure(Exception e);
     }
 
     public interface SingleUserCallback {
