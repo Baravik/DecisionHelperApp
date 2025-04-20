@@ -11,18 +11,16 @@ public class Quiz {
     private String customTitle;
     private String userId;
     private int score;
-    private String completedAt;
-    
+
     @PropertyName("isPublic")
     private boolean isPublic;
 
-    public Quiz(String id, String description, String customTitle, String userId, int score, String completedAt, boolean isPublic) {
+    public Quiz(String id, String description, String customTitle, String userId, int score, boolean isPublic) {
         this.id = id;
         this.description = description;
         this.customTitle = customTitle;
         this.userId = userId;
         this.score = score;
-        this.completedAt = completedAt;
         this.isPublic = isPublic;
     }
 
@@ -38,16 +36,8 @@ public class Quiz {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getCustomTitle() {
         return customTitle;
-    }
-
-    public void setCustomTitle(String customTitle) {
-        this.customTitle = customTitle;
     }
 
     public String getUserId() {
@@ -66,21 +56,9 @@ public class Quiz {
         this.score = score;
     }
 
-    public String getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(String completedAt) {
-        this.completedAt = completedAt;
-    }
-    
     @PropertyName("isPublic")
     public boolean getIsPublic() {
         return isPublic;
     }
 
-    @PropertyName("isPublic")
-    public void setIsPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
 }

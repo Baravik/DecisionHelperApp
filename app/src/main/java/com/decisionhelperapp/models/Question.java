@@ -108,53 +108,6 @@ public class Question implements Parcelable {
         return answers;
     }
 
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
-    }
-
-    public void addAnswer(Answer answer) {
-        if (this.answers == null) {
-            this.answers = new ArrayList<>();
-        }
-        this.answers.add(answer);
-    }
-
-    public void updateAnswerPercentages() {
-        if (answers == null || answers.isEmpty()) {
-            return;
-        }
-        
-        StringBuilder newDescription = new StringBuilder();
-        
-        // Preserve image information if it exists
-        if (description != null && description.contains("has_image:true")) {
-            String[] lines = description.split("\n");
-            for (String line : lines) {
-                if (line.startsWith("has_image:") || line.startsWith("image_url:")) {
-                    newDescription.append(line).append("\n");
-                }
-            }
-        }
-        
-        // Add yes/no information if it exists
-        if (description != null && description.contains("yes_full_score:")) {
-            String[] lines = description.split("\n");
-            for (String line : lines) {
-                if (line.startsWith("yes_full_score:")) {
-                    newDescription.append(line).append("\n");
-                }
-            }
-        }
-        
-        // Convert answers to description format
-        for (Answer answer : answers) {
-            newDescription.append("option:").append(answer.getText()).append("\n");
-            newDescription.append("percentage:").append(answer.getPercentage()).append("\n");
-        }
-        
-        this.description = newDescription.toString().trim();
-    }
-
     public void loadAnswersFromDescription() {
         if (description == null || description.isEmpty()) {
             return;
@@ -229,10 +182,6 @@ public class Question implements Parcelable {
 
         public int getPercentage() {
             return percentage;
-        }
-
-        public void setPercentage(int percentage) {
-            this.percentage = percentage;
         }
 
         @Override

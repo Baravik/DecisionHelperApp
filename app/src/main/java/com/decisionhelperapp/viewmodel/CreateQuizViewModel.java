@@ -250,7 +250,6 @@ public class CreateQuizViewModel extends AndroidViewModel {
                 name,
                 userId,
                 0,  // Default score
-                "",  // Completed at will be empty for new quiz
                 isPublic  // Include isPublic status directly in the Quiz object
         );
         
