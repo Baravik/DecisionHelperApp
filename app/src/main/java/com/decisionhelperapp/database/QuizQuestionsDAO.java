@@ -104,6 +104,14 @@ public class QuizQuestionsDAO {
         addQuizQuestions(quizQuestion, quizID, callback);
     }
 
+    public void deleteQuizQuestions(String quizId, final ActionCallback quizDeletedSuccessfully) {
+        db.collection(Table_QuizQuestions)
+            .document(quizId)
+            .delete()
+            .addOnSuccessListener(aVoid -> quizDeletedSuccessfully.onSuccess())
+            .addOnFailureListener(quizDeletedSuccessfully::onFailure);
+    }
+
     public interface QuizQuestionsCallback {
         void onCallback(List<QuizQuestions> quizQuestionsList);
         void onFailure(Exception e);

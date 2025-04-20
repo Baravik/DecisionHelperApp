@@ -38,8 +38,28 @@ public class ScoresDAO {
                 });
     }
 
+    public void deleteScore(String scoreId, final ActionCallback scoreDeletedSuccessfully) {
+        String currentUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
+        db.collection(COLLECTION_NAME)
+                .document(scoreId)
+                .delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        scoreDeletedSuccessfully.onSuccess();
+                    } else {
+                        scoreDeletedSuccessfully.onFailure(task.getException());
+                    }
+                });
+    }
+
     public interface ScoresCallback {
         void onCallback(List<Scores> scoresList);
+        void onFailure(Exception e);
+    }
+
+    public interface ActionCallback {
+        void onSuccess();
         void onFailure(Exception e);
     }
 
